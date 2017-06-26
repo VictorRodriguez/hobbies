@@ -1,4 +1,4 @@
-
+from random import randint
 SIZE = 8
 
 queens = [1,2,3,4,5,6,7,8]
@@ -18,8 +18,15 @@ def draw_board():
         row = row +1
 
 draw_board()
-queens = [1,2,3,2,5,3,7,1]
-print
+
+index=0;
+while index <  len(queens):
+    queens[index] = randint(0,7)
+    index= index+1
+
+
+print queens
+
 draw_board()
 
 
