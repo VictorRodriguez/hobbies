@@ -1,0 +1,3 @@
+ram1,RAM1
+ram2,RAM2
+ram3,RAM3

@@ -1,0 +1,3 @@
+cpu1,CPU1
+cpu2,CPU2
+cpu3,CPU3
