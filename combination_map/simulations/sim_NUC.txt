@@ -1,1 +1,7 @@
+plat_name:NUC
 plat_fname:configs/Platform_NUC.txt
+cpu_name:i3
+cpu_fname:configs/i3.txt
+memories_kind:ddr3,ddr2,ddr1
+memories_size:8G,16G,32G
+memories_brand:Kingston,ADATA
