@@ -1,0 +1,5 @@
+kind:platform
+model:nuc
+no_soquets:2
+no_mem_dims:4
+no_sata_dims:4
