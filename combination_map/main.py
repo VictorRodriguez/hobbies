@@ -16,6 +16,7 @@ print("Platform Model: %s" % platform.model)
 print("# soquets: %s" % platform.no_soquets)
 print("# memo dims: %s" % platform.no_mem_dims)
 print("# sata dims: %s" % platform.no_sata_dims)
+print("# oculink ports: %s" % platform.no_oculink_ports)
 
 # cpu
 print("CPU name: %s" % sim.cpu_name)
@@ -28,3 +29,17 @@ print("Memories size: %s" % sim.memories_size)
 
 # memories kind
 print("Memories brand: %s" % sim.memories_brand)
+
+
+# create trees of slots of cpu 
+# create trees of slots of mmeory 
+# create trees of slots of HD
+#
+# each leave of teh tree will have a conection to the next tree kind
+#
+# that will link to all the posibilities of sub threas that you coudl have 
+#
+# after the threa is conected 
+# then calculate all the posibilities
+# rules is cleaning all the leaves that do not apply in a fast way
+

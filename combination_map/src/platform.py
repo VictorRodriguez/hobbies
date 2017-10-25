@@ -19,4 +19,5 @@ class Platform:
                 self.no_mem_dims = value
             if key == "no_sata_dims":
                 self.no_sata_dims = value
-
+            if key == "no_oculink_ports":
+                self.no_oculink_ports = value
