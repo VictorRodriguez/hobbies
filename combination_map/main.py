@@ -4,18 +4,8 @@ from src.read_config import ReadConfig
 import argparse
 import os.path
 import sys
-
-# create trees of slots of cpu 
-# create trees of slots of mmeory 
-# create trees of slots of HD
-#
-# each leave of teh tree will have a conection to the next tree kind
-#
-# that will link to all the posibilities of sub threas that you coudl have 
-#
-# after the threa is conected 
-# then calculate all the posibilities
-# rules is cleaning all the leaves that do not apply in a fast way
+import pprint
+import numpy as np
 
 if __name__ == "__main__":
 
@@ -34,27 +24,36 @@ if __name__ == "__main__":
         sim_obj = ReadConfig(sim_file)
         sim_obj.load_simulation_values()
         sim_files = sim_obj.get_sim_files()
-        print(sim_files)
     else:
         print("ERROR: File %s does not exist",sim_file)
         sys.exit(-1)
+
+    # main db 
+    db_dic = {}
+
+    #array of size of elements per component
+    comp_len_array = []
 
     for comp,file_path in sim_files.items():
         if os.path.isfile(file_path):
             # create array of dictionaries to combine
             db_obj = ReadConfig(file_path)
             db_obj.load_db_values()
-            print(comp)
-            print(file_path)
-            print(db_obj.get_comp_items())
+            comp_len_array.append(len(db_obj.get_comp_items()))
+            # put the array in a dictionary to don't loose it
+            db_dic[comp] = db_obj.get_comp_items()
+
         else:
             print("WARNING: File %s does not exist",file_path)
             pass
 
-    # combine and create tree
-    #
+    pprint.pprint(db_dic)
 
+    # combine and create tree
+    combination = np.array(np.meshgrid(*[np.arange(1, x+1) for x in \
+            comp_len_array])).T.reshape(-1,len(comp_len_array))
+
+    print(combination)
 
     # apply rules, walk over teh tree as fast as possible
     #
-
