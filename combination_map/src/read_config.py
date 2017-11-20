@@ -19,6 +19,7 @@ class ReadConfig:
 
     def load_db_values(self):
         array_fields = []
+        self.db_array = []
         with open(self.fname) as f:
                 content = f.readlines()
         for line in content:
@@ -33,6 +34,14 @@ class ReadConfig:
                 if len(array_fields) and len(array_values):
                     if len(array_values) == len(array_fields):
                         tmp_dic = dict(zip(array_fields, array_values))
+                    else:
+                        print("ERROR: arrays != size")
+                        print("ERROR: len(array_fields) = %s" % len(array_fields))
+                        print("ERROR: len(array_values) = %s" % len(array_values))
+                else:
+                    print("ERROR: array = 0")
+                    print("ERROR: len(array_fields) = %s" % len(array_fields))
+                    print("ERROR: len(array_values) = %s" % len(array_values))
             self.db_array.append(tmp_dic)
         self.db_array = filter(None,self.db_array)
 
