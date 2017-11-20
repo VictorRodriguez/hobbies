@@ -1,13 +1,43 @@
-
 class ReadConfig:
-    d = {}
+    sim_dic = {}
+    db_array = []
+
     def __init__(self,fname):
-        with open(fname) as f:
+        self.fname = fname
+        
+
+    def load_simulation_values(self):
+        with open(self.fname) as f:
                 content = f.readlines()
         for line in content:
-            key=line.split(":")[0].strip()
-            value=line.split(":")[1].strip()
-            self.d[key] = value
+            if line.startswith('#') or line.startswith("//"):
+                pass
+            elif ":" in line:
+                key=line.split(":")[0].strip()
+                value=line.split(":")[1].strip()
+                self.sim_dic[key] = value
 
-    def get_values(self):
-        return self.d
+    def load_db_values(self):
+        array_fields = []
+        with open(self.fname) as f:
+                content = f.readlines()
+        for line in content:
+            tmp_dic = {}
+            array_values = []
+            if line.startswith('#') or line.startswith("//"):
+                pass
+            elif "ID" in line:
+                array_fields = filter(None,line.strip().split(","))
+            else:
+                array_values = filter(None,line.strip().split(","))
+                if len(array_fields) and len(array_values):
+                    if len(array_values) == len(array_fields):
+                        tmp_dic = dict(zip(array_fields, array_values))
+            self.db_array.append(tmp_dic)
+        self.db_array = filter(None,self.db_array)
+
+    def get_comp_items(self):
+        return self.db_array
+
+    def get_sim_files(self):
+        return self.sim_dic

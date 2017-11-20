@@ -5,8 +5,7 @@ class Simulation:
     def __init__(self,fname):
 
         self.filename = fname
-        config_file = ReadConfig(self.filename)
-        dictionary = config_file.get_values()
+        dictionary = ReadConfig(self.filename).get_values()
         
         for key, value in dictionary.iteritems():
             if key == "plat_name":
