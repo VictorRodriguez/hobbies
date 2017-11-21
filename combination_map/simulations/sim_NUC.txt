@@ -1,7 +1,6 @@
-plat_name:NUC
-plat_fname:configs/Platform_NUC.txt
-cpu_name:i3
-cpu_fname:configs/i3.txt
-memories_kind:ddr3,ddr2,ddr1
-memories_size:8G,16G,32G
-memories_brand:Kingston,ADATA
+#plat_name:NUC
+#boards_file:configs_nora/configs/Boards.txt
+#cpus_file:configs_nora/configs/CPU.txt
+#memories_file:configs_nora/configs/Memory1.txt
+hsbps_file:configs_nora/configs/HSBP.txt
+psus_file:configs_nora/configs/PSU.txt
