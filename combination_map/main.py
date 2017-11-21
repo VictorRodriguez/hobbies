@@ -6,7 +6,31 @@ import os.path
 import sys
 import pprint
 import numpy as np
+import csv
 
+def write_to_csv(array,file_path):
+    with open(file_path, 'a') as csv_file:
+        writer = csv.writer(csv_file)
+        writer.writerow(array)
+
+def get_db_value_str(id_value,component,db_dic):
+    value = "NONE"
+    #print("\n")
+    #print("id_value = %s" % id_value)
+    #print("components = %s" % component)
+    for k,v in db_dic.items():
+        if k == component:
+            for tmp_dic in v:
+                if str(tmp_dic.get("ID")) == str(id_value):
+                    value = (''.join(['{0}_{1}_'.format(key.strip(),\
+                            val.strip()) for key,val in tmp_dic.iteritems()]))
+                    value = value.replace(" ", "_")
+                else:
+                    pass
+        else:
+            pass
+    return value
+        
 if __name__ == "__main__":
 
     sim_file = "simulations/sim_NUC.txt"
@@ -62,5 +86,24 @@ if __name__ == "__main__":
     print("Total # combinations:")
     print(len(combination))
 
+    # convert to csv file with proper names
+    open("sample.csv", 'w').close()
+    tmp_row = []
+    for k,v in db_dic.items():
+        tmp_row.append(str(k.replace("file", "")))
+    write_to_csv(tmp_row,"sample.csv")
+
+    for line in combination:
+        tmp_row = []
+        cnt = 0
+        for id_value in line:
+            component = db_dic.keys()[cnt]
+            str_value = get_db_value_str(id_value,component,db_dic)
+            cnt+=1
+            tmp_row.append(str_value)
+        write_to_csv(tmp_row,"sample.csv")
+
     # apply rules, walk over teh tree as fast as possible
     #
+    #
+
