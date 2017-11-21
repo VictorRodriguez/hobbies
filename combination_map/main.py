@@ -32,14 +32,14 @@ if __name__ == "__main__":
     db_dic = {}
 
     #array of size of elements per component
-    comp_len_array = []
+    comp_len_dic = {}
 
     for comp,file_path in sim_files.items():
         if os.path.isfile(file_path):
             # create array of dictionaries to combine
             db_obj = ReadConfig(file_path)
             db_obj.load_db_values()
-            comp_len_array.append(len(db_obj.get_comp_items()))
+            comp_len_dic[comp]= (len(db_obj.get_comp_items()))
             # put the array in a dictionary to don't loose it
             db_dic[comp] = db_obj.get_comp_items()
 
@@ -50,10 +50,17 @@ if __name__ == "__main__":
     pprint.pprint(db_dic)
 
     # combine and create tree
-    combination = np.array(np.meshgrid(*[np.arange(1, x+1) for x in \
-            comp_len_array])).T.reshape(-1,len(comp_len_array))
+    combination = np.array(np.meshgrid(*[np.arange(1, x+1) for k,x in \
+            comp_len_dic.items()])).T.reshape(-1,len(comp_len_dic))
 
+    print("\n")
+    print("Combinations tree:")
+    print(''.join(['{0},'.format(k) for k,v in comp_len_dic.iteritems()]))
     print(combination)
+
+    print("\n")
+    print("Total # combinations:")
+    print(len(combination))
 
     # apply rules, walk over teh tree as fast as possible
     #

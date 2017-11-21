@@ -35,11 +35,13 @@ class ReadConfig:
                     if len(array_values) == len(array_fields):
                         tmp_dic = dict(zip(array_fields, array_values))
                     else:
-                        print("ERROR: arrays != size")
+                        print("ERROR: in %s arrays != size" % self.fname)
+                        print("ERROR: in line: %s" % line.strip())
                         print("ERROR: len(array_fields) = %s" % len(array_fields))
                         print("ERROR: len(array_values) = %s" % len(array_values))
                 else:
-                    print("ERROR: array = 0")
+                    print("ERROR: in % array = 0" % self.fname)
+                    print("ERROR: in line: %s" % line.strip())
                     print("ERROR: len(array_fields) = %s" % len(array_fields))
                     print("ERROR: len(array_values) = %s" % len(array_values))
             self.db_array.append(tmp_dic)
