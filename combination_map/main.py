@@ -1,5 +1,3 @@
-from src.platform import Platform
-from src.simulation import Simulation
 from src.read_config import ReadConfig
 import argparse
 import os.path
