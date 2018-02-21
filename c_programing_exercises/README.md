@@ -19,8 +19,7 @@ Install any compiler that could be reached by command line like gcc or llvm:
 https://gcc.gnu.org/install/
 
 * Ubuntu: 
-
-'''
+```
 sudo apt-get install build-essential
-'''
+```
 
