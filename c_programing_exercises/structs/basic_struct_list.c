@@ -29,7 +29,7 @@ typedef struct LinkedList *node; //Define node as pointer of data type struct Li
 
 
 void print_list(node p){
-    while(p->next != NULL){
+    while(p != NULL){
         printf ( "%d\n",p->data );
         p = p->next;
     }
@@ -67,7 +67,7 @@ int main ( int argc, char *argv[] ){
         head = addNode(head,i);
     }
     
-    print_list(head);
+   print_list(head);
 
     return 0;
 }
