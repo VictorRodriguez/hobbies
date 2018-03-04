@@ -11,7 +11,9 @@
  *       Compiler:  gcc
  *
  *         Author:  Victor Rodriguez (), vm.rod25@gmail.com
- *   Organization:  
+ *       Based on:
+ *       https://www.geeksforgeeks.org/sorting-algorithms/#Basic
+ *       https://www.geeksforgeeks.org/insertion-sort-for-singly-linked-list/
  *
  * =====================================================================================
  */
@@ -27,12 +29,63 @@ struct LinkedList {
 
 typedef struct LinkedList *node; //Define node as pointer of data type struct LinkedList
 
+/* function to insert a new_node in a list. Note that this
+  function expects a pointer to head_ref as this can modify the
+  head of the input linked list (similar to push())*/
+void sortedInsert(struct LinkedList** head_ref, struct LinkedList* new_node)
+{
+    struct LinkedList* current;
+    /* Special case for the head end */
+    if (*head_ref == NULL || (*head_ref)->data >= new_node->data)
+    {
+        new_node->next = *head_ref;
+        *head_ref = new_node;
+    }
+    else
+    {
+        /* Locate the node before the point of insertion */
+        current = *head_ref;
+        while (current->next!=NULL &&
+               current->next->data < new_node->data)
+        {
+            current = current->next;
+        }
+        new_node->next = current->next;
+        current->next = new_node;
+    }
+}
+// function to sort a singly linked list using insertion sort
+void insertionSort(struct LinkedList **head_ref)
+{
+    // Initialize sorted linked list
+    struct LinkedList *sorted = NULL;
+ 
+    // Traverse the given linked list and insert every
+    // node to sorted
+    struct LinkedList *current = *head_ref;
+    while (current != NULL)
+    {
+        // Store next for next iteration
+        struct LinkedList *next = current->next;
+ 
+        // insert current in sorted linked list
+        sortedInsert(&sorted, current);
+ 
+        // Update current
+        current = next;
+    }
+ 
+    // Update head_ref to point to sorted linked list
+    *head_ref = sorted;
+}
+
 
 void print_list(node p){
     while(p != NULL){
         printf ( "%d\n",p->data );
         p = p->next;
     }
+    printf("\n");
 }
 
 node createNode(){
@@ -71,7 +124,12 @@ int main ( int argc, char *argv[] ){
         r = rand() % 10 + 1;
         head = addNode(head,r);
     }
-    
+   
+   printf("Random: \n");
+   print_list(head);
+
+   printf("Sorted: \n");
+   insertionSort(&head);
    print_list(head);
 
     return 0;
