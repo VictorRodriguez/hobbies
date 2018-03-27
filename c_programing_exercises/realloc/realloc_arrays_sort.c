@@ -35,9 +35,9 @@ int cmpfunc (const void * a, const void * b) {
 
 void addnode(struct process *p)
 {
-	numproc++;
+    numproc++;
     allprocs = realloc(allprocs,numproc*sizeof(struct process));
-	allprocs[numproc-1]=*p;
+    allprocs[numproc-1]=*p;
 }
 
 void print_list(){
