@@ -20,17 +20,17 @@ with open('log') as f:
                 list_pkgs_avx512.append(pgk)
     print()
     print("packages with avx2")
-    for element in set(list_pkgs_avx2):
+    for element in sorted(set(list_pkgs_avx2)):
         print (element)
 
     print()
     print("packages with avx512")
-    for element in set(list_pkgs_avx512):
+    for element in sorted(set(list_pkgs_avx512)):
         print (element)
 
     print()
     print("packages w avx2 but no avx512")
-    for element in list(set(list_pkgs_avx2) - set(list_pkgs_avx512)):
+    for element in sorted(list(set(list_pkgs_avx2) - set(list_pkgs_avx512))):
         print(element)
         
 
