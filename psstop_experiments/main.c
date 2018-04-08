@@ -49,6 +49,16 @@ struct process {
 
 struct process *allprocs=NULL;
 int numproc=0;
+            
+void do_csv_report(){
+    struct process *p = allprocs;
+    FILE * fp;
+    fp = fopen ("report.csv", "w+");
+    for (int i=0 ; i<numproc; i++){
+        fprintf(fp,"%-20s,%-5i,%-5"PRIu64",Kb\n", p[i].name ,p[i].pid, p[i].PSS_kb);
+    }
+    fclose(fp);
+}
 
 int cmpfunc (const void * a, const void * b) {
     struct process *s_a = (struct process *)a;
@@ -152,6 +162,7 @@ void print_help(){
     printf("    -h : Print this help\n");
     printf("    -p : Process name to measure memory usage\n");
     printf("    -c : Use cmdline for process name\n");
+    printf("    -r : Generate .csv and .html report\n");
     printf(" \n");
 }
 
@@ -163,14 +174,18 @@ int main(int argc, char **argv)
     struct process process;
 
     int c = 0;
+    int report =0;
 
-    while ((c = getopt (argc, argv, "chp:")) != -1){
+    while ((c = getopt (argc, argv, "crhp:")) != -1){
         switch (c) {
             case 'c':
                 use_cmdline = 1;
                 break;
             case 'p':
                 searchkey = strdup(optarg);
+                break;
+            case 'r':
+                report = 1;
                 break;
             case 'h':
                 print_help();
@@ -204,6 +219,9 @@ int main(int argc, char **argv)
         qsort(allprocs,total_proc,sizeof(process), cmpfunc);
         print_list();
         printf("\nTotal is %" PRIu64 "Kb (%i processes)\n", total_PSS, total_proc);
+        if (report){
+            do_csv_report();
+        }
         closedir(dir);
         free(searchkey);
         return EXIT_SUCCESS;
