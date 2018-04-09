@@ -49,7 +49,7 @@ struct process {
 
 struct process *allprocs=NULL;
 int numproc=0;
-            
+
 void do_html_report(){
     struct process *p = allprocs;
     FILE * fp;
@@ -58,13 +58,13 @@ void do_html_report(){
     fprintf(fp,"<html>\n<body>\n<h1>PSSTOP Report</h1>");
     fprintf(fp,"<svg class='chart' width='1000' height='%d'\n",(numproc *35));
     fprintf(fp,"aria-labelledby='title desc' role='img'>\n");
-    
+
     for (int i=0 ; i<numproc; i++){
         fprintf(fp,"<g class='bar'>\n");
         fprintf(fp,"<rect width='%d' height='10' x=100 y='%d'"\
             ,p[i].PSS_kb/NORMALIZATION,(i+1)*30);
         fprintf(fp,"style='fill:rgb(66,179,244)'/>\n");
-        
+
         fprintf(fp,"<text x='0' y='%d' dy='.35em'>%s</text>\n"\
             ,((i+1)*30),p[i].name);
 
