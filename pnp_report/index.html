@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
+</style>
+</head>
+<body>
+
+<h2>PNP report</h2>
+
+<h3>Broken Tests</h3>
+<table>
+  <tr>
+    <th>Test Name</th>
+    <th>Status</th>
+    <th>Owner</th>
+    <th>Build detected</th>
+    <th>Date detected</th>
+    <th>Builds w/o fix</th>
+  </tr>
+  <tr>
+    <td>pts/testb</td>
+    <td>WORKING LOCAL MACHINE</td>
+    <td>Victor R</td>
+    <td>21870</td>
+    <td>21/04/18</td>
+    <td>10</td>
+  </tr>
+  <tr>
+    <td>pts/testc</td>
+    <td>FIXED</td>
+    <td>Juan A</td>
+    <td>21870</td>
+    <td>21/04/18</td>
+    <td>20</td>
+  </tr>
+</table>
+
+<h3>Regresions</h3>
+<table>
+  <tr>
+    <th>Test Name</th>
+    <th>% degradation</th>
+    <th>Status</th>
+    <th>Owner</th>
+    <th>Build detected</th>
+    <th>Builds w/o fix</th>
+  </tr>
+  <tr>
+    <td>pts/testd</td>
+    <td>-20%</td>
+    <td>WIP</td>
+    <td>Luis C</td>
+    <td>21870</td>
+    <td>10</td>
+  </tr>
+</table>
+</body>
+</html>
+
