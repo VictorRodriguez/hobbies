@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template
 app = Flask(__name__)
 
+from PNP_api import PNP_api
 import requests
 from bs4 import BeautifulSoup
 import datetime
@@ -11,6 +12,11 @@ def hello():
 
     build_url="https://download.clearlinux.org/current/latest"
     current_build = requests.get(build_url).text
+    
+    pnp_api = PNP_api()
+    pnp_api.set_current_build(current_build)
+    test_list = pnp_api.get_all_tests()
+    #latest_test_list = pnp_api.get_latest_run_tests()
 
     now = datetime.datetime.now()
     date = now.strftime("%Y-%m-%d")
@@ -18,7 +24,7 @@ def hello():
     status = get_status()
 
     render = render_template('index.html', \
-            current_build=current_build, \
+            current_build=pnp_api.current_build, \
             date=date,\
             status=status)
     
