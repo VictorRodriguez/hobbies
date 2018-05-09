@@ -1,9 +1,9 @@
 #!/bin/bash
 
 
-# minimal packages to build a inux system , taken from : 
+# minimal packages to build a linux system , taken from :
 # http://www.linuxfromscratch.org/lfs/view/6.6/index.html
-# systemd is exrta, but is evil when gcc change :) 
+# systemd is exrta, but is evil when gcc change :)
 
 declare -a arr=("binutils"\
     "gcc" \
@@ -46,9 +46,8 @@ declare -a arr=("binutils"\
     "systemd" \
     )
 
-
 function build_lfs() {
-for package in "${arr[@]}" 
+for package in "${arr[@]}"
 do
     build $package
 done
@@ -64,17 +63,23 @@ done
 
 function build(){
     if [ -d "packages/$1" ]; then
-        echo 
+        echo
         echo "  Building packages/$1"
-        echo 
+        echo
         pushd packages/$1
             make &> build_out.log
             if [ $? -eq 1 ]
             then
-                echo 
+                echo
                 echo "ERROR: $1 not building, time to debug"
-                echo 
+                echo
                 echo $1 >> ~/failing_pkgs.log
+            else
+                echo
+                echo "Copy RPMS to repo"
+                echo
+                cp results/*.rpm /home/repo
+                createrepo_c /home/repo
             fi
         popd
     else
@@ -85,3 +90,4 @@ function build(){
 }
 
 build_lfs
+
