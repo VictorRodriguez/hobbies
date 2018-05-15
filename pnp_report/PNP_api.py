@@ -2,9 +2,11 @@ import urllib.request, json
 import requests
 from bs4 import BeautifulSoup
 
-from urls import *
+#from urls import *
 
 class PNP_api:
+    API_URL = "https://clearlinux-resultsboard.zpn.intel.com/api/" 
+
     def __init__(self):
         self.current_build = 0
 
@@ -15,7 +17,7 @@ class PNP_api:
 
         test_list = []
 
-        with urllib.request.urlopen(alltest_url) as url:
+        with urllib.request.urlopen(PNP_api.API_URL+"test") as url:
             data = json.loads(url.read().decode())
 
         for item in data:
