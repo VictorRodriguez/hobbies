@@ -4,6 +4,7 @@ list_pkgs_avx512 = []
 pkg = ""
 
 import os
+import csv
 
 #os.system("grep -R '/haswell/' &> log")
 
@@ -22,6 +23,20 @@ with open('log') as f:
     print("packages with avx2")
     for element in sorted(set(list_pkgs_avx2)):
         print (element)
+        tmp = []
+        if element in list_pkgs_avx512:
+            with open('log.csv', 'w') as myfile:
+                wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
+                tmp.append(element)
+                tmp.append(element)
+                print(tmp)
+                wr.writerow(tmp)
+        else:
+            with open('log.csv', 'w') as myfile:
+                wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
+                tmp.append(element)
+                tmp.append(element)
+                wr.writerow(tmp)
 
     print()
     print("packages with avx512")
