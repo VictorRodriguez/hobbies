@@ -25,17 +25,17 @@ with open('log') as f:
         print (element)
         tmp = []
         if element in list_pkgs_avx512:
-            with open('log.csv', 'w') as myfile:
+            with open('log.csv', 'a') as myfile:
                 wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
                 tmp.append(element)
                 tmp.append(element)
                 print(tmp)
                 wr.writerow(tmp)
         else:
-            with open('log.csv', 'w') as myfile:
+            with open('log.csv', 'a') as myfile:
                 wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
                 tmp.append(element)
-                tmp.append(element)
+                tmp.append("")
                 wr.writerow(tmp)
 
     print()
