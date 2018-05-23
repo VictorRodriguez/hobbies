@@ -7,17 +7,6 @@ from distutils.version import LooseVersion
 pts_test_repo="https://github.com/phoronix-test-suite/test-profiles.git"
 build_url = "https://download.clearlinux.org/current/latest"
 
-def test_latest_versions(tests):
-    test_map = {}
-    for test in tests:
-        version = test.split("-")[-1]
-        name = test[:-(len(version)+1)]
-        test_map.setdefault(name, []).append(version)
-    latest = []
-    for name, versions in test_map.items():
-        latest.append("{}-{}".format(name, sorted(versions, key=LooseVersion)[-1]))
-    return latest
-
 def main():
 
     current_build = requests.get(build_url).text.strip()
@@ -25,7 +14,7 @@ def main():
 
     pnp_api = PNP_api()
     pnp_api.set_current_build(current_build)
-    pnp_tests = sorted(test_latest_versions(pnp_api.get_all_tests()))
+    pnp_tests = pnp_api.get_all_tests()
 
     if(os.path.isdir("test-profiles")):
         os.system("rm -rf test-profiles")
@@ -34,9 +23,9 @@ def main():
     phoronix_tests = []
     for prefix in ["pts", "system"]:
         for test in os.listdir(os.path.join("test-profiles", prefix)):
-            phoronix_tests.append(os.path.join(prefix, test))
-    phoronix_tests = sorted(test_latest_versions(phoronix_tests))
-
+            version = test.split("-")[-1]
+            name = test[:-(len(version)+1)]
+            phoronix_tests.append(os.path.join(prefix, name))
 
     missing = set(phoronix_tests) - set(pnp_tests)
     print("Missing tests:")
