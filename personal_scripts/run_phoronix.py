@@ -3,22 +3,19 @@ import os
 import sys
 import argparse
 import datetime
+import subprocess
 import socket
+import getpass
 
-if __name__ == "__main__":
+def debug_log():
 
-    cmd = ""
+    test_name = args.test.split("/")[1]
+    ip = socket.gethostbyname(socket.gethostname())
+    datetime = str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))
 
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument("--test", help="Test name ",\
-            type=str,dest='test',required=True)
-    parser.add_argument("--logpath", help="Path where to save logfiles",\
-            type=str,dest='logpath')
-    parser.add_argument("--verbose", help="Verbose",\
-             dest="verbose", action="store_true")
-
-    args = parser.parse_args()
+    result_name = "%s-%s-%s" % (test_name,ip,datetime)
+    result_identifier = result_name
+    result_description = result_name
 
     """
     Documentation:
@@ -42,84 +39,84 @@ if __name__ == "__main__":
             as the test results description when saving \
             the test results.
     """
+    os.environ['TEST_RESULTS_NAME'] = result_name
+    os.environ['TEST_RESULTS_IDENTIFIER'] = result_identifier
+    os.environ['TEST_RESULTS_DESCRIPTION'] = result_description
 
+    print("\n Variables \n")
+    print(test_name)
+    print(ip)
+    print(datetime)
 
-    test_name = args.test.split("/")[1]
-    ip = socket.gethostbyname(socket.gethostname())
-    datetime = str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))
+    print("\n Command line \n")
+    print(cmd_name)
+    print(cmd_identifier)
+    print(cmd_description)
+    print(cmd)
 
-    result_name = "%s-%s-%s" % (test_name,ip,datetime)
-    result_identifier = result_name
-    result_description = result_name
+def print_log(out):
+    alllines = out.decode("latin-1")
+    lines =  alllines.split("\n")
+    for line in lines:
+        print(line)
 
-    cmd = "phoronix-test-suite batch-run %s" % (args.test)
+if __name__ == "__main__":
+
+    cmd = ""
+
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("--test", help="Test name ",\
+            type=str,dest='test',required=True)
+    parser.add_argument("--logpath", help="Path where to save logfiles",\
+            type=str,dest='logpath')
+    parser.add_argument("--verbose", help="Verbose",\
+             dest="verbose", action="store_true")
+
+    args = parser.parse_args()
 
     if args.verbose:
+        debug_log()
 
-        print("\n Variables \n")
-        print(test_name)
-        print(ip)
-        print(datetime)
-
-        print("\n Command line \n")
-        print(cmd_name)
-        print(cmd_identifier)
-        print(cmd_description)
-        print(cmd)
-
+    # set up phoronix
+    home = os.path.expanduser('~')
+    tmp = os.path.join(home,".phoronix-test-suite/test-results/")
+    if os.path.isdir(tmp):
+        base_path = tmp
+        pass
+    elif os.path.isdir("/var/lib/phoronix-test-suite/"):
+        base_path = "/var/lib/phoronix-test-suite/"
+        pass
     else:
-        os.environ['TEST_RESULTS_NAME'] = result_name
-        os.environ['TEST_RESULTS_IDENTIFIER'] = result_identifier
-        os.environ['TEST_RESULTS_DESCRIPTION'] = result_description
-        os.system(cmd)
-
-        home = os.path.expanduser('~')
-        tmp = os.path.join(home,".phoronix-test-suite/test-results/")
-        if os.path.isdir(tmp):
-            base_path = tmp
-            pass
-        elif os.path.isdir("/var/lib/phoronix-test-suite/test-results/"):
-            base_path = "/var/lib/phoronix-test-suite/test-results/"
-            pass
+        print("Seting up phoronix")
+        if getpass.getuser() == "root":
+            os.system("mkdir -p /var/lib/phoronix-test-suite/")
+            os.system("cp user-config.xml /var/lib/phoronix-test-suite/")
+            base_path = "/var/lib/phoronix-test-suite/"
         else:
-            print("Error , log files doesn't exist")
-            sys.exit(-1)
+            os.system("mkdir -p /var/lib/phoronix-test-suite/")
+            tmp = os.path.join(home,".phoronix-test-suite/")
+            os.system("cp user-config.xml %s",tmp)
+            base_path = tmp
 
-        plog_path = os.path.join(base_path,result_name.replace(".", ""))
+    ret = os.system("phoronix-test-suite")
+    if not ret:
+        print("\nSET UP TEST = OK !")
+        print(base_path)
 
-        composite_path = os.path.join(plog_path,"composite.xml")
 
-        with open(composite_path) as f:
-            content = f.readlines()
+    # install test
+    out, err = subprocess.Popen(["phoronix-test-suite","install", args.test], \
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+    if not err:
+        print("\nINSTALLi TEST = OK !")
+    print_log(out)
 
-        hib = 1
-        result = '0'
-        metric = ''
-        for value in content:
-            if "Value" in value:
-                result = value.strip().replace("<Value>","").replace("</Value>","")
-            elif "Scale" in value:
-                metric = value.strip().replace("<Scale>","").replace("</Scale>","")
-            elif "Proportion" in value:
-                proportion = value.strip().replace("<Proportion>","").replace("</Proportion>","")
-                if proportion == 'LIB':
-                    hib = 0
-
-        cmd = "echo '%s,%d,%s' > results.csv" % (metric, hib, result)
-        print(cmd)
-        os.system(cmd)
-
-        if args.logpath:
-            cmd = "mkdir -p %s" % (args.logpath)
-            print(cmd)
-            os.system(cmd)
-
-            if os.path.isdir(args.logpath):
-                cmd = "cp -r %s/ %s" % (plog_path,args.logpath)
-                print(cmd)
-                os.system(cmd)
-            else:
-               print("Error log file was not generated by phronix")
-               sys.exit(-1)
+    # run
+    out, err = subprocess.Popen(["phoronix-test-suite","batch-run", args.test], \
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+    if not err:
+        print("\nRUNNING = OK !")
+    print_log(out)
 
     sys.exit(0)
