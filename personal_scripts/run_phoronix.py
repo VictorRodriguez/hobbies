@@ -54,11 +54,6 @@ def debug_log():
     print(cmd_description)
     print(cmd)
 
-def print_log(out):
-    alllines = out.decode("latin-1")
-    lines =  alllines.split("\n")
-    for line in lines:
-        print(line)
 
 if __name__ == "__main__":
 
@@ -67,16 +62,24 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--test", help="Test name ",\
-            type=str,dest='test',required=True)
+            type=str,dest='test')
     parser.add_argument("--logpath", help="Path where to save logfiles",\
             type=str,dest='logpath')
     parser.add_argument("--verbose", help="Verbose",\
              dest="verbose", action="store_true")
+    parser.add_argument("--checkup", help="Check that phoronix is well \
+            installed", dest="checkup", action="store_true")
 
     args = parser.parse_args()
 
     if args.verbose:
         debug_log()
+
+    # check if phoronix is installed
+    if args.checkup:
+        tmp = "/usr/bin/phoronix-test-suite"
+        if os.path.isfile(tmp):
+            print("\nINSTALL = OK !")
 
     # set up phoronix
     home = os.path.expanduser('~')
@@ -105,18 +108,15 @@ if __name__ == "__main__":
         print(base_path)
 
 
-    # install test
-    out, err = subprocess.Popen(["phoronix-test-suite","install", args.test], \
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-    if not err:
-        print("\nINSTALLi TEST = OK !")
-    print_log(out)
+    if args.test:
+        # install test
+        ret = os.system("phoronix-test-suite install %s" % args.test)
+        if not ret:
+            print("\nINSTALLi TEST = OK !")
 
-    # run
-    out, err = subprocess.Popen(["phoronix-test-suite","batch-run", args.test], \
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-    if not err:
-        print("\nRUNNING = OK !")
-    print_log(out)
+        # run
+        ret = os.system("phoronix-test-suite batch-run %s" % args.test)
+        if not ret:
+            print("\nRUNNING = OK !")
 
     sys.exit(0)
