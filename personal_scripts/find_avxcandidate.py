@@ -1,5 +1,6 @@
 import subprocess
 import argparse
+import re
 
 sse_instructions_xmm = []
 
@@ -37,10 +38,10 @@ sse_instructions_xmm.append("psubw")
 
 def analyse_sse(line):
     if "xmm" in line:
-        for sse_inst in sse_instructions_xmm:
-            if sse_inst in line:
-                print(line)
-                return True
+        return line
+    for sse_inst in sse_instructions_xmm:
+        if sse_inst in line:
+            return line
 
 def main():
 
@@ -56,14 +57,26 @@ def main():
     
 
     sse_cnt = 0
+    instructions = 0
 
     for line in lines:
+        ret = 0 
+        sse_line = ""
+
+        match = re.search(".*[0-9a-f]+\:\t[0-9a-f\ ]+\t([a-zA-Z0-9]+) \
+                (.*)", line)
+        instructions += 1
         if args.verbose:
             print(line)
-        if analyse_sse(line):
+        sse_line=analyse_sse(line)
+        if sse_line:
             sse_cnt+=1
+            if args.verbose:
+                print(sse_line)
 
-    print(sse_cnt)
+    print("Porcentage of SSE/XMM instructions/registers :%d " % \
+            (sse_cnt/instructions * 100)  + "%")
+
 if __name__ == '__main__':
     main()
 
