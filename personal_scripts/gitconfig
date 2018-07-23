@@ -1,0 +1,9 @@
+[user]
+	email = victor.rodriguez.bahena@intel.com
+    name = Victor Rodriguez
+[sendemail]
+    smtpserver = fm-out.intel.com
+    supressform = true
+    confirm = auto
+[http]
+	proxy = http://proxy-chain.intel.com:911
