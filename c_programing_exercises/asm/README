@@ -1,0 +1,13 @@
+# How to build 
+
+'''
+make
+'''
+
+How to asign a cpu : 
+
+'''
+./add & 
+taskset -cp 0 <PID>
+'''
+
