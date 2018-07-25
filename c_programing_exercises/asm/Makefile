@@ -3,6 +3,7 @@ all:
 	gcc sub_asm.c -o sub
 	gcc mul_asm.c -o mul
 	gcc div_asm.c -o div
+	gcc -O3 -march=haswell add_avx2.c -o add_avx2
 clean:
-	rm -rf add sub mul div
+	rm -rf add sub mul div add_avx2
 
