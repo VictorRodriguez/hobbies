@@ -1,7 +1,3 @@
-/* Fix not compiling by
- * gcc -O3 -march=icelake-server 4dpwssd_epi32.c
- * error: inlining failed in call to always_inline ‘_mm512_4dpwssd_epi32’: target specific option mismatch
- */
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
