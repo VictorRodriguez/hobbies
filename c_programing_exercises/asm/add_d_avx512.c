@@ -6,9 +6,9 @@
 #include <immintrin.h>
 
 
-float a[256] = {0}; 
-float b[256] = {0};
-float c[256] = {0};
+double a[256] = {0};
+double b[256] = {0};
+double c[256] = {0};
 
 void foo(){
     __m512d result,B,C;
@@ -37,6 +37,8 @@ int check_arrays(){
             continue;
         else
             printf("FAIL, corruption in arithmetic");
+            printf("%f\n",a[i]);
+            printf("%d\n",i);
             ret =  -1;
             break;
     }
