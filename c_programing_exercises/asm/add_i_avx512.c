@@ -6,51 +6,54 @@
 #include <immintrin.h>
 
 
-int a[256] = {0}; 
-int b[256] = {0};
-int c[256] = {0};
-
-void foo(){
-    __m512i result,B,C;
-        for (int i=0; i<256; i+=16){
-            B =  _mm512_load_epi32(&b[i]);
-            C =  _mm512_load_epi32(&c[i]);
-            result = _mm512_add_epi32(B,C);
-            for ( int j=0;j<16;j++){
-                a[i+j] = result[j];
-            }
-        }
-}
+u_int32_t *arr_a, *arr_b, *arr_c;
+int n = 16;
 
 void fill_arrays(){
-    for (int i=0; i<256; i++){
-        b[i] = 1.0;
-        c[i] = 2.0;
-
+    arr_a = _mm_malloc(sizeof(u_int32_t) * n, 64);
+    arr_b = _mm_malloc(sizeof(u_int32_t) * n, 64);
+    arr_c = _mm_malloc(sizeof(u_int32_t) * n, 64);
+    for(int i = 0; i < n; i++) {
+        arr_a[i] = 1;
+        arr_b[i] = 2;
     }
 }
 
-int check_arrays(){
+void foo(){
+
+    __m512i m_a, m_b, m_c;
+
+    m_a = _mm512_load_epi32(arr_a);
+    m_b = _mm512_load_epi32(arr_b);
+
+    m_c = _mm512_add_epi32(m_a, m_b);
+
+    _mm512_store_epi32(arr_c, m_c);
+
+}
+
+int check_result(){
+
     int ret = 0;
-    for (int i=0; i<256; i++){
-        if (a[i] == 3)
+    for (int i=0; i<n; i++){
+        if (arr_c[i] == 3)
             continue;
         else
             printf("FAIL, corruption in arithmetic");
             ret =  -1;
+            printf("%d\n",arr_c[i]);
             break;
     }
     return ret;
 }
 
-
 int main(int argc, char **argv){
-
-    // initialize arrays
     fill_arrays();
     foo();
-    if (check_arrays())
-        return -1;
-    printf("Works!!\n");
-    return 0;
+    if(check_result()){
+        return check_result();
+    }
+    else{
+        printf("Works!\n");
+    }
 }
