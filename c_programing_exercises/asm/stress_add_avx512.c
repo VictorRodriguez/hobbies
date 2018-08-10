@@ -17,7 +17,7 @@ void foo(){
             B =  _mm512_load_ps(&b[i]);
             C =  _mm512_load_ps(&c[i]);
             result = _mm512_add_ps(B,C);
-            _mm256_store_ps(&a[i], result);
+            _mm512_store_ps(&a[i], result);
         }
 }
 

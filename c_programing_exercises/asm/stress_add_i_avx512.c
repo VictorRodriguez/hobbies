@@ -7,6 +7,8 @@
 
 #define BILLION 1E9
 
+u_int32_t *arr_a, *arr_b, *arr_c;
+int N = 256;
 
 void fill_arrays(){
     arr_a = _mm_malloc(sizeof(u_int32_t) * N, 64);
@@ -31,6 +33,18 @@ void foo(){
     }
 }
 
+int check_arrays(){
+    int ret = 0;
+    for (int i=0; i<256; i++){
+        if (arr_a[i] == 3)
+            continue;
+        else
+            printf("FAIL, corruption in arithmetic");
+            ret =  -1;
+            break;
+    }
+    return ret;
+}
 void print_help(){
     printf("-h : Help\n");
     printf("-d <delay> : Delay in useconds\n");
