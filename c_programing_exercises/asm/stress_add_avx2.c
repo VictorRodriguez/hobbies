@@ -17,9 +17,7 @@ void foo(){
             B =  _mm256_load_ps(&b[i]);
             C =  _mm256_load_ps(&c[i]);
             result = _mm256_add_ps(B,C);
-            for ( int j=0;j<8;j++){
-                a[i+j] = result[j];
-            }
+            _mm256_store_ps(&a[i], result);
         }
 }
 
