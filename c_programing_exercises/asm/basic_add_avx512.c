@@ -6,7 +6,7 @@
 #include <immintrin.h>
 
 
-float a[256] = {0};
+float a[256] = {0}; 
 float b[256] = {0};
 float c[256] = {0};
 
@@ -16,9 +16,7 @@ void foo(){
             B =  _mm512_load_ps(&b[i]);
             C =  _mm512_load_ps(&c[i]);
             result = _mm512_add_ps(B,C);
-            for ( int j=0;j<16;j++){
-                a[i+j] = result[j];
-            }
+            _mm256_store_ps(&a[i], result);
         }
 }
 
@@ -37,8 +35,6 @@ int check_arrays(){
             continue;
         else
             printf("FAIL, corruption in arithmetic");
-            printf("%f\n",a[i]);
-            printf("%d\n",i);
             ret =  -1;
             break;
     }
@@ -53,6 +49,6 @@ int main(int argc, char **argv){
     foo();
     if (check_arrays())
         return -1;
-    printf("Works!!\n");
+    printf("Works !!!\n");
     return 0;
 }

@@ -16,9 +16,7 @@ void foo(){
             B =  _mm512_load_pd(&b[i]);
             C =  _mm512_load_pd(&c[i]);
             result = _mm512_add_pd(B,C);
-            for ( int j=0;j<8;j++){
-                a[i+j] = result[j];
-            }
+            _mm512d_store_pd(&a[i], result);
         }
 }
 
