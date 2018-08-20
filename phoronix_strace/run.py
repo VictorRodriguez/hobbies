@@ -1,10 +1,12 @@
 import os 
 import argparse
 import re
+import subprocess
 
 log_file = "/tmp/log"
 libraries = []
 binaries = []
+dnf_conf = "/home/clearlinux/projects/common-internal/conf/dnf.conf"
 
 def add_binary(binary):
     if os.path.isfile(binary):
@@ -18,11 +20,25 @@ def add_lib(lib):
 
 def whatprovides(file_name):
 
+    pkgs = []
+    ndf_log = "/tmp/dnf-3.log"
     cmd = "sudo dnf-3 --releasever=clear "
     cmd = cmd + " --config=/home/clearlinux/projects/common-internal/conf/dnf.conf provides "
     cmd = cmd + file_name
+    cmd = cmd + " &> /tmp/dnf-3.log"
     os.system(cmd)
 
+    if os.path.isfile(ndf_log):
+        with open(ndf_log) as f:
+            content = f.readlines()
+            for line in content:
+                if ".x86_64" in line: 
+                    pkg = line.split("-")[0]
+                    if pkg not in pkgs:
+                        pkgs.append(pkg)
+
+    for pkg in pkgs:
+        print("File : " + file_name + " is provided by : " + pkg)
 
 def analize():
     if os.path.isfile(log_file):
@@ -40,6 +56,14 @@ def analize():
                         if m:
                             binary = "/usr/bin/" + m.group(1)
                             add_binary(binary)
+
+        for lib in libraries:
+            print("Benchmark call: " + lib)
+            whatprovides(lib)
+
+        for binary in binaries:
+            print("Benchmark call: " + binary)
+            whatprovides(binary)
 
 def main():
     parser = argparse.ArgumentParser()
@@ -60,13 +84,5 @@ def main():
 
     if args.analize_mode:
         analize()
-
-        for lib in libraries:
-            print(lib)
-            whatprovides(lib)
-
-        for binary in binaries:
-            print(binary)
-            whatprovides(binary)
 if __name__ == "__main__":
     main()
