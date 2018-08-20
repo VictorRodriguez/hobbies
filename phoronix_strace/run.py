@@ -6,7 +6,10 @@ import subprocess
 log_file = "/tmp/log"
 libraries = []
 binaries = []
-dnf_conf = "/home/clearlinux/projects/common-internal/conf/dnf.conf"
+yum_conf = "~/clearlinux/projects/common-internal/conf/yum.conf"
+
+benchmark = ""
+benchmarks = []
 
 def add_binary(binary):
     if os.path.isfile(binary):
@@ -21,15 +24,21 @@ def add_lib(lib):
 def whatprovides(file_name):
 
     pkgs = []
-    ndf_log = "/tmp/dnf-3.log"
+    yum_log = "/tmp/yum.log"
     cmd = "sudo dnf-3 --releasever=clear "
     cmd = cmd + " --config=/home/clearlinux/projects/common-internal/conf/dnf.conf provides "
     cmd = cmd + file_name
-    cmd = cmd + " &> /tmp/dnf-3.log"
-    os.system(cmd)
+    cmd = cmd + " &> /tmp/yum.log"
+    ret = os.system(cmd)
+    if (ret):
+        cmd = "repoquery -c "
+        cmd = cmd + yum_conf
+        cmd = cmd + " --whatprovides " + file_name
+        cmd = cmd + " &> /tmp/yum.log"
+        ret = os.system(cmd)
 
-    if os.path.isfile(ndf_log):
-        with open(ndf_log) as f:
+    if os.path.isfile(yum_log):
+        with open(yum_log) as f:
             content = f.readlines()
             for line in content:
                 if ".x86_64" in line: 
@@ -42,6 +51,10 @@ def whatprovides(file_name):
 
 def analize():
     if os.path.isfile(log_file):
+        global libraries
+        libraries = []
+        global binaries 
+        binaries = []
         with open(log_file) as f:
             content = f.readlines()
             for line in content:
@@ -58,29 +71,38 @@ def analize():
                             add_binary(binary)
 
         for lib in libraries:
-            print("Benchmark call: " + lib)
+            print("Benchmark " + benchmark + " call: " + lib)
             whatprovides(lib)
 
         for binary in binaries:
-            print("Benchmark call: " + binary)
+            print("Benchmark " + benchmark + " call: " + binary)
             whatprovides(binary)
 
 def main():
+    global benchmark
     parser = argparse.ArgumentParser()
     parser.add_argument('--run', dest='run_mode', action='store_true')
     parser.add_argument('--analize', dest='analize_mode', action='store_true')
+    parser.add_argument('filename')
     args = parser.parse_args()
 
-    if args.run_mode:
-        if os.path.isfile(log_file):
-            os.remove(log_file)
-        os.environ['EXECUTE_BINARY_PREPEND'] = "strace -o /tmp/log"
+    if os.path.isfile(args.filename):
+        with open(args.filename) as f:
+            content = f.readlines()
+            for bench in content:
+                if bench not in benchmarks:
+                    benchmarks.append(bench)
 
-        benchmark="pts/pybench"
-        cmd = "phoronix-test-suite batch-run " + benchmark
-        os.system(cmd)
-        
-        analize()
+    if args.run_mode:
+        for loca_benchmark in benchmarks:
+            if os.path.isfile(log_file):
+                os.remove(log_file)
+            os.environ['EXECUTE_BINARY_PREPEND'] = "strace -o /tmp/log"
+            benchmark = loca_benchmark.strip()
+            cmd = "phoronix-test-suite batch-run " + benchmark
+            os.system(cmd)
+            analize()
+
 
     if args.analize_mode:
         analize()
