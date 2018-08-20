@@ -109,21 +109,27 @@ def main():
                 if bench not in benchmarks:
                     benchmarks.append(bench)
 
+    with open('data.json') as json_file:
+        data_json = json.load(json_file)
+
     if args.run_mode:
         for loca_benchmark in benchmarks:
-            if os.path.isfile(log_file):
-                os.remove(log_file)
-            os.environ['EXECUTE_BINARY_PREPEND'] = "strace -o /tmp/log"
             benchmark = loca_benchmark.strip()
-            cmd = "phoronix-test-suite batch-run " + benchmark
-            os.system(cmd)
-            analize()
+            if benchmark not in data_json:
+                if os.path.isfile(log_file):
+                    os.remove(log_file)
+                os.environ['EXECUTE_BINARY_PREPEND'] = "strace -o /tmp/log"
+                cmd = "phoronix-test-suite batch-run " + benchmark
+                os.system(cmd)
+                analize()
+            print("Benchmark " + benchmark + " info already in data.json")
 
-        with open('data.json', 'w') as outfile:
-            json.dump(data, outfile)
-        with open('data.json') as f:
-            infoFromJson = json.load(f)
-            print (json2html.convert(json = infoFromJson),file=open('data.html','w'))
+        if (data):
+            with open('data.json', 'w') as outfile:
+                json.dump(data, outfile)
+            with open('data.json') as f:
+                infoFromJson = json.load(f)
+                print (json2html.convert(json = infoFromJson),file=open('data.html','w'))
 
     if args.analize_mode:
         analize()
