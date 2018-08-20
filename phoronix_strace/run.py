@@ -2,6 +2,8 @@ import os
 import argparse
 import re
 import subprocess
+import json
+from json2html import *
 
 log_file = "/tmp/log"
 libraries = []
@@ -10,6 +12,7 @@ yum_conf = "~/clearlinux/projects/common-internal/conf/yum.conf"
 
 benchmark = ""
 benchmarks = []
+data = {}
 
 def add_binary(binary):
     if os.path.isfile(binary):
@@ -24,6 +27,7 @@ def add_lib(lib):
 def whatprovides(file_name):
 
     pkgs = []
+    pkg = ""
     yum_log = "/tmp/yum.log"
     cmd = "sudo dnf-3 --releasever=clear "
     cmd = cmd + " --config=/home/clearlinux/projects/common-internal/conf/dnf.conf provides "
@@ -48,6 +52,7 @@ def whatprovides(file_name):
 
     for pkg in pkgs:
         print("File : " + file_name + " is provided by : " + pkg)
+    return pkg
 
 def analize():
     if os.path.isfile(log_file):
@@ -70,13 +75,24 @@ def analize():
                             binary = "/usr/bin/" + m.group(1)
                             add_binary(binary)
 
+        data[benchmark] = []
         for lib in libraries:
             print("Benchmark " + benchmark + " call: " + lib)
-            whatprovides(lib)
+            pkg = whatprovides(lib)
+            if (pkg):
+                data[benchmark].append({
+                    'lib': lib,
+                    'provided by': pkg
+                })
 
         for binary in binaries:
             print("Benchmark " + benchmark + " call: " + binary)
-            whatprovides(binary)
+            pkg = whatprovides(binary)
+            if (pkg):
+                data[benchmark].append({
+                    'binary': binary,
+                    'provided by': pkg
+                })
 
 def main():
     global benchmark
@@ -103,6 +119,11 @@ def main():
             os.system(cmd)
             analize()
 
+        with open('data.json', 'w') as outfile:
+            json.dump(data, outfile)
+        with open('data.json') as f:
+            infoFromJson = json.load(f)
+            print (json2html.convert(json = infoFromJson),file=open('data.html','w'))
 
     if args.analize_mode:
         analize()
