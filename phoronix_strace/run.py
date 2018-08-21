@@ -3,7 +3,7 @@ import argparse
 import re
 import subprocess
 import json
-from json2html import *
+from jinja2 import Environment, FileSystemLoader
 
 log_file = "/tmp/log"
 libraries = []
@@ -13,6 +13,15 @@ yum_conf = "~/clearlinux/projects/common-internal/conf/yum.conf"
 benchmark = ""
 benchmarks = []
 data = {}
+
+# Capture our current directory
+THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+
+def print_html_doc(dictionary_data):
+    j2_env = Environment(loader=FileSystemLoader(THIS_DIR),
+                         trim_blocks=True)
+    print(j2_env.get_template('test_template.html').render(data=dictionary_data),file=open("index.html","w"))
+
 
 def add_binary(binary):
     if os.path.isfile(binary):
@@ -55,6 +64,7 @@ def whatprovides(file_name):
     return pkg
 
 def analize():
+    global data
     if os.path.isfile(log_file):
         global libraries
         libraries = []
@@ -96,9 +106,11 @@ def analize():
 
 def main():
     global benchmark
+    data_json = None
     parser = argparse.ArgumentParser()
     parser.add_argument('--run', dest='run_mode', action='store_true')
     parser.add_argument('--analize', dest='analize_mode', action='store_true')
+    parser.add_argument('--report', dest='report_mode', action='store_true')
     parser.add_argument('filename')
     args = parser.parse_args()
 
@@ -109,29 +121,36 @@ def main():
                 if bench not in benchmarks:
                     benchmarks.append(bench)
 
-    with open('data.json') as json_file:
-        data_json = json.load(json_file)
+    if os.path.isfile("data.json"):
+        with open('data.json') as json_file:
+            data_json = json.load(json_file)
 
     if args.run_mode:
         for loca_benchmark in benchmarks:
             benchmark = loca_benchmark.strip()
-            if benchmark not in data_json:
+            if data_json:
+                if benchmark in data_json:
+                    print("Benchmark " + benchmark + " info already in data.json")
+                    pass
+            else:
                 if os.path.isfile(log_file):
                     os.remove(log_file)
                 os.environ['EXECUTE_BINARY_PREPEND'] = "strace -o /tmp/log"
                 cmd = "phoronix-test-suite batch-run " + benchmark
                 os.system(cmd)
                 analize()
-            print("Benchmark " + benchmark + " info already in data.json")
-
-        if (data):
-            with open('data.json', 'w') as outfile:
+        if data:
+            with open('data.json', 'a') as outfile:
                 json.dump(data, outfile)
-            with open('data.json') as f:
-                infoFromJson = json.load(f)
-                print (json2html.convert(json = infoFromJson),file=open('data.html','w'))
-
+    
+    if args.report_mode:
+        if os.path.isfile("data.json"):
+            with open('data.json') as json_file:
+                data_json = json.load(json_file)
+                print_html_doc(data_json)
+            print("index.html generated")
     if args.analize_mode:
         analize()
+
 if __name__ == "__main__":
     main()
