@@ -17,6 +17,15 @@ data = {}
 # Capture our current directory
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
+def generate_results_dir():
+    newpath = r'results' 
+    if not os.path.exists(newpath):
+        os.makedirs(newpath)
+        os.system('mv index.html results/index.html')
+    else:
+        os.system('mv index.html results/index.html')
+
+
 def print_html_doc(dictionary_data):
     j2_env = Environment(loader=FileSystemLoader(THIS_DIR),
                          trim_blocks=True)
@@ -103,6 +112,11 @@ def analize():
                     'binary': binary,
                     'provided by': pkg
                 })
+        if "strace" not in data[benchmark]:
+            strace_log = benchmark.replace("/","-") + "-strace.log"
+            data[benchmark].append({
+                    'strace':strace_log
+                    })
 
 def main():
     global benchmark
@@ -138,6 +152,10 @@ def main():
                 os.environ['EXECUTE_BINARY_PREPEND'] = "strace -o /tmp/log"
                 cmd = "phoronix-test-suite batch-run " + benchmark
                 os.system(cmd)
+                cmd = "mkdir -p results/"
+                os.system(cmd)
+                cmd = "cp /tmp/log results/%s-strace.log" % (benchmark.replace("/","-"))
+                os.system(cmd)
                 analize()
         if data:
             with open('data.json', 'a') as outfile:
@@ -149,6 +167,14 @@ def main():
                 data_json = json.load(json_file)
                 print_html_doc(data_json)
             print("index.html generated")
+        if os.path.isfile("index.html"):
+            newpath = r'results' 
+            if not os.path.exists(newpath):
+                os.makedirs(newpath)
+                os.system('mv index.html results/index.html')
+            else:
+                os.system('mv index.html results/index.html')
+
     if args.analize_mode:
         analize()
 
