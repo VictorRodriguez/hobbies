@@ -142,10 +142,8 @@ def main():
     if args.run_mode:
         for loca_benchmark in benchmarks:
             benchmark = loca_benchmark.strip()
-            if data_json:
-                if benchmark in data_json:
-                    print("Benchmark " + benchmark + " info already in data.json")
-                    pass
+            if benchmark in data_json:
+                print("Benchmark " + benchmark + " info already in data.json")
             else:
                 if os.path.isfile(log_file):
                     os.remove(log_file)
@@ -158,9 +156,16 @@ def main():
                 os.system(cmd)
                 analize()
         if data:
-            with open('data.json', 'a') as outfile:
-                json.dump(data, outfile)
-    
+            try:
+                with open('data.json') as json_file:
+                    data_json = json.load(json_file)
+                    if data_json:
+                        merge_dict = {**data, **data_json}
+            except ValueError:
+                    pass
+            with open('data.json', 'w') as outfile:
+                json.dump(merge_dict, outfile)
+
     if args.report_mode:
         if os.path.isfile("data.json"):
             with open('data.json') as json_file:
