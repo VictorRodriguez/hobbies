@@ -2,8 +2,12 @@ import os
 import argparse
 import re
 import subprocess
-import json
-from jinja2 import Environment, FileSystemLoader
+import json 
+import wget # pip install wget
+import csv
+from jinja2 import Environment, FileSystemLoader # pip install jinja2
+from itertools import islice
+
 
 log_file = "/tmp/log"
 libraries = []
@@ -14,8 +18,24 @@ benchmark = ""
 benchmarks = []
 data = {}
 
-# Capture our current directory
-THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+def get_commit(release,pkg):
+    blame_log = []
+    # get info from : 
+    # https://cdn.download.clearlinux.org/releases/24660/clear/RELEASENOTES
+    filename = "/tmp/RELEASENOTES-" + str(release)
+    if not os.path.isfile(filename):
+        url = 'https://cdn.download.clearlinux.org/releases/'+ release+'/clear/RELEASENOTES'
+        filename = wget.download(url=url,out=filename)
+        print()
+    else:
+        with open(filename) as f:
+            content = f.readlines()
+            for line in content:
+                if pkg in line and "Changes" not in line:
+                    blame_log.append(line.strip())
+                if pkg in line and "Changes" in line:
+                    blame_log.append(content[content.index(line)+1].strip())
+    return blame_log
 
 def generate_results_dir():
     newpath = r'results' 
@@ -27,6 +47,7 @@ def generate_results_dir():
 
 
 def print_html_doc(dictionary_data):
+    THIS_DIR = os.path.dirname(os.path.abspath(__file__))
     j2_env = Environment(loader=FileSystemLoader(THIS_DIR),
                          trim_blocks=True)
     print(j2_env.get_template('test_template.html').render(data=dictionary_data),file=open("index.html","w"))
@@ -121,6 +142,7 @@ def analize():
 def main():
     global benchmark
     data_json = None
+    bench = None
     parser = argparse.ArgumentParser()
     parser.add_argument('--run', dest='run_mode', action='store_true')
     parser.add_argument('--analize', dest='analize_mode', action='store_true')
@@ -129,9 +151,11 @@ def main():
     args = parser.parse_args()
 
     if os.path.isfile(args.filename):
-        with open(args.filename) as f:
-            content = f.readlines()
-            for bench in content:
+        with open(args.filename) as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter=',')
+            for row in csv_reader:
+                if row[0]:
+                    bench = row[0]
                 if bench not in benchmarks:
                     benchmarks.append(bench)
 
@@ -181,7 +205,47 @@ def main():
                 os.system('mv index.html results/index.html')
 
     if args.analize_mode:
-        analize()
+        regression_flag = False
+        changelog_flag = False
+        regression = None
+        data_json = None
+        if os.path.isfile(args.filename) and os.path.isfile("data.json"):
+            with open(args.filename) as csv_file:
+                csv_reader = csv.reader(csv_file, delimiter=',')
+                for row in csv_reader:
+                    if row[0]:
+                        bench = row[0]
+                    if row[1]:
+                        regression = row[1]
+                    if bench and regression:
+                        with open('data.json') as json_file:
+                            data_json = json.load(json_file)
+                            for k, v in data_json.items():
+                                for v_2 in v:
+                                    if 'regresion' in v_2:
+                                        regression_flag = True
+                                if not regression_flag:
+                                    data_json[bench].append({
+                                        'regresion': regression,
+                                    })
+                                    regression_flag = True
 
+                            for element in data_json[bench]:
+                                for k, v in element.items():
+                                    if k == "changelog":
+                                        changelog_flag = True
+                                        break
+                                if changelog_flag:
+                                    for k, v in element.items():
+                                        if k == "provided by":
+                                            pkg = element[k]
+                                            blame_log = get_commit(regression,pkg)
+                                            for changelog_line in blame_log:
+                                                    data_json[bench].append({
+                                                        'changelog': changelog_line,
+                                                    })
+            if data_json:
+                with open('data.json', 'w') as outfile:
+                    json.dump(data_json, outfile)
 if __name__ == "__main__":
     main()

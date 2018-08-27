@@ -1,2 +1,5 @@
-pts/pybench
-pts/phpbench
+pts/pybench,
+pts/phpbench,
+pts/perl-benchmark,
+pts/ebizzy,
+pts/systemd-boot-total,24660
