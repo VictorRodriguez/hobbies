@@ -172,7 +172,7 @@ def main():
             else:
                 if os.path.isfile(log_file):
                     os.remove(log_file)
-                os.environ['EXECUTE_BINARY_PREPEND'] = "strace -o /tmp/log"
+                os.environ['EXECUTE_BINARY_PREPEND'] = "strace -ff -o /tmp/log"
                 cmd = "phoronix-test-suite batch-run " + benchmark
                 os.system(cmd)
                 cmd = "mkdir -p results/"
