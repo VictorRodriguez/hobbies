@@ -100,20 +100,24 @@ def analize():
         libraries = []
         global binaries 
         binaries = []
+        lib_count = 0
+        bin_count = 0
         with open(log_file) as f:
             content = f.readlines()
             for line in content:
                 if "openat" in line or "access" in line:
-                    if "/usr/lib" in line:
+                    if "/usr/lib" in line and lib_count < 10:
                         m = re.search('<(.+?)>', line)
                         if m:
                             lib = m.group(1)
                             add_lib(lib)
-                    if "/usr/bin" in line:
+                            lib_count +=1
+                    if "/usr/bin" in line and bin_count < 10:
                         m = re.search('/usr/bin/(.+?)"',line)
                         if m:
                             binary = "/usr/bin/" + m.group(1)
                             add_binary(binary)
+                            bin_count +=1
 
         data[benchmark] = []
         for lib in libraries:
@@ -139,10 +143,13 @@ def analize():
                     'strace':strace_log
                     })
 
+
 def main():
     global benchmark
+    global log_file
     data_json = None
     bench = None
+    data_json_valid = False
     parser = argparse.ArgumentParser()
     parser.add_argument('--run', dest='run_mode', action='store_true')
     parser.add_argument('--analize', dest='analize_mode', action='store_true')
@@ -159,35 +166,54 @@ def main():
                 if bench not in benchmarks:
                     benchmarks.append(bench)
 
+    cmd = "touch data.json"
+    os.system(cmd)
+
     if os.path.isfile("data.json"):
         with open('data.json') as json_file:
-            data_json = json.load(json_file)
+            try:
+                data_json = json.load(json_file)
+                data_json_valid = True
+            except ValueError as e:
+                print('invalid json: %s' % e)
+                data_json_valid = False
 
     if args.run_mode:
         for loca_benchmark in benchmarks:
             benchmark = loca_benchmark.strip()
-            if os.path.isfile("data.json"):
+            if data_json:
                 if benchmark in data_json:
                     print("Benchmark " + benchmark + " info already in data.json")
             else:
                 if os.path.isfile(log_file):
                     os.remove(log_file)
-                os.environ['EXECUTE_BINARY_PREPEND'] = "strace -ff -o /tmp/log"
+                cmd = "mkdir -p /tmp/logs/"
+                os.system(cmd)
+                cmd = "rm -rf  /tmp/logs/log*"
+                os.system(cmd)
+                os.environ['EXECUTE_BINARY_PREPEND'] = "strace -ff -o /tmp/logs/log"
                 cmd = "phoronix-test-suite batch-run " + benchmark
                 os.system(cmd)
                 cmd = "mkdir -p results/"
                 os.system(cmd)
-                cmd = "cp /tmp/log results/%s-strace.log" % (benchmark.replace("/","-"))
+                cmd = "cat /tmp/logs/log* > results/%s-strace.log" % (benchmark.replace("/","-"))
                 os.system(cmd)
+                tmp_log_file = "./results/%s-strace.log" % (benchmark.replace("/","-"))
+                if os.path.isfile(tmp_log_file):
+                    log_file = tmp_log_file
+                else:
+                    print("log file not generated")
                 analize()
         if data:
-            try:
-                with open('data.json') as json_file:
-                    data_json = json.load(json_file)
-                    if data_json:
-                        merge_dict = {**data, **data_json}
-            except ValueError:
-                    pass
+            merge_dict = {}
+            if os.path.isfile('data.json'):
+                if data_json_valid:
+                    with open('data.json') as json_file:
+                        data_json = json.load(json_file)
+                        if data_json:
+                            merge_dict = {**data, **data_json}
+            if not merge_dict: 
+                merge_dict = data
             with open('data.json', 'w') as outfile:
                 json.dump(merge_dict, outfile)
 
