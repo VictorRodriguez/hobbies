@@ -251,11 +251,13 @@ def main():
                                 for v_2 in v:
                                     if 'regresion' in v_2:
                                         regression_flag = True
-                                if not regression_flag:
-                                    data_json[bench].append({
-                                        'regresion': regression,
-                                    })
-                                    regression_flag = True
+                                        pass
+                        if not regression_flag:
+                            print("in")
+                            data_json[bench].append({
+                                'regresion': regression,
+                                })
+                            regression_flag = True
 
                             for element in data_json[bench]:
                                 for k, v in element.items():
@@ -263,6 +265,7 @@ def main():
                                         changelog_flag = True
                                         break
                                 if changelog_flag:
+                                    print("in")
                                     for k, v in element.items():
                                         if k == "provided by":
                                             pkg = element[k]
