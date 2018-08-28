@@ -166,8 +166,9 @@ def main():
     if args.run_mode:
         for loca_benchmark in benchmarks:
             benchmark = loca_benchmark.strip()
-            if benchmark in data_json:
-                print("Benchmark " + benchmark + " info already in data.json")
+            if os.path.isfile("data.json"):
+                if benchmark in data_json:
+                    print("Benchmark " + benchmark + " info already in data.json")
             else:
                 if os.path.isfile(log_file):
                     os.remove(log_file)
