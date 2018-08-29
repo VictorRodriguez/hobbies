@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
+import os
 import numpy as np
+import csv
 
 def print_regresion(data,count,case):
     print("%s: regresion in value %s with regards to previus value %s"\
@@ -30,11 +32,23 @@ def detect_regresions(data,stdv_datail,HIB_flag):
         count+=1
     return regressions
 
-data = np.array([10, 10, 10, 12, 10,13])
-stdv_data = np.array([1.2, 1.1, 0.9, 1.5, 1.2,1.1])
+data = np.empty((1))
+stdv_data = np.empty((1))
 HIB_flag = False
 
-regressions = detect_regresions(data,stdv_data,HIB_flag)
+if os.path.isfile("data.csv"):
+    csv = np.genfromtxt ('data.csv', delimiter=",")
+    data = csv[:,0]
+    stdv_data = csv[:,1]
+
+else:
+    data = np.array([10, 10, 10, 12, 10,13])
+    stdv_data = np.array([1.2, 1.1, 0.9, 1.5, 1.2,1.1])
+
+if (data.size == stdv_data.size):
+    regressions = detect_regresions(data,stdv_data,HIB_flag)
+else:
+    print("Arrays are not from the same size")
 
 x = np.arange(1,data.size+1,1)
 plt.errorbar(x, data, stdv_data, linestyle='-.', marker='*')
@@ -43,5 +57,5 @@ if regressions:
     for position in regressions:
         plt.annotate("regresion",(x[position], data[position]))
 
-#plt.savefig('image.png')
-#plt.show()
+plt.savefig('image.png')
+plt.show()
