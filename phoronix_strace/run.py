@@ -280,10 +280,12 @@ def main():
                                             else:
                                                 tmp[pkg] = blame_log
                                         
-                            for k,v in tmp.items():
-                                data_json[bench].append({
-                                    'changelog': v,
-                                    })
+                            if not changelog_flag:
+                                for k,v in tmp.items():
+                                    data_json[bench].append({
+                                        'changelog': v,
+                                        })
+                                changelog_flag_flag = True
             if data_json:
                 with open('data.json', 'w') as outfile:
                     json.dump(data_json, outfile)
