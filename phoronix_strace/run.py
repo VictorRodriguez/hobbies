@@ -28,14 +28,16 @@ def get_commit(release,pkg):
         filename = wget.download(url=url,out=filename)
         print()
     else:
+        token = "Changes in package " + (pkg)
         with open(filename) as f:
             content = f.readlines()
             for line in content:
-                if pkg in line and "Changes" not in line:
+                if token in line:
                     blame_log.append(line.strip())
-                if pkg in line and "Changes" in line:
-                    blame_log.append(content[content.index(line)+1].strip())
-    return blame_log
+                    blame_log.append(content[content.index(line)+1].strip().split("-")[0])
+    tmp = list(set(blame_log))
+    str1 = ''.join(tmp)
+    return str1
 
 def generate_results_dir():
     newpath = r'results' 
@@ -240,6 +242,7 @@ def main():
             with open(args.filename) as csv_file:
                 csv_reader = csv.reader(csv_file, delimiter=',')
                 for row in csv_reader:
+                    tmp = {}
                     if row[0]:
                         bench = row[0]
                     if row[1]:
@@ -252,28 +255,35 @@ def main():
                                     if 'regresion' in v_2:
                                         regression_flag = True
                                         pass
-                        if not regression_flag:
-                            print("in")
-                            data_json[bench].append({
-                                'regresion': regression,
-                                })
-                            regression_flag = True
+                            if not regression_flag:
+                                data_json[bench].append({
+                                    'regresion': regression,
+                                    })
+                                regression_flag = True
 
                             for element in data_json[bench]:
                                 for k, v in element.items():
                                     if k == "changelog":
                                         changelog_flag = True
                                         break
-                                if changelog_flag:
-                                    print("in")
+                                if not changelog_flag:
+                                    blame_log = None
+                                    pkg = None
                                     for k, v in element.items():
                                         if k == "provided by":
                                             pkg = element[k]
                                             blame_log = get_commit(regression,pkg)
-                                            for changelog_line in blame_log:
-                                                    data_json[bench].append({
-                                                        'changelog': changelog_line,
-                                                    })
+                                            if pkg in tmp:
+                                                pass
+                                            if not blame_log:
+                                                pass
+                                            else:
+                                                tmp[pkg] = blame_log
+                                        
+                            for k,v in tmp.items():
+                                data_json[bench].append({
+                                    'changelog': v,
+                                    })
             if data_json:
                 with open('data.json', 'w') as outfile:
                     json.dump(data_json, outfile)
