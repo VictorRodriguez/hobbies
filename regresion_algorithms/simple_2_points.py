@@ -1,7 +1,9 @@
 import matplotlib.pyplot as plt
+import sys
 import os
 import numpy as np
 import csv
+import argparse
 
 def print_regresion(data,count,case):
     print("%s: regresion in value %s with regards to previus value %s"\
@@ -34,7 +36,21 @@ def detect_regresions(data,stdv_datail,HIB_flag):
 
 data = np.empty((1))
 stdv_data = np.empty((1))
-HIB_flag = False
+HIB_flag = True
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--HIB", help="Higher is better (default)",\
+        action='store_true')
+parser.add_argument("--LIB", help="Lower is better",\
+        action='store_true')
+args = parser.parse_args()
+
+if args.HIB:
+    HIB_flag = True
+if args.LIB:
+    HIB_flag = False
+if args.HIB and args.LIB:
+    sys.exit(-1)
 
 if os.path.isfile("data.csv"):
     csv = np.genfromtxt ('data.csv', delimiter=",")
