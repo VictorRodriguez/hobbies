@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 # calculate the average STDV of the history
-average_stdv = 100
+average_stdv = 150
 
 def detect_regresions(data,prediction,average_stdv):
     regressions = []
@@ -49,14 +49,16 @@ print(regressions)
 
 x = np.arange(0,test.size,1)
 
-plt.errorbar(x, test, average_stdv, linestyle='-.', marker='*')
+plt.errorbar(x, test, average_stdv, linestyle='-.', marker='*',label="real data")
 
+if regressions:
+    for position in regressions:
+        plt.annotate("regresion",(x[position], test[position]))
+# if you want to see the full data
 #plt.plot(series)
-#plt.plot(test)
-plt.plot(predictions)
+plt.plot(predictions,label="predictions")
+plt.legend(loc='best')
+
+plt.savefig('image.png')
 plt.show()
 
-# line plot of observed vs predicted
-#pyplot.plot(test)
-#pyplot.plot(predictions)
-#pyplot.show()
