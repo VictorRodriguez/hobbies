@@ -4,29 +4,43 @@ refname="$1"
 oldrev="$2"
 newrev="$3"
 
+package_name=$(pwd | cut -d'/' -f5 | cut -d'.' -f1)
+echo "Package: $package_name"
+git branch test-$newrev $newrev
+hook_dir=$(pwd)
+echo "creating workspace ..."
+    rm -rf /tmp/git-workspace
+    mkdir -p /tmp/git-workspace
+    cd /tmp/git-workspace
+echo "cloning branch ..."
+    git clone ~/cgit-repos/$package_name.git &>/dev/null
+    cd /tmp/git-workspace/$package_name
+
+# This is necesary to prevent working as remote
+unset GIT_DIR
+
+echo "Creating branch to test ..."
+    git checkout origin/test-$newrev -b test-$newrev &>/dev/null
+    mkdir patches-git-hook
+    git format-patch -1 -o patches/ &>/dev/null
+    git checkout master &>/dev/null
+    for f in patches/*
+    do
+        echo "Checking patch $f merge in master..."
+        git apply --check $f
+        retval=$?
+        if [ $retval -ne 0 ]; then
+            echo "ERROR: patch $f can not be merged in master"
+        else
+            echo "PASS: patch $f can be merged to master"
+        fi
+    done
+cd $hook_dir
+git branch -D test-$newrev
+
+echo "Pushing $oldrev to $newrev from $refname branch"
 if [ "$refname" = "refs/heads/master" ];then
     echo "ERROR: push to master is not OK"
     exit 1
 fi
 
-git archive -o latest.zip $newrev
-mkdir -p /tmp/git-$newrev
-unzip latest.zip /tmp/git-$newrev
-cd /tmp/git-$newrev
-git init
-git add -A
-git commit -m 'test-patch'
-git format-patch -1
-
-cd /tmp
-git archive -o latest.zip HEAD
-mkdir -p /tmp/git-master
-unzip latest.zip /tmp/git-master
-cd /tmp/git-master
-git init
-git add -A
-git commit -m 'initial commit'
-git apply --check /tmp/git-$newrev/*.patch
-
-# --- Finished
-exit 1
