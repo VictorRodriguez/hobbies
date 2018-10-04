@@ -4,6 +4,8 @@ refname="$1"
 oldrev="$2"
 newrev="$3"
 
+ret=0
+
 package_name=$(pwd | cut -d'/' -f5 | cut -d'.' -f1)
 echo "Package: $package_name"
 git branch test-$newrev $newrev
@@ -22,7 +24,8 @@ unset GIT_DIR
 echo "Creating branch to test ..."
     git checkout origin/test-$newrev -b test-$newrev &>/dev/null
     mkdir patches-git-hook
-    git format-patch -1 -o patches/ &>/dev/null
+    num_patches=$(git log --oneline test-$newrev ^origin/master | wc -l)
+    git format-patch -$num_patches -o patches/ &>/dev/null
     git checkout master &>/dev/null
     for f in patches/*
     do
@@ -31,6 +34,7 @@ echo "Creating branch to test ..."
         retval=$?
         if [ $retval -ne 0 ]; then
             echo "ERROR: patch $f can not be merged in master"
+            ret=1
         else
             echo "PASS: patch $f can be merged to master"
         fi
@@ -44,3 +48,4 @@ if [ "$refname" = "refs/heads/master" ];then
     exit 1
 fi
 
+exit $ret
