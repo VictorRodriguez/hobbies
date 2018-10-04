@@ -1,0 +1,32 @@
+#!/bin/sh
+
+refname="$1"
+oldrev="$2"
+newrev="$3"
+
+if [ "$refname" = "refs/heads/master" ];then
+    echo "ERROR: push to master is not OK"
+    exit 1
+fi
+
+git archive -o latest.zip $newrev
+mkdir -p /tmp/git-$newrev
+unzip latest.zip /tmp/git-$newrev
+cd /tmp/git-$newrev
+git init
+git add -A
+git commit -m 'test-patch'
+git format-patch -1
+
+cd /tmp
+git archive -o latest.zip HEAD
+mkdir -p /tmp/git-master
+unzip latest.zip /tmp/git-master
+cd /tmp/git-master
+git init
+git add -A
+git commit -m 'initial commit'
+git apply --check /tmp/git-$newrev/*.patch
+
+# --- Finished
+exit 1
