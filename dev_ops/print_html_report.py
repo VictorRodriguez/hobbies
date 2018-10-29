@@ -1,7 +1,9 @@
 """Print HTML report."""
 import json
 import os
-
+import wget
+import shutil
+import git
 from jinja2 import Environment, FileSystemLoader
 
 def print_html_doc(dictionary_data):
@@ -13,24 +15,56 @@ def print_html_doc(dictionary_data):
           render(data=dictionary_data),
           file=open("index.html", "w"))
 
-def main():
-   
-    data = {}
-    pkg = 'helloworld'
+def get_clr_status(pkg):
+
+    local_repo_path='/tmp/' + pkg
+    if os.path.isdir(local_repo_path):
+        shutil.rmtree(local_repo_path)
+    gitrepo = 'http://starlingx-koji.zpn.intel.com/cgit/packages/' + pkg 
+    git.Git("/tmp/").clone(gitrepo)
+    savedpath = os.getcwd()
+    os.chdir(local_repo_path)
+    os.system('git remote rm origin')
+    os.system('git remote add origin git://kojiclear.jf.intel.com/packages/'+pkg)
+    ret = os.system('git fetch')
+    os.chdir(savedpath)
+    return ret
+
+
+def get_build_status():
+    return True
+def get_qa_status():
+    return True
+def get_last_commit():
+    return True
+
+def add_pkg(data,pkg,clr_status,build_status,qa_status,last_commit):
+    
     data[pkg] = []
-
     data[pkg].append({
-        'clr_status': "Ok",
-        'build_status': "Ok",
-        'qa_status': "Ok",
-        'last_commit': "1234asda1 <vrodri3>"
+        'clr_status':str(clr_status),
+        'build_status':str(build_status),
+        'qa_status':str(qa_status),
+        'last_commit':str(last_commit)
         })
+    return data
 
-    with open('data.json', 'w') as outfile:
-        json.dump(data, outfile)
-    with open('data.json') as json_file:
-        data_json = json.load(json_file)
-        print_html_doc(data_json)
+def main():
+
+    data = {}
+    pkgs = []
+
+    filename='/tmp/stx_pkg.log'
+    url='http://starlingx-koji.zpn.intel.com/misc/projects.list'
+    filename = wget.download(url=url,out=filename)
+    with open(filename) as f:
+        lines = f.readlines()
+        for line in lines:
+            if 'packages' in line and 'common' not in line:
+                pkgs.append(line.split("/")[1].split(".")[0].strip())
+
+    for pkg in pkgs:
+        clr_status = get_clr_status(pkg)
 
 
 if __name__ == '__main__':

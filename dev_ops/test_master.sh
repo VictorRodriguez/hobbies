@@ -42,8 +42,8 @@ for f in $CGIT_PATH/*;do
     echo debug $status_flag_master $status_flag_merge >> $CGIT_LOG
     if [ $status_flag_master -eq 1 ] || [ $status_flag_merge -eq 1 ]; then
         echo "ERROR: in $PKG" >> $CGIT_LOG
-        echo "entre $PKG,1" >> /tmp/results_fetch.csv
+        echo "$PKG,1" >> /tmp/results_fetch.csv
     else
-        echo "entre $PKG,0" >> /tmp/results_fetch.csv
+        echo "$PKG,0" >> /tmp/results_fetch.csv
     fi
 done
