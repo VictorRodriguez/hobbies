@@ -24,6 +24,7 @@ def check_autospec(pkg):
     os.chdir(local_repo_path)
     cmd = 'python ../autospec/autospec/autospec.py'
     ret = os.system(cmd)
+    os.chdir(savedpath)
     return ret
 
 def main():
@@ -32,13 +33,16 @@ def main():
     pkgs = []
 
     filename='/tmp/stx_pkg.log'
+    outputfile='/tmp/output.csv'
     url='http://starlingx-koji.zpn.intel.com/misc/projects.list'
-
 
     if os.path.isfile(filename):
         pass
     else:
         filename = wget.download(url=url,out=filename)
+
+    if os.path.isfile(outputfile):
+        os.remove(outputfile)
 
     if os.path.isfile(filename):
         with open(filename) as f:
@@ -57,11 +61,14 @@ def main():
         print("Clonning: " + pkg)
         clone_repo(pkg)
         if check_autospec(pkg):
-            print(pkg + "Fail")
+            print(pkg + " Fail")
+            print(pkg + ",Fail", file=open(outputfile,"a"))
             data[pkg] = "Fail"
         else:
             print(pkg + "Pass")
+            print(pkg + ",Pass", file=open(outputfile,"a"))
             data[pkg] = "Pass"
+
     print(data)
 
 if __name__ == '__main__':
