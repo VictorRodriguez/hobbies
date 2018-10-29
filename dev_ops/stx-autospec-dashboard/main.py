@@ -15,8 +15,20 @@ def clone_repo(pkg):
     gitrepo = 'http://starlingx-koji.zpn.intel.com/cgit/packages/' + pkg 
     local_repo_path='/tmp/' + pkg
     if os.path.isdir(local_repo_path):
-        shutil.rmtree(local_repo_path)
-    git.Git("/tmp/").clone(gitrepo)
+        savedpath = os.getcwd()
+        os.chdir(local_repo_path)
+        cmd = "git reset --hard & git pull"
+        ret = os.system(cmd)
+        os.chdir(savedpath)
+        if ret:
+            shutil.rmtree(local_repo_path)
+            git.Git("/tmp/").clone(gitrepo)
+    else:
+        try:
+            git.Git("/tmp/").clone(gitrepo)
+        except:
+            print("clone fail !!!!")
+
 
 def check_autospec(pkg):
     data = {}
@@ -32,7 +44,6 @@ def check_autospec(pkg):
                 author =  line.strip()
     cmd = 'python ../autospec/autospec/autospec.py'
     ret = os.system(cmd)
-    ret = 0
     os.chdir(savedpath)
     return ret,author
 
