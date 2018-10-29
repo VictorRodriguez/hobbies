@@ -19,17 +19,25 @@ def clone_repo(pkg):
     git.Git("/tmp/").clone(gitrepo)
 
 def check_autospec(pkg):
+    data = {}
     local_repo_path='/tmp/' + pkg
     savedpath = os.getcwd()
     os.chdir(local_repo_path)
+    cmd = 'git show --name-only &> /tmp/log'
+    os.system(cmd)
+    with open('/tmp/log') as f:
+        content = f.readlines()
+        for line in content:
+            if "Author" in line:
+                author =  line.strip()
     cmd = 'python ../autospec/autospec/autospec.py'
     ret = os.system(cmd)
+    ret = 0
     os.chdir(savedpath)
-    return ret
+    return ret,author
 
 def main():
 
-    data = {}
     pkgs = []
 
     filename='/tmp/stx_pkg.log'
@@ -60,16 +68,13 @@ def main():
     for pkg in pkgs:
         print("Clonning: " + pkg)
         clone_repo(pkg)
-        if check_autospec(pkg):
-            print(pkg + " Fail")
-            print(pkg + ",Fail", file=open(outputfile,"a"))
-            data[pkg] = "Fail"
+        ret,author = check_autospec(pkg)
+        if ret:
+            print(pkg + "   Fail")
+            print(pkg + ",Fail," + author, file=open(outputfile,"a"))
         else:
-            print(pkg + "Pass")
-            print(pkg + ",Pass", file=open(outputfile,"a"))
-            data[pkg] = "Pass"
-
-    print(data)
+            print(pkg + "   Pass")
+            print(pkg + ",Pass," + author, file=open(outputfile,"a"))
 
 if __name__ == '__main__':
     main()

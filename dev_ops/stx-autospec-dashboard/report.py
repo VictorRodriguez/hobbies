@@ -20,7 +20,7 @@ def main():
     with open(outfile, mode='r') as infile:
         reader = csv.reader(infile)
         for rows in reader:
-            data[rows[0]] = {'autospec_status':rows[1]}
+            data[rows[0]] = {'autospec_status':rows[1], 'last_commit': rows[2]}
 
     print_html_doc(data)
     print(data)
