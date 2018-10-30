@@ -1,0 +1,9 @@
+[Unit]
+Description=personal
+
+[Service]
+Type=oneshot
+ExecStart=/bin/python /usr/local/bin/main.py
+
+[Install]
+WantedBy=multi-user.target
