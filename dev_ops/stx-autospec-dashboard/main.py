@@ -26,9 +26,10 @@ def clone_repo(pkg):
     else:
         try:
             git.Git("/tmp/").clone(gitrepo)
+            return True
         except:
             print("clone fail !!!!")
-            pass
+            return False
 
 
 def check_autospec(pkg):
@@ -79,14 +80,14 @@ def main():
 
     for pkg in pkgs:
         print("Clonning: " + pkg)
-        clone_repo(pkg)
-        ret,author = check_autospec(pkg)
-        if ret:
-            print(pkg + "   Fail")
-            print(pkg + ",Fail," + author, file=open(outputfile,"a"))
-        else:
-            print(pkg + "   Pass")
-            print(pkg + ",Pass," + author, file=open(outputfile,"a"))
+        if clone_repo(pkg):
+            ret,author = check_autospec(pkg)
+            if ret:
+                print(pkg + "   Fail")
+                print(pkg + ",Fail," + author, file=open(outputfile,"a"))
+            else:
+                print(pkg + "   Pass")
+                print(pkg + ",Pass," + author, file=open(outputfile,"a"))
 
 if __name__ == '__main__':
     main()
