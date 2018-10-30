@@ -17,7 +17,7 @@ def clone_repo(pkg):
     if os.path.isdir(local_repo_path):
         savedpath = os.getcwd()
         os.chdir(local_repo_path)
-        cmd = "git reset --hard & git pull"
+        cmd = "git fetch origin & git reset --hard origin/master & git pull"
         ret = os.system(cmd)
         os.chdir(savedpath)
         if ret:
@@ -28,6 +28,7 @@ def clone_repo(pkg):
             git.Git("/tmp/").clone(gitrepo)
         except:
             print("clone fail !!!!")
+            pass
 
 
 def check_autospec(pkg):
