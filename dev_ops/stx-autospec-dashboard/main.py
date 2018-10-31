@@ -7,7 +7,7 @@ logs_directory = os.path.join(os.getcwd(), 'logs')
 
 def clone_autospec():
     gitrepo="https://github.com/clearlinux/autospec.git"
-    local_repo_path='/tmp/autospec'
+    local_repo_path='/tmp/clearlinux/projects/autospec'
     if os.path.isdir(local_repo_path):
         shutil.rmtree(local_repo_path)
     git.Repo.clone_from(gitrepo,local_repo_path, depth=1)
@@ -23,10 +23,10 @@ def clone_repo(pkg):
         os.chdir(savedpath)
         if ret:
             shutil.rmtree(local_repo_path)
-            git.Git("/tmp/").clone(gitrepo)
+            git.Git("/tmp/clearlinux/packages/").clone(gitrepo)
     else:
         try:
-            git.Git("/tmp/").clone(gitrepo)
+            git.Git("/tmp/clearlinux/packages/").clone(gitrepo)
             return True
         except:
             print("clone fail !!!!")
@@ -35,7 +35,7 @@ def clone_repo(pkg):
 
 def check_autospec(pkg):
     data = {}
-    local_repo_path='/tmp/' + pkg
+    local_repo_path='/tmp/clearlinux/packages/' + pkg
     savedpath = os.getcwd()
 
     if not os.path.isdir(local_repo_path):
@@ -49,7 +49,8 @@ def check_autospec(pkg):
         for line in content:
             if "Author" in line:
                 author =  line.strip()
-    cmd = 'python ../autospec/autospec/autospec.py &> %s/%s-build.log' % (logs_directory,pkg)
+    cmd = 'make autospec &> %s/%s-build.log' % (logs_directory,pkg)
+    print("Building %s ..." % (pkg))
     ret = os.system(cmd)
     
     
@@ -78,6 +79,10 @@ def main():
 
     if not os.path.exists(logs_directory):
         os.makedirs(logs_directory)
+
+    if not os.path.isdir('/tmp/clearlinux/projects/common-internal'):
+        print("ERROR, please run user-setup.sh under /tmp")
+        return -1
 
     if os.path.isfile(filename):
         with open(filename) as f:
