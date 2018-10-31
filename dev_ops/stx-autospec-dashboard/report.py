@@ -20,7 +20,15 @@ def main():
     with open(outfile, mode='r') as infile:
         reader = csv.reader(infile)
         for rows in reader:
-            data[rows[0]] = {'autospec_status':rows[1], 'last_commit': rows[2]}
+            pkg = rows[0]
+            status = rows[1]
+            author = rows[2]
+            if author != 'N/A':
+                if os.path.isfile('logs/%s-build.log' % (pkg)):
+                    logfile = './logs/%s-build.log' % (pkg)
+                else:
+                    logfile = 'N/A'
+                data[pkg] = {'autospec_status':status, 'last_commit':author,'logfile':logfile}
 
     print_html_doc(data)
     print(data)

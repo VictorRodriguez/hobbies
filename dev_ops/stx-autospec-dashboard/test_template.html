@@ -19,6 +19,7 @@
 	  <th scope="col">Package</th>
 	  <th scope="col">Autospec status</th>
 	  <th scope="col">Last commit</th>
+	  <th scope="col">Build log</th>
 	</tr>
       </thead>
       <tbody>
@@ -39,6 +40,15 @@
 	      {% if value['last_commit'] != null %}
 	      <li class="list-group-item list-group-item-secondary">
         {{ value['last_commit'] }}
+	      {% endif %}
+          </li>
+        </ul>
+      </td>
+      <td>
+	    <ul class="list-group">
+	      {% if value['last_commit'] != null %}
+	      <li class="list-group-item list-group-item-secondary">
+            <a href="{{ '%s'%value['logfile'] }}"> {{ value['logfile'] }}</a>
 	      {% endif %}
           </li>
         </ul>
