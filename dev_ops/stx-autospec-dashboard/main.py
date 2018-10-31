@@ -3,6 +3,7 @@ import os
 import git
 import shutil
 
+logs_directory = os.path.join(os.getcwd(), 'logs')
 
 def clone_autospec():
     gitrepo="https://github.com/clearlinux/autospec.git"
@@ -36,6 +37,10 @@ def check_autospec(pkg):
     data = {}
     local_repo_path='/tmp/' + pkg
     savedpath = os.getcwd()
+
+    if not os.path.isdir(local_repo_path):
+        return -1,"N/A"
+
     os.chdir(local_repo_path)
     cmd = 'git show --name-only &> /tmp/log'
     os.system(cmd)
@@ -44,8 +49,10 @@ def check_autospec(pkg):
         for line in content:
             if "Author" in line:
                 author =  line.strip()
-    cmd = 'python ../autospec/autospec/autospec.py'
+    cmd = 'python ../autospec/autospec/autospec.py &> %s/%s-build.log' % (logs_directory,pkg)
     ret = os.system(cmd)
+    
+    
     os.chdir(savedpath)
     return ret,author
 
@@ -65,6 +72,13 @@ def main():
     if os.path.isfile(outputfile):
         os.remove(outputfile)
 
+    clone_flag = False
+    if os.path.isfile('clone_flag'):
+        clone_flag = True
+
+    if not os.path.exists(logs_directory):
+        os.makedirs(logs_directory)
+
     if os.path.isfile(filename):
         with open(filename) as f:
             lines = f.readlines()
@@ -79,8 +93,10 @@ def main():
     clone_autospec()
 
     for pkg in pkgs:
-        print("Clonning: " + pkg)
-        if clone_repo(pkg):
+        if clone_flag:
+            print("Clonning: " + pkg)
+            clone_repo(pkg)
+        else:
             ret,author = check_autospec(pkg)
             if ret:
                 print(pkg + "   Fail")
