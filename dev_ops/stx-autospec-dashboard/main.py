@@ -14,7 +14,7 @@ def clone_autospec():
 
 def clone_repo(pkg):
     gitrepo = 'http://starlingx-koji.zpn.intel.com/cgit/packages/' + pkg 
-    local_repo_path='/tmp/' + pkg
+    local_repo_path='./clearlinux/packages/' + pkg
     if os.path.isdir(local_repo_path):
         savedpath = os.getcwd()
         os.chdir(local_repo_path)
@@ -23,10 +23,10 @@ def clone_repo(pkg):
         os.chdir(savedpath)
         if ret:
             shutil.rmtree(local_repo_path)
-            git.Git("/tmp/clearlinux/packages/").clone(gitrepo)
+            git.Git(local_repo_path).clone(gitrepo)
     else:
         try:
-            git.Git("/tmp/clearlinux/packages/").clone(gitrepo)
+            git.Git(local_repo_path).clone(gitrepo)
             return True
         except:
             print("clone fail !!!!")
@@ -35,7 +35,7 @@ def clone_repo(pkg):
 
 def check_autospec(pkg):
     data = {}
-    local_repo_path='/tmp/clearlinux/packages/' + pkg
+    local_repo_path='./clearlinux/packages/' + pkg
     savedpath = os.getcwd()
 
     if not os.path.isdir(local_repo_path):
@@ -61,8 +61,8 @@ def main():
 
     pkgs = []
 
-    filename='/tmp/stx_pkg.log'
-    outputfile='/tmp/output.csv'
+    filename='stx_pkg.log'
+    outputfile='output.csv'
     url='http://starlingx-koji.zpn.intel.com/misc/projects.list'
 
     if os.path.isfile(filename):
@@ -80,8 +80,8 @@ def main():
     if not os.path.exists(logs_directory):
         os.makedirs(logs_directory)
 
-    if not os.path.isdir('/tmp/clearlinux/projects/common-internal'):
-        print("ERROR, please run user-setup.sh under /tmp")
+    if not os.path.isdir('./clearlinux/projects/common-internal'):
+        print("ERROR, please run user-setup.sh to set up a clear dev system")
         return -1
 
     if os.path.isfile(filename):
