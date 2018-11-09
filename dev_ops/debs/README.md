@@ -76,6 +76,58 @@ build the Debian binary package under the proper environment variables.
 Here is an example of creating a simple Debian package from a simple C source
 using the Makefile as its build system.
 
+mkdir debhello-0.0
+
+├── Makefile
+└── src
+    └── hello.c
+
+$ cat src/hello.c
+#include <stdio.h>
+int
+main()
+{
+        printf("Hello, world!\n");
+        return 0;
+}
+
+$ cat Makefile
+prefix = /usr/local
+
+all: src/hello
+
+src/hello: src/hello.c
+	@echo "CFLAGS=$(CFLAGS)" | \
+		fold -s -w 70 | \
+		sed -e 's/^/# /'
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDCFLAGS) -o $@ $^
+
+install: src/hello
+	install -D src/hello \
+		$(DESTDIR)$(prefix)/bin/hello
+
+clean:
+	-rm -f src/hello
+
+distclean: clean
+
+uninstall:
+	-rm -f $(DESTDIR)$(prefix)/bin/hello
+
+.PHONY: all install clean distclean uninstall
+
+tar -czf debhello-0.0.tar.gz debhello-0.0/
+
+cd debhello-0.0/
+debmake
+vim debian/rules
+dpkg-buildpackage
+cd ..
+sudo dpkg -i debhello_0.0-1_amd64.deb
+hello
+
+
+More info at : 
 https://www.debian.org/doc/manuals/debmake-doc/ch04.en.html
 
 
