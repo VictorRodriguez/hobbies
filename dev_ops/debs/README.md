@@ -51,13 +51,13 @@ These are the steps
  * Get the build dependencies with: sudo apt-get build-dep fdupes
 
  * Rebuild without changes with
-
+```
     debuild -b -uc -us
-
+```
  * Install this file with:
-    
+```
     sudo dpkg -i ../fdupes_1.50-PR2-3_<your arch>.deb
-
+```
 
 At this point you might be wondering what is the diference between: 
 
@@ -76,6 +76,7 @@ build the Debian binary package under the proper environment variables.
 Here is an example of creating a simple Debian package from a simple C source
 using the Makefile as its build system.
 
+```
 mkdir debhello-0.0
 
 ├── Makefile
@@ -125,7 +126,7 @@ dpkg-buildpackage
 cd ..
 sudo dpkg -i debhello_0.0-1_amd64.deb
 hello
-
+```
 
 More info at : 
 https://www.debian.org/doc/manuals/debmake-doc/ch04.en.html
