@@ -59,14 +59,35 @@ These are the steps
     sudo dpkg -i ../fdupes_1.50-PR2-3_<your arch>.deb
 
 
+At this point you might be wondering what is the diference between: 
+
+* debuild - build a Debian package
+https://manpages.debian.org/jessie/devscripts/debuild.1.en.html
+
+* dpkg-buildpackage - build binary or source packages from sources
+https://manpages.debian.org/jessie/dpkg-dev/dpkg-buildpackage.1.en.html
 
 
+The debuild command is a wrapper script of the dpkg-buildpackage command to
+build the Debian binary package under the proper environment variables.
+
+## How to build a package from tar.gz ( simple example ) 
+
+Here is an example of creating a simple Debian package from a simple C source
+using the Makefile as its build system.
+
+https://www.debian.org/doc/manuals/debmake-doc/ch04.en.html
 
 
+## How to build a package from tar.gz ( more complex example ) 
 
+More instructions at: 
 
+https://www.debian.org/doc/manuals/debmake-doc/ch08.en.html
 
+## Where does the debian repositories live: 
 
-## How to build a package from tar.gz
+Examples: 
 
-
+ * GLIBC:   https://salsa.debian.org/glibc-team/glibc/tree/sid
+ * GCC:     https://salsa.debian.org/toolchain-team/gcc-cross 
