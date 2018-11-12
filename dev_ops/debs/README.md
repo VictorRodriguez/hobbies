@@ -1,7 +1,7 @@
 # How to build deb files
 
 These are personal examples to document how to build debian files for my own
-experiance: 
+experience: 
 
 ## How to build a package that already exist in debian
 
@@ -59,7 +59,7 @@ These are the steps
     sudo dpkg -i ../fdupes_1.50-PR2-3_<your arch>.deb
 ```
 
-At this point you might be wondering what is the diference between: 
+At this point you might be wondering what is the difference between: 
 
 * debuild - build a Debian package
 https://manpages.debian.org/jessie/devscripts/debuild.1.en.html
@@ -144,3 +144,5 @@ Examples:
 
  * GLIBC:   https://salsa.debian.org/glibc-team/glibc/tree/sid
  * GCC:     https://salsa.debian.org/toolchain-team/gcc-cross 
+
+
