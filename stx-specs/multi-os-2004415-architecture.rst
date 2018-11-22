@@ -54,7 +54,7 @@ proposed change fit in StarlingX, you can stop here and post this for review to
 get preliminary feedback. If so please say: Posting to get preliminary feedback
 on the scope of this spec.
 
- Alternatives
+Alternatives
 ============
 
 Refactor most of the tools from : 
@@ -79,6 +79,7 @@ None
 Security impact
 ===============
 
+   None
 
 Other end user impact
 =====================
@@ -93,21 +94,29 @@ stx-clearlinux.iso
 Performance Impact
 ==================
 
-
+ 
 Other deployer impact
 =====================
 
+None
 
 Developer impact
 =================
 
-Discuss things that will affect other developers working on StarlingX.
+Improve developer experianace to isolate each package increasing the modularity
+of the development , having delimitated the boundaries of each package and what
+patches and CFLAGS are applied to each project
 
 Upgrade impact
 ===============
 
+None
+
 Implementation
 ==============
+
+Implementation will be in parallel to the current build system and will be
+available for the comunity to be evaluated and used if needed
 
 Assignee(s)
 ===========
@@ -128,15 +137,12 @@ https://git.starlingx.io/cgit/stx-integ/
 Work Items
 ===========
 
-0) Enable autotools build systems in STX projects: make / make install
-1) Generate an tar.gz for every STX propietary source code project
-2) Generate .spec and .rules for each package that STX modify or provide
-3) Provide tool that create build system enviroment for developers to 
-build each package for multiple operating systems
-4) Provide tool that make .iso image for each flavor or Linux base OS taking
-upstream repos, local mirror or local changes
-5) Provide tool that generate .img file to boot and test patches to source
-code , configuration changes or new features on STX systems
+- Enable autotools build systems in STX projects: make / make install
+- Generate an tar.gz for every STX propietary source code project
+- Generate .spec and .rules for each package that STX modify or provide
+- Provide tool that create build system enviroment for developers to build each package for multiple operating systems
+- Provide tool that make .iso image for each flavor or Linux base OS taking upstream repos, local mirror or local changes
+- Provide tool that generate .img file to boot and test patches to source code , configuration changes or new features on STX systems
 
 
 Dependencies
@@ -146,10 +152,22 @@ Dependencies
 Testing
 =======
 
+Generate a CI/CD  that build daily an image of each Linux flavor : 
 
+- Ubuntu
+- Centos
+- Clear Linux
+
+And then run a basic test that proves: 
+
+- Boot
+- Lauch of VMs with Open Stack
+- Minimal STX application
 
 Documentation Impact
 ====================
+
+New documentation will be generated for this multi OS case
 
 References
 ==========
