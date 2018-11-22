@@ -1,0 +1,40 @@
+diff --git a/aclocal.m4 b/aclocal.m4
+index ed7ae27..18d989a 100644
+--- a/aclocal.m4
++++ b/aclocal.m4
+@@ -32,7 +32,7 @@ To do so, use the procedure documented by the package, typically 'autoreconf'.])
+ # generated from the m4 files accompanying Automake X.Y.
+ # (This private macro should not be called outside this file.)
+ AC_DEFUN([AM_AUTOMAKE_VERSION],
+-[am__api_version='1.15'
++[am__api_version='1.16'
+ dnl Some users find AM_AUTOMAKE_VERSION and mistake it for a way to
+ dnl require some minimum version.  Point them to the right macro.
+ m4_if([$1], [1.15], [],
+diff --git a/configure b/configure
+index a8488cd..596cd70 100755
+--- a/configure
++++ b/configure
+@@ -4128,7 +4128,7 @@ ac_configure="$SHELL $ac_aux_dir/configure"  # Please don't use this var.
+ ac_config_headers="$ac_config_headers lib/config.h:lib/config.hin"
+ 
+ 
+-am__api_version='1.15'
++am__api_version='1.16'
+ 
+ # Find a good install program.  We prefer a C program (faster),
+ # so one script is as good as another.  But avoid the broken or
+diff --git a/configure.ac b/configure.ac
+index 669e9d1..b4cdc3b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -35,7 +35,7 @@ AC_CONFIG_SRCDIR([src/ls.c])
+ AC_CONFIG_AUX_DIR([build-aux])
+ AC_CONFIG_HEADERS([lib/config.h:lib/config.hin])
+ 
+-AM_INIT_AUTOMAKE([1.11.2 no-dist-gzip dist-xz color-tests parallel-tests
++AM_INIT_AUTOMAKE([1.16.1 no-dist-gzip dist-xz color-tests parallel-tests
+                   subdir-objects])
+ AM_SILENT_RULES([yes]) # make --enable-silent-rules the default.
+ 
+
