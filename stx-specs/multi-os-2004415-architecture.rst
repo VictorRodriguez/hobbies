@@ -128,15 +128,15 @@ https://git.starlingx.io/cgit/stx-integ/
 Work Items
 ===========
 
-   0) Enable autotools build systems in STX projects: make / make install
-   1) Generate an tar.gz for every STX propietary source code project
-   2) Generate .spec and .rules for each package that STX modify or provide
-   3) Provide tool that create build system enviroment for developers to build
-   each package for multiple operating systems
-   4) Provide tool that make .iso image for each flavor or Linux base OS taking
-   upstream repos, local mirror or local changes
-   5) Provide tool that generate .img file to boot and test patches to source
-   code , configuration changes or new features on STX systems
+0) Enable autotools build systems in STX projects: make / make install
+1) Generate an tar.gz for every STX propietary source code project
+2) Generate .spec and .rules for each package that STX modify or provide
+3) Provide tool that create build system enviroment for developers to 
+build each package for multiple operating systems
+4) Provide tool that make .iso image for each flavor or Linux base OS taking
+upstream repos, local mirror or local changes
+5) Provide tool that generate .img file to boot and test patches to source
+code , configuration changes or new features on STX systems
 
 
 Dependencies
