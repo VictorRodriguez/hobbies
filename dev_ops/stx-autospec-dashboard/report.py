@@ -14,7 +14,7 @@ def print_html_doc(dictionary_data):
 
 def main():
 
-    outfile = '/tmp/output.csv'
+    outfile = 'output.csv'
     data = {}
 
     with open(outfile, mode='r') as infile:
