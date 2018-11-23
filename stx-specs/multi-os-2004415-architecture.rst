@@ -1,17 +1,12 @@
-
-Save New Duplicate & Edit Just Text Twitter
->..
-  This work is licensed under a Creative Commons Attribution 3.0 Unported
-  License. http://creativecommons.org/licenses/by/3.0/legalcode
-
-..
+..  This work is licensed under a Creative Commons Attribution 3.0 Unported
+    License.
+    http://creativecommons.org/licenses/by/3.0/legalcode
 
 =======================
 StarlingX: Multi OS build architecture
 =======================
 
 Storyboard: https://storyboard.openstack.org/#!/story/2004415
-
 
 Starling X is based on CentOS operating system, however, is necessary to give
 support of the product in other base OS layers. The current build system under
@@ -109,9 +104,12 @@ Proposed change
 - Enable Autotools to build systems in STX projects: make/make install
 - Generate a tar.gz for every STX proprietary source code project
 - Generate .spec and .rules for each package that STX modify or provide
-- Provide a tool that creates build system environment for developers to build each package for multiple operating systems
-- Provide a tool that make .iso image for each flavor or Linux based OS taking upstream repositories, local mirror or local changes
-- Provide a tool that generates .img file to boot and test patches to the source code, configuration changes or new features on STX systems
+- Provide a tool that creates build system environment for developers to 
+build each package for multiple operating systems
+- Provide a tool that make .iso image for each flavor or Linux based OS 
+taking upstream repositories, local mirror or local changes
+- Provide a tool that generates .img file to boot and test patches to 
+the source code, configuration changes or new features on STX systems
 
 
 Alternatives
