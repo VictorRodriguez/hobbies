@@ -108,7 +108,8 @@ http://git.openstack.org/cgit/openstack/stx-specs/tree/specs/2019.03/approved/mu
 
 - Generate a tar.gz for every STX proprietary source code project
 - Generate .spec and .rules for each package that STX modify or provide
-example 
+
+One example coudl be  
 
 ::
  
@@ -130,7 +131,7 @@ example
 
 
 - Provide a tool that creates build system environment for developers to build each package for multiple operating systems
-    -Proof of concept: https://github.com/VictorRodriguez/linuxbuilder Section:  How to build a package
+    - Proof of concept: https://github.com/VictorRodriguez/linuxbuilder Section:  How to build a package
 
 - Provide a tool that make .iso image for each flavor or Linux based OS taking upstream repositories, local mirror or local changes
     - Proof of concept: https://github.com/VictorRodriguez/linuxbuilder Section:  How to build an standard image
