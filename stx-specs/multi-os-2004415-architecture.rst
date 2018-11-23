@@ -92,8 +92,6 @@ to deploy STX solution either RPMs base or DEBs base OSs
 Use Cases
 =========
 
-Use cases: 
-
 a) Developers need to generate an image based on Ubuntu for some End User
 client or Deployer
 
@@ -104,13 +102,46 @@ operating systems customers
 Proposed change
 ===============
 
-- Enable Autotools to build systems in STX projects: make/make install
+- Enable Autotools to build systems in STX projects: make/make install with proper Linux standards
+http://git.openstack.org/cgit/openstack/stx-specs/tree/specs/2019.03/approved/multi-os-2004039-variable-substitution.rst
+http://git.openstack.org/cgit/openstack/stx-specs/tree/specs/2019.03/approved/multi-os-2003768-refactor-init-config-patches.rst
+
 - Generate a tar.gz for every STX proprietary source code project
 - Generate .spec and .rules for each package that STX modify or provide
+example 
+
+::
+    libvirt/
+├── deb_base
+│   └── ubuntu
+│       ├── patches
+│       │   └── cve_fix.patch
+│       └── rules
+└── rpm_base
+    ├── centos
+    │   ├── cve_fix.patch
+    │   ├── improve_perf.patch
+    │   └── libvrit.spec
+    ├── clr
+    │   └── cve_fix.patch
+    └── fedora
+        └── cve_fix.patch
+
+
 - Provide a tool that creates build system environment for developers to build each package for multiple operating systems
+
+Prove of concept: https://github.com/VictorRodriguez/linuxbuilder 
+    Section:  How to build a package
+
 - Provide a tool that make .iso image for each flavor or Linux based OS taking upstream repositories, local mirror or local changes
+
+Prove of concept: https://github.com/VictorRodriguez/linuxbuilder 
+    Section:  How to build an standard image
+    
 - Provide a tool that generates .img file to boot and test patches to the source code, configuration changes or new features on STX systems
 
+Prove of concept: https://github.com/VictorRodriguez/linuxbuilder 
+    Section: How to build a custome image
 
 Alternatives
 ============
@@ -121,32 +152,15 @@ There are some alternatives to transform current RPMs to DEBs, the most used
 is Alien.
 
 Alien is a program that converts between the rpm, dpkg file formats. If you 
-want to use a package from another
-distribution than the one you have installed on your system, you can use alien
-to convert it to your preferred package format and install it.
-
-A .rpm package can be converted to .deb package using following command: 
+want to use a package from another distribution than the one you have installed on your system, you can use alien
+to convert it to your preferred package format and install it. A .rpm package can be converted to .deb package using following command: 
 
 sudo alien -to-deb -scripts someone-0.11-4.i386.rpm 
 
 it will generate a .deb package someone_0.11-5_i386.deb
 
 What alien cannot resolve is converting rpm dependencies (both run and build)
-to Debian dependencies.
-
-So, here is a solution.. (there might be others).. putting the dependencies
-manually.
-
-- convert the rpm package to debian package format directory. use command sudo
-   alien –generate –scripts ecedemo-0.11-1.noarch.rpm this will create
-   directory someone-0.11/ with deb package like structure.
-
-- now, all you have to do is change the someone-0.11/debian/control file. add
-   whatever dependencies you like in the for “Depends: ” tag.
-   Depends:sun-java5-jre, slapd
-
-- rebuild deb package from intermediate directory cd someone-0.11/ sudo
-   dpkg-buildpackage
+to Debian dependencies. Is necesary to add dependencies manually.
 
 Keep in mind that it typically isn’t a good idea to install packages that were
 not meant for your system. It can lead to dependency issues and can cause
@@ -256,6 +270,7 @@ Work Items
 - Provide a tool that creates build system environment for developers to build each package for multiple operating systems
 - Provide a tool that make .iso image for each flavor or Linux base OS taking upstream repos, local mirror or local changes
 - Provide a tool that generates .img file to boot and test patches to the source code, configuration changes or new features on STX systems
+- Create CI/CD system on CENG using koji for RPMS and debian build system for deb files to automatically build a package change for m ultiple OSs
 
 
 Dependencies
