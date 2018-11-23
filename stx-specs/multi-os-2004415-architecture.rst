@@ -103,8 +103,8 @@ Proposed change
 ===============
 
 - Enable Autotools to build systems in STX projects: make/make install with proper Linux standards
-http://git.openstack.org/cgit/openstack/stx-specs/tree/specs/2019.03/approved/multi-os-2004039-variable-substitution.rst
-http://git.openstack.org/cgit/openstack/stx-specs/tree/specs/2019.03/approved/multi-os-2003768-refactor-init-config-patches.rst
+    - http://git.openstack.org/cgit/openstack/stx-specs/tree/specs/2019.03/approved/multi-os-2004039-variable-substitution.rst
+    - http://git.openstack.org/cgit/openstack/stx-specs/tree/specs/2019.03/approved/multi-os-2003768-refactor-init-config-patches.rst
 
 - Generate a tar.gz for every STX proprietary source code project
 - Generate .spec and .rules for each package that STX modify or provide
