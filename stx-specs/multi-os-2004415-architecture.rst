@@ -22,11 +22,72 @@ flock services, patches and build tools
 Problem description
 ===================
 
-STX build tools generate only rpms for CentOS operating system. This will not
-be scalable for ussers trying to deploy STX solution on other operating systems
-based on debs and rpms. Build system needs to generate debs and rpms for
-operating systems such as ubuntu / fedora / clear linux and current centos
-using the same build tools
+STX build tools generate only rpms for CentOS operating system due to two main
+reasons:
+
+- STX RPMs can not be installed on ubuntu/debian
+
+In Ubuntu Linux, installation of software can be done on using  Ubuntu Software
+Center or  Synaptic package manager or apt-get command line mode.  Current STX
+solution with YUM or rpm install  does not work. Ubuntu documentation recomends
+to use Alien ( described in Alternatives section) tool to transfor RPMs to DEB
+files, however it can lead to dependency issues or runtime crashes
+  
+- STX RPMs has hardcoded runtime and build requriements for CentOS
+
+CentOS RPM's can have dependencies on versions of software that do not exist on
+Fedora and vice versa. For example , CentOS kernel spec file has the following
+Build requirements: 
+
+BuildRequires: module-init-tools, patch >= 2.5.4, bash >= 2.03, sh-utils, tar
+BuildRequires: xz, findutils, gzip, m4, perl, make >= 3.78, diffutils, gawk
+BuildRequires: gcc >= 4.8.5-29, binutils >= 2.25, redhat-rpm-config >= 9.1.0-55
+BuildRequires: hostname, net-tools, bc
+BuildRequires: xmlto, asciidoc
+BuildRequires: openssl
+BuildRequires: hmaccalc
+BuildRequires: python-devel, newt-devel, perl(ExtUtils::Embed)
+BuildRequires: pesign >= 0.109-4
+BuildRequires: elfutils-libelf-devel
+BuildRequires: sparse >= 0.4.1
+BuildRequires: elfutils-devel zlib-devel binutils-devel bison
+BuildRequires: audit-libs-devel
+BuildRequires: java-devel
+BuildRequires: numactl-devel
+BuildRequires: pciutils-devel gettext ncurses-devel
+BuildRequires: python-docutils
+BuildRequires: zlib-devel binutils-devel
+BuildRequires: rpm-build >= 4.9.0-1, elfutils >= 0.153-1
+BuildRequires: bison flex
+BuildRequires: glibc-static
+
+Many of these do not exist with that specific name on RPMs base distros such as
+Fedora: 
+
+https://src.fedoraproject.org/rpms/kernel/blob/master/f/kernel.spec
+
+Or Clear Linux: 
+
+https://github.com/clearlinux-pkgs/linux/blob/master/linux.spec
+
+Apart from this, it is also very possible that Fedora RPM's will use macros in
+RPM pre- and postscripts that are unavailable on CentOS or try to do stuff in
+those scripts that is not possible on CentOS.
+
+That said, it is not impossible to use Fedora RPM's on CentOS. but will not
+work 100% of the times. What is probably safer, is to rebuild and refactor each
+SRPM on the new target OS. This will make the build requirement and run time
+requirment warnigns/ errors came up during the rebuild and be fixed before
+deploying the software to custumers
+
+
+The curent build system is very smart to detect missing dependendencies and
+what packages to rebuild if one package has a change. However making the same
+logic of other 3 OSs will not scale. 
+
+STX developers need to have a solid solution for multiple OSs where they want
+to deploy STX solution either RPMs base or DEBs base OSs
+
 
 Use Cases
 =========
@@ -43,26 +104,77 @@ operating systems costumerts
 Proposed change
 ===============
 
-Here is where you cover the change you propose to make in detail. How do you
-propose to solve this problem?
+- Enable autotools build systems in STX projects: make / make install
+- Generate an tar.gz for every STX propietary source code project
+- Generate .spec and .rules for each package that STX modify or provide
+- Provide tool that create build system enviroment for developers to build each package for multiple operating systems
+- Provide tool that make .iso image for each flavor or Linux base OS taking upstream repos, local mirror or local changes
+- Provide tool that generate .img file to boot and test patches to source code , configuration changes or new features on STX systems
 
-If this is one part of a larger effort make it clear where this piece ends. In
-other words, what's the scope of this effort?
 
-At this point, if you would like to just get feedback on if the problem and
-proposed change fit in StarlingX, you can stop here and post this for review to
-get preliminary feedback. If so please say: Posting to get preliminary feedback
-on the scope of this spec.
+
 
 Alternatives
 ============
 
-Refactor most of the tools from : 
+- From Current RPMs to DEBs:
+
+There are some alternatives to transform current RPMs to DEBs, the most used
+is Alien.
+
+Alien is a program that converts between the rpm, dpkg, stampede slp, and
+slackware tgz file formats. If you want to use a package from another
+distribution than the one you have installed on your system, you can use alien
+to convert it to your preferred package format and install it.
+
+A .rpm package can be converted to .deb package using following command: 
+
+sudo alien -to-deb -scripts someone-0.11-4.i386.rpm 
+
+it will generate a .deb package someone_0.11-5_i386.deb
+
+What alien cannot resolve is converting rpm dependencies (both run and build)
+to debian dependencies..
+
+So, here is a solution.. (there might be others).. putting the dependencies
+manually..
+
+- convert the rpm package to debian package format directory. use command sudo
+   alien –generate –scripts ecedemo-0.11-1.noarch.rpm this will create
+   directory someone-0.11/ with deb package like structure.
+
+- now, all you have to do is change the someone-0.11/debian/control file. add
+   whatever dependencies you like in the for “Depends: ” tag.
+   Depends:sun-java5-jre, slapd
+
+- rebuild deb package from intermediate direcotory cd someone-0.11/ sudo
+   dpkg-buildpackage
+
+Keep in mind that it typically isn’t a good idea to install packages that were
+not meant for your system. It can lead to dependency issues and can cause
+errors or even crash. If the software you are installing has some dependencies
+that need to be installed, you will need to install these first.
+
+All of these converted packages only increase the chance of the software not
+functioning properly, so do this at your own risk. If there is no available
+.deb substitute, then compiling the source code on your machine might be a
+better choice when possible.  
+
+Other solution is to refactor most of the tools and build scripts from : 
 
 https://git.starlingx.io/cgit
 
-If we do this for every OS requirement it will take time and replication of
-coudl coudl be created
+To work with deb build process , described in : 
+
+https://github.com/VictorRodriguez/hobbies/tree/master/dev_ops/debs
+
+
+- From Current RPMs to other RPMs base distro:
+
+
+If we do this for every OS requirement (lets take for example that in the
+future we need to make this for Fedora or other OS) it will take time and
+replication of coudl coudl be created
 
 
 Data model impact
