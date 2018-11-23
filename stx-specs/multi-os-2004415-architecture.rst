@@ -111,6 +111,7 @@ http://git.openstack.org/cgit/openstack/stx-specs/tree/specs/2019.03/approved/mu
 example 
 
 ::
+ 
     libvirt/
     ├── deb_base
     │   └── ubuntu
@@ -129,19 +130,13 @@ example
 
 
 - Provide a tool that creates build system environment for developers to build each package for multiple operating systems
-
-    Prove of concept: https://github.com/VictorRodriguez/linuxbuilder 
-        Section:  How to build a package
+    -Proof of concept: https://github.com/VictorRodriguez/linuxbuilder Section:  How to build a package
 
 - Provide a tool that make .iso image for each flavor or Linux based OS taking upstream repositories, local mirror or local changes
-
-    Prove of concept: https://github.com/VictorRodriguez/linuxbuilder 
-        Section:  How to build an standard image
+    - Proof of concept: https://github.com/VictorRodriguez/linuxbuilder Section:  How to build an standard image
     
 - Provide a tool that generates .img file to boot and test patches to the source code, configuration changes or new features on STX systems
-
-    Prove of concept: https://github.com/VictorRodriguez/linuxbuilder 
-        Section: How to build a custome image
+    - Proof of concept: https://github.com/VictorRodriguez/linuxbuilder Section: How to build a custome image
 
 Alternatives
 ============
@@ -156,6 +151,7 @@ package format and install it. A .rpm package can be converted to .deb package
 using following command: 
 
 ::
+ 
     sudo alien -to-deb -scripts someone-0.11-4.i386.rpm 
 
 This will generate a .deb package someone_0.11-5_i386.deb
