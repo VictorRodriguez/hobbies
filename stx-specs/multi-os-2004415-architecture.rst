@@ -36,32 +36,32 @@ CentOS RPM's can have dependencies on versions of software that do not exist on
 Fedora and vice versa. For example , CentOS kernel spec file has the following
 Build requirements: 
 
-.. code-block::
 
-BuildRequires: module-init-tools, patch >= 2.5.4, bash >= 2.03, sh-utils, tar
-BuildRequires: xz, findutils, gzip, m4, perl, make >= 3.78, diffutils, gawk
-BuildRequires: gcc >= 4.8.5-29, binutils >= 2.25, redhat-rpm-config >= 9.1.0-55
-BuildRequires: hostname, net-tools, bc
-BuildRequires: xmlto, asciidoc
-BuildRequires: openssl
-BuildRequires: hmaccalc
-BuildRequires: python-devel, newt-devel, perl(ExtUtils::Embed)
-BuildRequires: pesign >= 0.109-4
-BuildRequires: elfutils-libelf-devel
-BuildRequires: sparse >= 0.4.1
-BuildRequires: elfutils-devel zlib-devel binutils-devel bison
-BuildRequires: audit-libs-devel
-BuildRequires: java-devel
-BuildRequires: numactl-devel
-BuildRequires: pciutils-devel gettext ncurses-devel
-BuildRequires: python-docutils
-BuildRequires: zlib-devel binutils-devel
-BuildRequires: rpm-build >= 4.9.0-1, elfutils >= 0.153-1
-BuildRequires: bison flex
-BuildRequires: glibc-static
+::
+ 
+    BuildRequires: module-init-tools, patch >= 2.5.4, bash >= 2.03, sh-utils, tar
+    BuildRequires: xz, findutils, gzip, m4, perl, make >= 3.78, diffutils, gawk
+    BuildRequires: gcc >= 4.8.5-29, binutils >= 2.25, redhat-rpm-config >= 9.1.0-55
+    BuildRequires: hostname, net-tools, bc
+    BuildRequires: xmlto, asciidoc
+    BuildRequires: openssl
+    BuildRequires: hmaccalc
+    BuildRequires: python-devel, newt-devel, perl(ExtUtils::Embed)
+    BuildRequires: pesign >= 0.109-4
+    BuildRequires: elfutils-libelf-devel
+    BuildRequires: sparse >= 0.4.1
+    BuildRequires: elfutils-devel zlib-devel binutils-devel bison
+    BuildRequires: audit-libs-devel
+    BuildRequires: java-devel
+    BuildRequires: numactl-devel
+    BuildRequires: pciutils-devel gettext ncurses-devel
+    BuildRequires: python-docutils
+    BuildRequires: zlib-devel binutils-devel
+    BuildRequires: rpm-build >= 4.9.0-1, elfutils >= 0.153-1
+    BuildRequires: bison flex
+    BuildRequires: glibc-static
 
-
-Many of these do not exist with that specific name on RPMs base distros such as
+Many of these do not exist with that specific name on RPMs base distributions such as
 Fedora: 
 
 https://src.fedoraproject.org/rpms/kernel/blob/master/f/kernel.spec
@@ -107,12 +107,9 @@ Proposed change
 - Enable Autotools to build systems in STX projects: make/make install
 - Generate a tar.gz for every STX proprietary source code project
 - Generate .spec and .rules for each package that STX modify or provide
-- Provide a tool that creates build system environment for developers to 
-build each package for multiple operating systems
-- Provide a tool that make .iso image for each flavor or Linux based OS 
-taking upstream repositories, local mirror or local changes
-- Provide a tool that generates .img file to boot and test patches to 
-the source code, configuration changes or new features on STX systems
+- Provide a tool that creates build system environment for developers to build each package for multiple operating systems
+- Provide a tool that make .iso image for each flavor or Linux based OS taking upstream repositories, local mirror or local changes
+- Provide a tool that generates .img file to boot and test patches to the source code, configuration changes or new features on STX systems
 
 
 Alternatives
