@@ -112,52 +112,53 @@ example
 
 ::
     libvirt/
-├── deb_base
-│   └── ubuntu
-│       ├── patches
-│       │   └── cve_fix.patch
-│       └── rules
-└── rpm_base
-    ├── centos
-    │   ├── cve_fix.patch
-    │   ├── improve_perf.patch
-    │   └── libvrit.spec
-    ├── clr
-    │   └── cve_fix.patch
-    └── fedora
-        └── cve_fix.patch
+    ├── deb_base
+    │   └── ubuntu
+    │       ├── patches
+    │       │   └── cve_fix.patch
+    │       └── rules
+    └── rpm_base
+        ├── centos
+        │   ├── cve_fix.patch
+        │   ├── improve_perf.patch
+        │   └── libvrit.spec
+        ├── clr
+        │   └── cve_fix.patch
+        └── fedora
+            └── cve_fix.patch
 
 
 - Provide a tool that creates build system environment for developers to build each package for multiple operating systems
 
-Prove of concept: https://github.com/VictorRodriguez/linuxbuilder 
-    Section:  How to build a package
+    Prove of concept: https://github.com/VictorRodriguez/linuxbuilder 
+        Section:  How to build a package
 
 - Provide a tool that make .iso image for each flavor or Linux based OS taking upstream repositories, local mirror or local changes
 
-Prove of concept: https://github.com/VictorRodriguez/linuxbuilder 
-    Section:  How to build an standard image
+    Prove of concept: https://github.com/VictorRodriguez/linuxbuilder 
+        Section:  How to build an standard image
     
 - Provide a tool that generates .img file to boot and test patches to the source code, configuration changes or new features on STX systems
 
-Prove of concept: https://github.com/VictorRodriguez/linuxbuilder 
-    Section: How to build a custome image
+    Prove of concept: https://github.com/VictorRodriguez/linuxbuilder 
+        Section: How to build a custome image
 
 Alternatives
 ============
 
 - From Current RPMs to DEBs:
 
-There are some alternatives to transform current RPMs to DEBs, the most used
-is Alien.
+There are some alternatives to transform current RPMs to DEBs, the most used is
+Alien.Alien is a program that converts between the rpm, dpkg file formats. If
+you want to use a package from another distribution than the one you have
+installed on your system, you can use alien to convert it to your preferred
+package format and install it. A .rpm package can be converted to .deb package
+using following command: 
 
-Alien is a program that converts between the rpm, dpkg file formats. If you 
-want to use a package from another distribution than the one you have installed on your system, you can use alien
-to convert it to your preferred package format and install it. A .rpm package can be converted to .deb package using following command: 
+::
+    sudo alien -to-deb -scripts someone-0.11-4.i386.rpm 
 
-sudo alien -to-deb -scripts someone-0.11-4.i386.rpm 
-
-it will generate a .deb package someone_0.11-5_i386.deb
+This will generate a .deb package someone_0.11-5_i386.deb
 
 What alien cannot resolve is converting rpm dependencies (both run and build)
 to Debian dependencies. Is necesary to add dependencies manually.
@@ -250,11 +251,11 @@ Assignee(s)
 
 
 Primary assignee:
-   Victor Rodriguez
+   - Victor Rodriguez
 
 Other contributors:
-   Jesus Ornelas
-   Mario Carrillo
+   - Jesus Ornelas
+   - Mario Carrillo
 
 Repos Impacted
 ==============
@@ -300,25 +301,9 @@ New documentation will be generated for this multi-OS case
 References
 ==========
 
-Please add any useful references here. You are not required to have any
-reference. Moreover, this specification should still make sense when your
-references are unavailable. Examples of what you could include are:
-
-* Links to mailing list or IRC discussions
-
-* Links to notes from a summit session
-
-* Links to relevant research, if appropriate
-
-* Related specifications as appropriate (e.g. if it's an EC2 thing, link the
-  EC2 docs)
-
-* Anything else you feel it is worthwhile to refer to
-
 
 History
 =======
-
 
 .. list-table:: Revisions
    :header-rows: 1
