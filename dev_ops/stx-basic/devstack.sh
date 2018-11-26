@@ -1,8 +1,7 @@
 #!/bin/bash
 sudo useradd -s /bin/bash -d /opt/stack -m stack
 echo "stack ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/stack
-sudo su - stack
-
+sudo -u stack bash << EOF
 
 echo "disable autoupdate"
 sudo swupd autoupdate --disable
@@ -28,5 +27,8 @@ cd devstack/
 git apply ../10.patch
 git apply ../24.patch
 mv  local.conf.example_vanilla local.conf
+echo "HOST_IP=127.0.0.1" >> local.conf
 
 ./stack.sh
+
+EOF
