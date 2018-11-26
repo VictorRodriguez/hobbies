@@ -31,7 +31,7 @@ git apply ../10.patch
 git apply ../24.patch
 mv  local.conf.example_vanilla local.conf
 echo "HOST_IP=127.0.0.1" >> local.conf
-
+echo "GIT_BASE=https://git.openstack.org" >> local.conf
 ./stack.sh
 
 EOF
