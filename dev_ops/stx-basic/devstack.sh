@@ -3,7 +3,9 @@ mkdir -p /opt/stack
 sudo useradd -s /bin/bash -d /opt/stack -m stack
 echo "stack ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/stack
 sudo -u stack bash << EOF
-
+cd /opt/stack
+export http_proxy="http://proxy-chain.intel.com:911"
+export https_proxy="http://proxy-chain.intel.com:911"
 echo "disable autoupdate"
 sudo swupd autoupdate --disable
 echo "create folders under /etc"
