@@ -20,11 +20,21 @@ echo "start needed services"
 sudo systemctl start rabbitmq-server.service
 sudo cp /var/lib/rabbitmq/.erlang.cookie $HOME/.erlang.cookie
 sudo cp /var/lib/rabbitmq/.erlang.cookie /root/.erlang.cookie
+sudo pip2 install --no-binnary :all: psycopg2===2.7.3
+sudo pip2 install libvirt-python==4.8.0
 
 rm -rf devstack/
 git clone --depth=1 https://github.com/starlingx-staging/devstack.git -b stx/pike
 curl -O -L https://patch-diff.githubusercontent.com/raw/starlingx-staging/devstack/pull/10.patch
 curl -O -L https://patch-diff.githubusercontent.com/raw/starlingx-staging/devstack/pull/24.patch
+
+git clone https://git.openstack.org/openstack/requirements.git -b stable/pike /opt/stack/requirements
+cat /opt/stack/requirements/upper-constraints.txt | grep docutils
+cat /opt/stack/requirements/upper-constraints.txt | grep cffi
+cat /opt/stack/requirements/upper-constraints.txt | grep PyYAML
+cat /opt/stack/requirements/upper-constraints.txt | grep os-brick
+cat /opt/stack/requirements/upper-constraints.txt | grep libvirt-python
+cat /opt/stack/requirements/upper-constraints.txt | grep psycopg2
 
 cd devstack/
 git apply ../10.patch
