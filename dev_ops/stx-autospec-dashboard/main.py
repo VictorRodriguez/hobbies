@@ -13,10 +13,12 @@ def clone_autospec():
     git.Repo.clone_from(gitrepo,local_repo_path, depth=1)
 
 def clone_repo(pkg):
-    gitrepo = 'http://starlingx-koji.zpn.intel.com/cgit/packages/' + pkg 
+    gitrepo = 'http://starlingx-koji.zpn.intel.com/cgit/packages/' + pkg
+
     local_repo_path='./clearlinux/packages/' + pkg
+    savedpath = os.getcwd()
+
     if os.path.isdir(local_repo_path):
-        savedpath = os.getcwd()
         os.chdir(local_repo_path)
         cmd = "git fetch origin & git reset --hard origin/master & git pull"
         ret = os.system(cmd)
@@ -25,13 +27,13 @@ def clone_repo(pkg):
             shutil.rmtree(local_repo_path)
             git.Git(local_repo_path).clone(gitrepo)
     else:
-        try:
-            git.Git(local_repo_path).clone(gitrepo)
-            return True
-        except:
+        print(gitrepo)
+        os.chdir('./clearlinux/packages/')
+        cmd = "git clone " + gitrepo
+        if (os.system(cmd)):
             print("clone fail !!!!")
-            return False
-
+        os.chdir(savedpath)
+        return True
 
 def check_autospec(pkg):
     data = {}
@@ -42,6 +44,13 @@ def check_autospec(pkg):
         return -1,"N/A"
 
     os.chdir(local_repo_path)
+
+    cmd = "git fetch origin"
+    os.system(cmd)
+
+    cmd = "git reset --hard origin/master"
+    os.system(cmd)
+
     cmd = 'git show --name-only &> /tmp/log'
     os.system(cmd)
     with open('/tmp/log') as f:
@@ -103,6 +112,7 @@ def main():
             clone_repo(pkg)
         else:
             ret,author = check_autospec(pkg)
+            print(author)
             if ret:
                 print(pkg + "   Fail")
                 print(pkg + ",Fail," + author, file=open(outputfile,"a"))
