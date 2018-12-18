@@ -1,8 +1,16 @@
 # Security Flags at GCC and its impact in performance
 
-Stack buffer overflows are a longstanding problem for C programs that leads to all manner of ills, many of which are security vulnerabilities. The biggest problems have typically been with string buffers on the stack coupled with bad or missing length tests. A programmer who mistakenly leaves open the possibility of overrunning a buffer on a function's stack may be allowing attackers to overwrite the return pointer pushed onto the stack earlier. Since the attackers may be able to control what gets written, they can control where the function returns ( based on https://lwn.net/Articles/584225/ ) 
+Stack buffer overflows are a longstanding problem for C programs that leads to
+all manner of ills, many of which are security vulnerabilities. The biggest
+problems have typically been with string buffers on the stack coupled with bad
+or missing length tests. A programmer who mistakenly leaves open the
+possibility of overrunning a buffer on a function's stack may be allowing
+attackers to overwrite the return pointer pushed onto the stack earlier. Since
+the attackers may be able to control what gets written, they can control where
+the function returns ( based on https://lwn.net/Articles/584225/ ) 
 
- GCC, like many compilers, offers features to help detect and prevent this vulnerabilities 
+GCC, like many compilers, offers features to help detect and prevent this
+vulnerabilities 
 
 This basic document describe the the following security flags: 
 
@@ -21,13 +29,29 @@ Format string vulnerabilities:          CFLAGS="-Wformat -Wformat-security"
 
 Stack-based Buffer Overrun Detection:   CFLAGS=”-fstack-protector-strong”
 
-This flag emits extra code to check for buffer overflows, such as stack smashing attacks. This is done by adding a guard variable to functions with vulnerable objects (canary). The basic idea behind stack protection is to push a "canary" (a randomly chosen integer) on the stack just after the function return pointer has been pushed. The canary value is then checked before the function returns; if it has changed, the program will abort. Generally, stack buffer overflow (aka "stack smashing") attacks will have to change the value of the canary as they write beyond the end of the buffer before they can get to the return pointer. Since the value of the canary is unknown to the attacker, it cannot be replaced by the attack. Thus, the stack protection allows the program to abort when that happens rather than return to wherever the attacker wanted it to go.
+This flag emits extra code to check for buffer overflows, such as stack
+smashing attacks. This is done by adding a guard variable to functions with
+vulnerable objects (canary). The basic idea behind stack protection is to push
+a "canary" (a randomly chosen integer) on the stack just after the function
+return pointer has been pushed. The canary value is then checked before the
+function returns; if it has changed, the program will abort. Generally, stack
+buffer overflow (aka "stack smashing") attacks will have to change the value of
+the canary as they write beyond the end of the buffer before they can get to
+the return pointer. Since the value of the canary is unknown to the attacker,
+it cannot be replaced by the attack. Thus, the stack protection allows the
+program to abort when that happens rather than return to wherever the attacker
+wanted it to go.
 
-Putting stack protection into every function is both overkill and may hurt performance, so one of the GCC options chooses a subset of functions to protect. 
+Putting stack protection into every function is both overkill and may hurt
+performance, so one of the GCC options chooses a subset of functions to
+protect. 
 
 * The existing -fstack-protector-all option will protect all functions
-* The -fstack-protector option chooses any function that declares a character array of eight bytes or more in length on its stack.
-* The -fstack-protector-strong option has been developed to broaden the scope of the stack protection without extending it to every function in the program.
+* The -fstack-protector option chooses any function that declares a character
+  array of eight bytes or more in length on its stack.
+* The -fstack-protector-strong option has been developed to broaden the scope
+  of the stack protection without extending it to every function in the
+  program.
 
 Example code for -fstack-protector-strong
 
@@ -49,7 +73,8 @@ If we compile with
 gcc main.c -o main -fstack-protector-all
 ```
 
-We force to all the functions to have the security protection enebale, the foo function then generate the following code
+We force to all the functions to have the security protection enebale, the foo
+function then generate the following code
 
 ```
 0000000000401112 <foo>:
@@ -79,8 +104,10 @@ If we change to use -fstack-protector-strong the foo function is not affected:
   4010fa:       c3                      retq
   4010fb:       0f 1f 44 00 00          nopl   0x0(%rax,%rax,1)
 ```
-
-The -fstack-protector-strong is recomended to be used to do not affect the perfomrance, instead of protecting all functions that coudl affect the perfomrance , the next question is how much coudl this falg affect the performance ? 
+The -fstack-protector-strong is recomended to be used to do not affect the
+perfomrance, instead of protecting all functions that coudl affect the
+perfomrance , the next question is how much coudl this falg affect the
+performance ? 
 
 Here is a simple benchmark code: 
 
@@ -183,16 +210,13 @@ Sample Standard Deviation: 0.128
 
 The diference is  abs( 12.888426 - 12.439861 ) =  0.448565 secs
 
-The delta in performance ( time ) of this exampel by using th flag : -fstack-protection-all ( forcing to use fstack protection , in case of -fstack-protection-stong , less functions are afected , we are just forcing to simulate the worst case scenario ) is : ~3.4 % 
-
-
+The delta in performance ( time ) of this exampel by using th flag :
+-fstack-protection-all ( forcing to use fstack protection , in case of
+-fstack-protection-stong , less functions are afected , we are just forcing to
+simulate the worst case scenario ) is : ~3.4 % 
 
 ## TODO , same example for:
-
 ## Stack execution protection (LDFLAGS="-z noexecstack")
 ## Fortify source (CFLAGS="-O2 -D_FORTIFY_SOURCE=2")
 ## Format string vulnerabilities( CFLAGS="-Wformat -Wformat-security")
 
-
-
-  
