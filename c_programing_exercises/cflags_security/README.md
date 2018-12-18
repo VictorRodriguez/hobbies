@@ -218,7 +218,7 @@ The delta in performance ( instructions ) of this example by using th flag :
 is 
 
 ```
-abs( 154000124297.67 - 154000122937.33 ) =  1360.34 instructions = ~3.4 % of degradation
+abs( 154000124297.67 - 154000122937.33 ) =  1360.34 instructions = ~0.00000088 % of degradation
 ```
 ## Fortify source (CFLAGS="-O2 -D_FORTIFY_SOURCE=2")
 
@@ -327,7 +327,7 @@ The compiler returns a warning because it correctly detects the buffer overflaw 
 
 if we modify the strcpy(buffer,"deadbeef") to strcpy(buffer,argv[1])
 
--D_FORTIFY_SOURCE=1 will not detect a thing , because at compile tiem it does not has an idea of the lenght of the string to copy to buffer and if it will generate a buffer overflow. However with -D_FORTIFY_SOURCE=2 it does generate code to check at build time ( objdump -d ./<binary> after gcc -D_FORTIFY_SOURCE=2 -Wall -g -O2 mem_test.c -o mem_test
+-D_FORTIFY_SOURCE=1 will not detect a thing , because at compile tiem it does not has an idea of the lenght of the string to copy to buffer and if it will generate a buffer overflow. However with -D_FORTIFY_SOURCE=2 it does generate code to check at build time:
 
 ```
 $ gcc -D_FORTIFY_SOURCE=2 -Wall -g -O2 mem_test.c -o mem_test
@@ -337,7 +337,71 @@ Buffer Contains:  , Size Of Buffer is 5
 Aborted (core dumped)
 ```
 
+Performance can be measure with the next code: 
 
+```
+#include<stdio.h>
+#include<string.h>
+#define MAX 100000000
+
+char buffer[5];
+
+void foo(char *value){
+    strcpy(buffer,value);
+}
+
+int main(int argc, char **argv) {
+    printf ("Buffer Contains: %s , Size Of Buffer is %ld\n",
+                               buffer,sizeof(buffer));
+    int i,x;
+    for (x=0; x<MAX; x++){
+        for (i=0; i<256; i++){
+            foo(argv[1]);
+        }
+    }
+    printf ("Buffer Contains: %s , Size Of Buffer is %ld\n",
+                               buffer,sizeof(buffer));
+}
+```
+
+The difernece in terms of performance is: 
+
+```
+gcc -D_FORTIFY_SOURCE=2 -Wall -g -O2 bench_mem_test.c -o bench_mem_test-forty-2
+
+perf stat ./bench_mem_test-forty-2 aaa
+
+   1,587,600,365,662 instructions:u # 2.77  insn per cycle
+   1,587,600,366,031 instructions:u # 2.77  insn per cycle
+   1,587,600,366,625 instructions:u # 2.77  insn per cycle
+
+Mean (Average):	Mean (Average):	1587600366106 instructions
+Sample Standard Deviation: 280.51 instructions # 2.77 insn per cycle
+```
+
+
+```
+gcc -Wall -g -O2 bench_mem_test.c -o bench_mem_test
+
+perf stat ./bench_mem_test aaa
+
+   870,800,283,138 instructions:u # 2.79  insn per cycle
+   870,800,283,822 instructions:u # 2.78  insn per cycle
+   870,800,283,193 instructions:u # 2.79  insn per cycle
+
+Mean (Average):	Mean (Average):	870800283384.33 instructions
+Sample Standard Deviation: 219.40 instructions # 2.79 insn per cycle
+```
+
+The delta in performance ( instructions ) of this example by using this flag :
+  
+  * -D_FORTIFY_SOURCE=2
+  
+is
+
+```
+abs( 1587600366106 - 870800283384.33 ) =  716800082721.67 instructions = ~82.31 % of degradation
+```
 
 ## TODO , same example for:
 ## Stack execution protection (LDFLAGS="-z noexecstack")
