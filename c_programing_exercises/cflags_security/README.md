@@ -337,6 +337,8 @@ Buffer Contains:  , Size Of Buffer is 5
 Aborted (core dumped)
 ```
 
+  
+
 Performance can be measure with the next code: 
 
 ```
@@ -362,6 +364,20 @@ int main(int argc, char **argv) {
     printf ("Buffer Contains: %s , Size Of Buffer is %ld\n",
                                buffer,sizeof(buffer));
 }
+```
+
+
+If we disassemble the binary output of the above command, we can see the call to <__strcpy_chk@plt>, which checks for a potential buffer overflow:
+
+```
+00000000004011a0 <foo>:
+  4011a0:       48 89 fe                mov    %rdi,%rsi
+  4011a3:       ba 05 00 00 00          mov    $0x5,%edx
+  4011a8:       bf 39 40 40 00          mov    $0x404039,%edi
+  4011ad:       e9 7e fe ff ff          jmpq   401030 <__strcpy_chk@plt>
+  4011b2:       66 2e 0f 1f 84 00 00    nopw   %cs:0x0(%rax,%rax,1)
+  4011b9:       00 00 00
+  4011bc:       0f 1f 40 00             nopl   0x0(%rax)
 ```
 
 The difernece in terms of performance is: 
