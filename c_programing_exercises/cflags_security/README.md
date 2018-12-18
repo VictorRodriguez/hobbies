@@ -189,31 +189,36 @@ with -fstack-protection-all:
 The difernece in terms of performance is: 
 
 ```
-$ perf stat ./bench-no-fstack-protection
+$ perf stat ./bench-fstack-protection-strong
 Executed 3 times: 
-     12.532183000 seconds user
-     12.255217000 seconds user
-     12.532183000 seconds user
-Mean (Average):	12.439861
-Sample Standard Deviation: 0.159
+  154,000,122,982 instructions:u # 3.97  insn per cycle
+  154,000,123,058 instructions:u # 3.99  insn per cycle
+  154,000,122,877 instructions:u # 3.98  insn per cycle
+
+Mean (Average):	Mean (Average):	154000122937.33 instructions
+Sample Standard Deviation: 60.3 instructions # 3.9 insn per cycle
 ```
 
 ```
-$ perf stat ./bench-fstack-protection
+$ perf stat ./bench-fstack-protection-all
 Executed 3 times: 
-     12.877789000 seconds user
-     12.765657000 seconds user
-     13.021832000 seconds user
-Mean (Average):	12.888426
-Sample Standard Deviation: 0.128
+    154,000,124,108 instructions:u # 3.79  insn per cycle
+    154,000,124,669 instructions:u # 3.79  insn per cycl
+    154,000,124,116 instructions:u # 3.79  insn per cycle
+Mean (Average):	154000124297.67 instructions 
+Sample Standard Deviation: 185.68 instructions # 3.7  insn per cycle
 ```
 
-The diference is  abs( 12.888426 - 12.439861 ) =  0.448565 secs
 
-The delta in performance ( time ) of this exampel by using th flag :
--fstack-protection-all ( forcing to use fstack protection , in case of
--fstack-protection-stong , less functions are afected , we are just forcing to
-simulate the worst case scenario ) is : ~3.4 % 
+The delta in performance ( instructions ) of this example by using th flag :
+  * -fstack-protection-all ( forcing to use fstack protection in all functions,simulate the worst case scenario )
+  against: 
+  * -fstack-protection-stong ( less functions are afected ) 
+is 
+
+```
+abs( 154000124297.67 - 154000122937.33 ) =  1360.34 instructions = ~3.4 % of degradation
+```
 
 ## TODO , same example for:
 ## Stack execution protection (LDFLAGS="-z noexecstack")
