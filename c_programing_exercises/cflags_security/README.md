@@ -25,7 +25,7 @@ Format string vulnerabilities:          CFLAGS="-Wformat -Wformat-security"
 ```
 
 
-## GCC Stack Protection Mechanisms
+## GCC Stack Protection Mechanisms (CFLAGS=”-fstack-protector-strong”)
 
 Stack-based Buffer Overrun Detection:   CFLAGS=”-fstack-protector-strong”
 
@@ -68,7 +68,8 @@ int main() {
 }
 ```
 
-If we compile with 
+If we compile with
+
 ```
 gcc main.c -o main -fstack-protector-all
 ```
@@ -219,9 +220,126 @@ is
 ```
 abs( 154000124297.67 - 154000122937.33 ) =  1360.34 instructions = ~3.4 % of degradation
 ```
+## Fortify source (CFLAGS="-O2 -D_FORTIFY_SOURCE=2")
+
+The FORTIFY_SOURCE macro provides lightweight support for detecting buffer overflows in various functions that perform operations on memory and strings. Not all types of buffer overflows can be detected with this macro, but it does provide an extra level of validation for some functions that are potentially a source of buffer overflow flaws. (based on https://access.redhat.com/blogs/766093/posts/1976213)
+
+FORTIFY_SOURCE provides buffer overflow checks for the following functions:
+
+```
+memcpy, mempcpy, memmove, memset, strcpy, stpcpy, strncpy, strcat, 
+strncat, sprintf, vsprintf, snprintf, vsnprintf, gets.
+```
+[reference = http://man7.org/linux/man-pages/man7/feature_test_macros.7.html]
+
+
+For example the next code : 
+
+```
+#include <stdio.h>
+
+void secretFunction()
+{
+    printf("Congratulations!\n");
+    printf("You have entered in the secret function!\n");
+}
+
+void echo()
+{
+    char buffer[20];
+
+    printf("Enter some text:\n");
+    scanf("%s", buffer);
+    printf("You entered: %s\n", buffer);    
+}
+
+int main()
+{
+    echo();
+    return 0;
+}
+```
+
+Is a good example of vulneravility and by following some simple steps in 
+
+https://github.com/VictorRodriguez/operating-systems-lecture/tree/master/labs/gcc/security
+
+We can easily access to the secretFunction() by buffer overflow
+
+When we compile with: -D_FORTIFY_SOURCE=1 we get 
+
+```
+vuln.c: In function ‘echo’:
+vuln.c:18:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+     scanf("%s", buffer);
+     ^~~~~~~~~~~~~~~~~~~
+```
+
+As we can see the compiler (GCC 8.1) do a very good job by detecting the security issue at scanf function
+
+Compiling with:
+
+```
+gcc -Wall -g -O2 vuln.c -o vuln
+```
+
+Generates no issue or warning 
+
+Now for the diference with -D_FORTIFY_SOURCE=2 is  
+
+* gcc -D_FORTIFY_SOURCE=1 adds checks at compile-time only
+* gcc -D_FORTIFY_SOURCE=2 also adds checks at run-time (detected buffer overflow terminates the program)
+
+For example: 
+
+```
+#include<stdio.h>
+#include<string.h>
+
+int main(int argc, char **argv) {
+char buffer[5];
+printf ("Buffer Contains: %s , Size Of Buffer is %ld\n",
+                               buffer,sizeof(buffer));
+strcpy(buffer,"deadbeef");
+printf ("Buffer Contains: %s , Size Of Buffer is %ld\n",
+                               buffer,sizeof(buffer));
+}
+```
+
+with -D_FORTIFY_SOURCE=1  we get:
+
+```
+$ gcc -D_FORTIFY_SOURCE=1 -Wall -g -O2 mem_test.c -o mem_test
+In file included from /usr/include/string.h:494,
+                 from mem_test.c:3:
+In function ‘strcpy’,
+    inlined from ‘main’ at mem_test.c:9:1:
+/usr/include/bits/string_fortified.h:90:10: warning: ‘__builtin___memcpy_chk’ forming offset [6, 9] is out of the bounds [0, 5] of object ‘buffer’ with type ‘char[5]’ [-Warray-bounds]
+   return __builtin___strcpy_chk (__dest, __src, __bos (__dest));
+          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+mem_test.c: In function ‘main’:
+mem_test.c:6:6: note: ‘buffer’ declared here
+ char buffer[5];
+      ^~~~~~
+```
+
+The compiler returns a warning because it correctly detects the buffer overflaw in the buffer variable:
+
+if we modify the strcpy(buffer,"deadbeef") to strcpy(buffer,argv[1])
+
+-D_FORTIFY_SOURCE=1 will not detect a thing , because at compile tiem it does not has an idea of the lenght of the string to copy to buffer and if it will generate a buffer overflow. However with -D_FORTIFY_SOURCE=2 it does generate code to check at build time ( objdump -d ./<binary> after gcc -D_FORTIFY_SOURCE=2 -Wall -g -O2 mem_test.c -o mem_test
+
+```
+$ gcc -D_FORTIFY_SOURCE=2 -Wall -g -O2 mem_test.c -o mem_test
+$ ./mem_test aaaaaaaaaaaaaa
+Buffer Contains:  , Size Of Buffer is 5
+*** buffer overflow detected ***: ./mem_test terminated
+Aborted (core dumped)
+```
+
+
 
 ## TODO , same example for:
 ## Stack execution protection (LDFLAGS="-z noexecstack")
-## Fortify source (CFLAGS="-O2 -D_FORTIFY_SOURCE=2")
 ## Format string vulnerabilities( CFLAGS="-Wformat -Wformat-security")
 
