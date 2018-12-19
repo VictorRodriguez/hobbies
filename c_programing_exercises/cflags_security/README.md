@@ -415,7 +415,39 @@ is
 abs( 1485405795306.7 - 1485255023773 ) =  150771533.7 instructions = ~0.01 % of degradation
 ```
 
+## Format string vulnerabilities( CFLAGS="-Wformat -Wformat-security")
+
+-Wformat check calls to printf and scanf, etc., to make sure that the arguments supplied have types appropriate to the format string specified, and that the conversions specified in the format string make sense. This includes standard functions, and others specified by format attributes (see Function Attributes), in the printf, scanf, strftime and strfmon (an X/Open extension, not in the C standard) families (or other target-specific families). 
+
+With -Wformat-security if -Wformat is specified, also warn about uses of format functions that represent possible security problems. At present, this warns about calls to printf and scanf functions where the format string is not a string literal and there are no format arguments, as in printf (foo);. This may be a security hole if the format string came from untrusted input and contains ‘%n’. (This is currently a subset of what -Wformat-nonliteral warns about, but in future warnings may be added to -Wformat-security that are not included in -Wformat-nonliteral.)
+
+[taken from https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html]
+
+Example of code that -Wformat-security detects
+
+```
+#include <stdio.h>
+#include <stdlib.h>
+
+void foo(char *s) {
+    printf(s);
+}
+
+int main(){
+    char greeting[] = "Hello";
+    foo(greeting);
+    return EXIT_SUCCESS;
+}
+
+$ gcc -Wall -Wextra -Wformat-security  printf-secure.c
+printf-secure.c: In function ‘foo’:
+printf-secure.c:5:5: warning: format not a string literal and no format arguments [-Wformat-security]
+     printf(s);
+     ^~~~~~
+```
+
+There is no performance penalty since the code is not affected , just a warning is generated at compile time 
+
 ## TODO , same example for:
 ## Stack execution protection (LDFLAGS="-z noexecstack")
-## Format string vulnerabilities( CFLAGS="-Wformat -Wformat-security")
 
