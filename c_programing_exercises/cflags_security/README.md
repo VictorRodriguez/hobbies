@@ -192,22 +192,23 @@ The difernece in terms of performance is:
 ```
 $ perf stat ./bench-fstack-protection-strong
 Executed 3 times: 
-  154,000,122,982 instructions:u # 3.97  insn per cycle
-  154,000,123,058 instructions:u # 3.99  insn per cycle
-  154,000,122,877 instructions:u # 3.98  insn per cycle
+  154,054,541,632 instructions:u # 2.84  insn per cycle
+  154,059,056,179 instructions:u # 2.84  insn per cycle
+  154,013,291,687 instructions:u # 2.84  insn per cycle
 
-Mean (Average):	Mean (Average):	154000122937.33 instructions
-Sample Standard Deviation: 60.3 instructions # 3.9 insn per cycle
+Mean (Average):	Mean (Average):	154042296499.33 instructions
+Sample Standard Deviation: 14560845.185207 instructions # 2.84 insn per cycle
 ```
 
 ```
 $ perf stat ./bench-fstack-protection-all
 Executed 3 times: 
-    154,000,124,108 instructions:u # 3.79  insn per cycle
-    154,000,124,669 instructions:u # 3.79  insn per cycl
-    154,000,124,116 instructions:u # 3.79  insn per cycle
-Mean (Average):	154000124297.67 instructions 
-Sample Standard Deviation: 185.68 instructions # 3.7  insn per cycle
+    153,987,502,402 instructions:u # 2.84  insn per cycle
+    153,995,330,286 instructions:u # 2.84  insn per cycle
+    154,004,792,847 instructions:u # 2.84  insn per cycle
+
+Mean (Average):	153995875178.33 instructions 
+Sample Standard Deviation: 4998751.6046743 instructions # 2.84  insn per cycle
 ```
 
 
@@ -218,7 +219,7 @@ The delta in performance ( instructions ) of this example by using th flag :
 is 
 
 ```
-abs( 154000124297.67 - 154000122937.33 ) =  1360.34 instructions = ~0.00000088 % of degradation
+abs( 154042296499.33 - 153995875178.33 ) =  46421321 instructions = ~0.03 % of degradation
 ```
 ## Fortify source (CFLAGS="-O2 -D_FORTIFY_SOURCE=2")
 
@@ -285,12 +286,7 @@ gcc -Wall -g -O2 vuln.c -o vuln
 
 Generates no issue or warning 
 
-Now for the diference with -D_FORTIFY_SOURCE=2 is  
-
-* gcc -D_FORTIFY_SOURCE=1 adds checks at compile-time only
-* gcc -D_FORTIFY_SOURCE=2 also adds checks at run-time (detected buffer overflow terminates the program)
-
-For example: 
+Taking another example with more easy to handle buffer overflow
 
 ```
 #include<stdio.h>
@@ -387,12 +383,12 @@ gcc -D_FORTIFY_SOURCE=2 -Wall -g -O2 bench_mem_test.c -o bench_mem_test-forty-2
 
 perf stat ./bench_mem_test-forty-2 aaa
 
-   1,587,600,365,662 instructions:u # 2.77  insn per cycle
-   1,587,600,366,031 instructions:u # 2.77  insn per cycle
-   1,587,600,366,625 instructions:u # 2.77  insn per cycle
+   1,485,272,192,918 instructions:u # 2.31  insn per cycle
+   1,485,453,650,633 instructions:u # 2.31  insn per cycle
+   1,485,491,542,369 instructions:u # 2.31  insn per cycle
 
-Mean (Average):	Mean (Average):	1587600366106 instructions
-Sample Standard Deviation: 280.51 instructions # 2.77 insn per cycle
+Mean (Average):	Mean (Average):	1485405795306.7 instructions
+Sample Standard Deviation: 67690828.052631 instructions # 2.31 insn per cycle
 ```
 
 
@@ -401,12 +397,12 @@ gcc -Wall -g -O2 bench_mem_test.c -o bench_mem_test
 
 perf stat ./bench_mem_test aaa
 
-   870,800,283,138 instructions:u # 2.79  insn per cycle
-   870,800,283,822 instructions:u # 2.78  insn per cycle
-   870,800,283,193 instructions:u # 2.79  insn per cycle
+   1,485,386,835,017 instructions:u # 2.3  insn per cycle
+   1,485,194,110,041 instructions:u # 2.3  insn per cycle
+   1,485,184,126,261 instructions:u # 2.3  insn per cycle
 
-Mean (Average):	Mean (Average):	870800283384.33 instructions
-Sample Standard Deviation: 219.40 instructions # 2.79 insn per cycle
+Mean (Average):	Mean (Average):	1485255023773 instructions
+Sample Standard Deviation: 65968608.694825 instructions # 2.3 insn per cycle
 ```
 
 The delta in performance ( instructions ) of this example by using this flag :
@@ -416,7 +412,7 @@ The delta in performance ( instructions ) of this example by using this flag :
 is
 
 ```
-abs( 1587600366106 - 870800283384.33 ) =  716800082721.67 instructions = ~82.31 % of degradation
+abs( 1485405795306.7 - 1485255023773 ) =  150771533.7 instructions = ~0.01 % of degradation
 ```
 
 ## TODO , same example for:
