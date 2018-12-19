@@ -450,4 +450,5 @@ There is no performance penalty since the code is not affected , just a warning 
 
 ## TODO , same example for:
 ## Stack execution protection (LDFLAGS="-z noexecstack")
+## Data relocation and protection (RELRO): LDLFAGS="-z relro -z now"
 
