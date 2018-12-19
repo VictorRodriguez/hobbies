@@ -6,6 +6,7 @@ all:
 	gcc -D_FORTIFY_SOURCE=1 -Wall -g -O2 vuln.c -o vuln
 	gcc -Wall -g -O2 bench_mem_test.c -o bench_mem_test
 	gcc -D_FORTIFY_SOURCE=2 -Wall -g -O2 bench_mem_test.c -o bench_mem_test-forty-2
+	gcc -Wall -Wextra -Wformat-security  printf-secure.c -o printf-secure
 
 clean:
 	rm -rf main
@@ -15,3 +16,4 @@ clean:
 	rm -rf mem_test
 	rm -rf bench_mem_test
 	rm -rf bench_mem_test-forty-2
+	rm -rf printf-secure
