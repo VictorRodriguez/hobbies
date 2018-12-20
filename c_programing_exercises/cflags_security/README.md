@@ -467,6 +467,5 @@ To prevent this kind of exploitation technique, we can tell the linker to resolv
 
 The performance of RELocation Read-Only depends on the number of times the library is called, is hard to generate a micr benchmark for it
 
-## TODO , same example for:
-## Stack execution protection (LDFLAGS="-z noexecstack")
-
+[source https://developers.redhat.com/blog/2018/03/21/compiler-and-linker-flags-gcc/]
+[source https://medium.com/@HockeyInJune/relro-relocation-read-only-c8d0933faef3]
