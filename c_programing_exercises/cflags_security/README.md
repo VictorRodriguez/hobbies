@@ -450,9 +450,9 @@ There is no performance penalty since the code is not affected , just a warning 
 
 ## Data relocation and protection (RELRO): LDLFAGS="-z relro -z now"
 
-A dynamically linked ELF binary uses a look-up table called Global Offset Table (GOT) to dynamically resolve functions that are located in shared libraries. When you call a function that is located in a shared library, it looks like the following. This is a high-level view of what is going on, there are lots of things the linker is doing that we won’t go into.
+A dynamically linked ELF binary uses a look-up table called Global Offset Table (GOT) to dynamically resolve functions that are located in shared libraries. There are several steps in the middle to make it possible: 
 
-* First, the call is actually pointing to the Procedure Linkage Table (PLT), which exists in the .plt section of the binary.
+* First, the function call is actually pointing to the Procedure Linkage Table (PLT), which exists in the .plt section of the binary.
 
 * The .plt section contains x86 instructions that point directly to the GOT, which lives in the .got.plt section.
 
@@ -460,9 +460,10 @@ A dynamically linked ELF binary uses a look-up table called Global Offset Table 
 
 By default, the GOT is populated dynamically while the program is running. The first time a function is called, the GOT contains a pointer back to the PLT, where the linker is called to find the actual location of the function in question (this is the part we’re not going into detail about). The location found is then written to the GOT. The second time a function is called, the GOT contains the known location of the function. This is called “lazy binding.”. Since we know that the GOT lives in a predefined place and is writable, all that is needed is a bug that lets an attacker write four bytes anywhere.
 
-To prevent an exploitation technique, we can tell the linker to resolve all dynamically linked functions at the beginning of execution and make the GOT read-only. Note that we are operating on a different binary below compiled from the same source code.
+To prevent this kind of exploitation technique, we can tell the linker to resolve all dynamically linked functions at the beginning of execution and make the GOT read-only. For this case the compiler provide 2 flags 
 
-We can turn on Full RELRO with the gcc compiler option: -Wl,-z,relro,-z,now. This gets passed to the linker as -z relro -z now. On most modern Linux distributions a variant of RELRO known as Partial RELRO is used by default. Partial RELRO uses the -z relro option, but not the -z now option.
+* -Wl,-z,now : It Disable lazy binding. 
+* -Wl,-z,relro : Makes Read-only segments after relocation	
 
 The performance of RELocation Read-Only depends on the number of times the library is called, is hard to generate a micr benchmark for it
 
