@@ -508,3 +508,11 @@ library is called, is hard to generate a micr benchmark for it
 
 [source https://developers.redhat.com/blog/2018/03/21/compiler-and-linker-flags-gcc/]
 [source https://medium.com/@HockeyInJune/relro-relocation-read-only-c8d0933faef3]
+
+## Stack execution protection: LDFLAGS="-z noexecstack"
+
+Buffer overflow exploits often put some code in a program's data area or stack, and then jump to it. If all writable addresses are non-executable, such an attack is prevented. This is OpenBSD's W^X. The implementation is straightforward when an NX bit is provided by the hardware. And it is, on most architectures. On i386 software schemes are needed, like Pax or Exec Shield. NX is turned off by the noexec=off boot parameter.
+### PT_GNU_STACK
+PT_GNU_STACK is an ELF header item that indicates whether an executable stack is needed. If this item is missing, we have no information and must assume that an executable stack is needed. By default, gcc will mark the stack non-executable, unless an executable stack is needed for function trampolines. The gcc marking can be overridden via the -z execstack or -z noexecstack compiler flags.
+
+[source https://www.win.tue.nl/~aeb/linux/hh/protection.html]
