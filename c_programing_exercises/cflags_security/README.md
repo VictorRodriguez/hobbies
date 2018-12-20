@@ -511,8 +511,28 @@ library is called, is hard to generate a micr benchmark for it
 
 ## Stack execution protection: LDFLAGS="-z noexecstack"
 
-Buffer overflow exploits often put some code in a program's data area or stack, and then jump to it. If all writable addresses are non-executable, such an attack is prevented. This is OpenBSD's W^X. The implementation is straightforward when an NX bit is provided by the hardware. And it is, on most architectures. On i386 software schemes are needed, like Pax or Exec Shield. NX is turned off by the noexec=off boot parameter.
+Buffer overflow exploits often put some code in a program's data area or stack, and then jump to it. If all writable addresses are non-executable, such an attack is prevented. The implementation is straightforward when an NX bit is provided by the hardware. 
 ### PT_GNU_STACK
 PT_GNU_STACK is an ELF header item that indicates whether an executable stack is needed. If this item is missing, we have no information and must assume that an executable stack is needed. By default, gcc will mark the stack non-executable, unless an executable stack is needed for function trampolines. The gcc marking can be overridden via the -z execstack or -z noexecstack compiler flags.
+
+```
+$ gcc main.c -o main-execstack -z execstack
+$ objdump -p main-execstack | grep -i -A1 stack
+main-execstack:     file format elf64-x86-64
+
+--
+   STACK off    0x0000000000000000 vaddr 0x0000000000000000 paddr 0x0000000000000000 align 2**4
+         filesz 0x0000000000000000 memsz 0x0000000000000000 flags rwx
+```
+
+```
+$ gcc main.c -o main-noexecstack -z noexecstack
+$ objdump -p main-noexecstack | grep -i -A1 stack
+main-noexecstack:     file format elf64-x86-64
+
+--
+   STACK off    0x0000000000000000 vaddr 0x0000000000000000 paddr 0x0000000000000000 align 2**4
+         filesz 0x0000000000000000 memsz 0x0000000000000000 flags rw-
+```
 
 [source https://www.win.tue.nl/~aeb/linux/hh/protection.html]
