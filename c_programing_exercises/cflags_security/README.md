@@ -223,7 +223,12 @@ abs( 154042296499.33 - 153995875178.33 ) =  46421321 instructions = ~0.03 % of d
 ```
 ## Fortify source (CFLAGS="-O2 -D_FORTIFY_SOURCE=2")
 
-The FORTIFY_SOURCE macro provides lightweight support for detecting buffer overflows in various functions that perform operations on memory and strings. Not all types of buffer overflows can be detected with this macro, but it does provide an extra level of validation for some functions that are potentially a source of buffer overflow flaws. (based on https://access.redhat.com/blogs/766093/posts/1976213)
+The FORTIFY_SOURCE macro provides lightweight support for detecting buffer
+overflows in various functions that perform operations on memory and strings.
+Not all types of buffer overflows can be detected with this macro, but it does
+provide an extra level of validation for some functions that are potentially a
+source of buffer overflow flaws. (based on
+https://access.redhat.com/blogs/766093/posts/1976213)
 
 FORTIFY_SOURCE provides buffer overflow checks for the following functions:
 
@@ -276,7 +281,8 @@ vuln.c:18:5: warning: ignoring return value of ‘scanf’, declared with attrib
      ^~~~~~~~~~~~~~~~~~~
 ```
 
-As we can see the compiler (GCC 8.1) do a very good job by detecting the security issue at scanf function
+As we can see the compiler (GCC 8.1) do a very good job by detecting the
+security issue at scanf function
 
 Compiling with:
 
@@ -319,11 +325,15 @@ mem_test.c:6:6: note: ‘buffer’ declared here
       ^~~~~~
 ```
 
-The compiler returns a warning because it correctly detects the buffer overflaw in the buffer variable:
+The compiler returns a warning because it correctly detects the buffer overflaw
+in the buffer variable:
 
 if we modify the strcpy(buffer,"deadbeef") to strcpy(buffer,argv[1])
 
--D_FORTIFY_SOURCE=1 will not detect a thing , because at compile tiem it does not has an idea of the lenght of the string to copy to buffer and if it will generate a buffer overflow. However with -D_FORTIFY_SOURCE=2 it does generate code to check at build time:
+-D_FORTIFY_SOURCE=1 will not detect a thing , because at compile tiem it does
+not has an idea of the lenght of the string to copy to buffer and if it will
+generate a buffer overflow. However with -D_FORTIFY_SOURCE=2 it does generate
+code to check at build time:
 
 ```
 $ gcc -D_FORTIFY_SOURCE=2 -Wall -g -O2 mem_test.c -o mem_test
@@ -363,7 +373,8 @@ int main(int argc, char **argv) {
 ```
 
 
-If we disassemble the binary output of the above command, we can see the call to <__strcpy_chk@plt>, which checks for a potential buffer overflow:
+If we disassemble the binary output of the above command, we can see the call
+to <__strcpy_chk@plt>, which checks for a potential buffer overflow:
 
 ```
 00000000004011a0 <foo>:
@@ -417,9 +428,21 @@ abs( 1485405795306.7 - 1485255023773 ) =  150771533.7 instructions = ~0.01 % of 
 
 ## Format string vulnerabilities( CFLAGS="-Wformat -Wformat-security")
 
--Wformat check calls to printf and scanf, etc., to make sure that the arguments supplied have types appropriate to the format string specified, and that the conversions specified in the format string make sense. This includes standard functions, and others specified by format attributes (see Function Attributes), in the printf, scanf, strftime and strfmon (an X/Open extension, not in the C standard) families (or other target-specific families). 
+-Wformat check calls to printf and scanf, etc., to make sure that the arguments
+supplied have types appropriate to the format string specified, and that the
+conversions specified in the format string make sense. This includes standard
+functions, and others specified by format attributes (see Function Attributes),
+in the printf, scanf, strftime and strfmon (an X/Open extension, not in the C
+standard) families (or other target-specific families). 
 
-With -Wformat-security if -Wformat is specified, also warn about uses of format functions that represent possible security problems. At present, this warns about calls to printf and scanf functions where the format string is not a string literal and there are no format arguments, as in printf (foo);. This may be a security hole if the format string came from untrusted input and contains ‘%n’. (This is currently a subset of what -Wformat-nonliteral warns about, but in future warnings may be added to -Wformat-security that are not included in -Wformat-nonliteral.)
+With -Wformat-security if -Wformat is specified, also warn about uses of format
+functions that represent possible security problems. At present, this warns
+about calls to printf and scanf functions where the format string is not a
+string literal and there are no format arguments, as in printf (foo);. This may
+be a security hole if the format string came from untrusted input and contains
+‘%n’. (This is currently a subset of what -Wformat-nonliteral warns about, but
+in future warnings may be added to -Wformat-security that are not included in
+-Wformat-nonliteral.)
 
 [taken from https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html]
 
@@ -446,26 +469,42 @@ printf-secure.c:5:5: warning: format not a string literal and no format argument
      ^~~~~~
 ```
 
-There is no performance penalty since the code is not affected , just a warning is generated at compile time 
+There is no performance penalty since the code is not affected , just a warning
+is generated at compile time 
 
 ## Data relocation and protection (RELRO): LDLFAGS="-z relro -z now"
 
-A dynamically linked ELF binary uses a look-up table called Global Offset Table (GOT) to dynamically resolve functions that are located in shared libraries. There are several steps in the middle to make it possible: 
+A dynamically linked ELF binary uses a look-up table called Global Offset Table
+(GOT) to dynamically resolve functions that are located in shared libraries.
+There are several steps in the middle to make it possible: 
 
-* First, the function call is actually pointing to the Procedure Linkage Table (PLT), which exists in the .plt section of the binary.
+* First, the function call is actually pointing to the Procedure Linkage Table
+  (PLT), which exists in the .plt section of the binary.
 
-* The .plt section contains x86 instructions that point directly to the GOT, which lives in the .got.plt section.
+* The .plt section contains x86 instructions that point directly to the GOT,
+  which lives in the .got.plt section.
 
-* The .got.plt section contains binary data. The GOT contain pointers back to the PLT or to the location of the dynamically linked function.
+* The .got.plt section contains binary data. The GOT contain pointers back to
+  the PLT or to the location of the dynamically linked function.
 
-By default, the GOT is populated dynamically while the program is running. The first time a function is called, the GOT contains a pointer back to the PLT, where the linker is called to find the actual location of the function in question (this is the part we’re not going into detail about). The location found is then written to the GOT. The second time a function is called, the GOT contains the known location of the function. This is called “lazy binding.”. Since we know that the GOT lives in a predefined place and is writable, all that is needed is a bug that lets an attacker write four bytes anywhere.
+By default, the GOT is populated dynamically while the program is running. The
+first time a function is called, the GOT contains a pointer back to the PLT,
+where the linker is called to find the actual location of the function in
+question (this is the part we’re not going into detail about). The location
+found is then written to the GOT. The second time a function is called, the GOT
+contains the known location of the function. This is called “lazy binding.”.
+Since we know that the GOT lives in a predefined place and is writable, all
+that is needed is a bug that lets an attacker write four bytes anywhere.
 
-To prevent this kind of exploitation technique, we can tell the linker to resolve all dynamically linked functions at the beginning of execution and make the GOT read-only. For this case the compiler provide 2 flags 
+To prevent this kind of exploitation technique, we can tell the linker to
+resolve all dynamically linked functions at the beginning of execution and make
+the GOT read-only. For this case the compiler provide 2 flags 
 
 * -Wl,-z,now : It Disable lazy binding. 
 * -Wl,-z,relro : Makes Read-only segments after relocation	
 
-The performance of RELocation Read-Only depends on the number of times the library is called, is hard to generate a micr benchmark for it
+The performance of RELocation Read-Only depends on the number of times the
+library is called, is hard to generate a micr benchmark for it
 
 [source https://developers.redhat.com/blog/2018/03/21/compiler-and-linker-flags-gcc/]
 [source https://medium.com/@HockeyInJune/relro-relocation-read-only-c8d0933faef3]
