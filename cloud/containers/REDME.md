@@ -20,6 +20,11 @@ Status: Downloaded newer image for debian:stretch-slim
 $ docker run 702d6b306afb
 hola mundo desde mi pc
 
+More cool examples of Dockerfiles: 
+
+* https://github.com/kstaken/dockerfile-examples
+
+
 ## Links
 
 * https://docker-curriculum.com/
