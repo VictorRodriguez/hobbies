@@ -3,10 +3,10 @@
     http://creativecommons.org/licenses/by/3.0/legalcode
 
 ==============================================
-StarlingX: Reorganize Flock Servie Source code
+StarlingX: Reorganize Flock Services Source code
 ==============================================
 
-Storyboard: <need Story here>
+Storyboard: https://storyboard.openstack.org/#!/story/2004792
 
 StarlingX currently combines source code and build meta-data in the same
 directory structure, as we move to support multiple OSes, this structure
