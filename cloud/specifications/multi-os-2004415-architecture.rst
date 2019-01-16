@@ -43,8 +43,7 @@ the distribution, by having MultiOS support for the STX project the STX
 developers/users at the community could benefit from the advantages that each
 the operating system offers:
 
-- CentOS uses a more conservative approach and uses older versions of packages.
-Many fixes and features are backported to these versions.
+- CentOS uses a more conservative approach and uses older versions of packages. Many fixes and features are backported to these versions.
 
 - Ubuntu is more aggressive and uses more recent versions
 
