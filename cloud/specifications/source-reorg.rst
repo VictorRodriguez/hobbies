@@ -31,11 +31,13 @@ now we are not using many of that standard directory structure.
 Use Cases
 =========
 
-a) Developers want to apply a change in the CentOS spec file but not to the
+1. Developers want to apply a change in the CentOS spec file but not to the
 Ubuntu rules file.
-b) Developers want to apply a performance change into CentOS but is not
+
+2. Developers want to apply a performance change into CentOS but is not
 necesary in Ubuntu.
-c) Developers want to change the installation path at the CentOS spec file but
+
+3. Developers want to change the installation path at the CentOS spec file but
 not at the Ubuntu build scripts . Developer will not change anything at the src
 code of the service, no need to touch the git history of the source code
 project.
@@ -145,20 +147,20 @@ Other contributors:
 Repos Impacted
 ==============
 
-https://git.starlingx.io/cgit/stx-integ/stx-clients
-https://git.starlingx.io/cgit/stx-integ/stx-config
-https://git.starlingx.io/cgit/stx-integ/stx-distcloud
-https://git.starlingx.io/cgit/stx-integ/stx-distcloud-client
-https://git.starlingx.io/cgit/stx-integ/stx-fault
-https://git.starlingx.io/cgit/stx-integ/stx-governance
-https://git.starlingx.io/cgit/stx-integ/stx-gplv2
-https://git.starlingx.io/cgit/stx-integ/stx-gplv3
-https://git.starlingx.io/cgit/stx-integ/stx-gui
-https://git.starlingx.io/cgit/stx-integ/stx-ha
-https://git.starlingx.io/cgit/stx-integ/stx-nfv
-https://git.starlingx.io/cgit/stx-integ/stx-update
-https://git.starlingx.io/cgit/stx-integ/stx-upstream
-https://git.starlingx.io/cgit/stx-integ/stx-utils
+- https://git.starlingx.io/cgit/stx-integ/stx-clients
+- https://git.starlingx.io/cgit/stx-integ/stx-config
+- https://git.starlingx.io/cgit/stx-integ/stx-distcloud
+- https://git.starlingx.io/cgit/stx-integ/stx-distcloud-client
+- https://git.starlingx.io/cgit/stx-integ/stx-fault
+- https://git.starlingx.io/cgit/stx-integ/stx-governance
+- https://git.starlingx.io/cgit/stx-integ/stx-gplv2
+- https://git.starlingx.io/cgit/stx-integ/stx-gplv3
+- https://git.starlingx.io/cgit/stx-integ/stx-gui
+- https://git.starlingx.io/cgit/stx-integ/stx-ha
+- https://git.starlingx.io/cgit/stx-integ/stx-nfv
+- https://git.starlingx.io/cgit/stx-integ/stx-update
+- https://git.starlingx.io/cgit/stx-integ/stx-upstream
+- https://git.starlingx.io/cgit/stx-integ/stx-utils
 
 
 Work Items
@@ -193,6 +195,7 @@ References
 ==========
 
 [1] https://www.gun.io/blog/maintaining-an-open-source-project
+
 [2] https://github.com/kriasoft/Folder-Structure-Conventions
 
 History
