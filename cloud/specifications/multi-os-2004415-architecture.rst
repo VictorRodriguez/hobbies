@@ -8,17 +8,52 @@ StarlingX: Build system architecture for multiOS
 
 Storyboard: https://storyboard.openstack.org/#!/story/2004415
 
-Starling X is based on CentOS operating system, however, we would like to
-support other operating systems such as Ubuntu or Clear. The current build
-system under STX will not support the transition to other OS based on rpm or
-deb files. In order to give a full support for other operating systems it is
-necessary to refactor the current build model and generate an separation of
-source code vs build metadata for the STX flock services, patches, and build
-tools.
+Starling X is growing as edge cloud solution, however, the curent cloud use
+more than one kind of operating system. The Cloud Market's latest analysis of
+operating systems on the Amazon Elastic Compute Cloud (EC2) shows Ubuntu as the
+most used OS, in the same list we can find CentOS and Red Hat Enterprise Linux
+(RHEL). By having a MultiOS support for the STX project the STX
+developers/users at the community could benefit from the advantages that each
+operating system offers.
 
+Today, Starling X is based on CentOS operating system, however, we would like
+to support other operating systems such as Ubuntu or Clear Linux (Clear Linux
+OS is an open source, rolling release Linux distribution optimized for
+performance and security for the x86 platforms, since a high percentage of the
+data center servers are based on x86 architectures, enable Starling X in an x86
+optimized OS coudl be an option). The current build system under STX does not
+support the transition to other OS based on rpm or deb files. In order to give
+a full support for other operating systems we are propousing to make changes on
+the current build model and generate an issolation of source code vs build
+metadata for the STX flock services. All this with the aim of setting of common
+of making is easier for others to understand and contribute to our project. The
+order of what operating support first, either Ubuntu or Clear Linux is out of
+the scope of this specification.
 
 Problem description
 ===================
+
+Curent cloud systems use different kind of operating system. Among th most used
+OS, CentOS / RHEL. represents approximately 55% of Openstack and Ubuntu Server
+represents 35% of deployments and a significant amount of the users as a whole.
+
+Since Linux distributions have many different approaches to pulling together
+the distribution, bBy having a MultiOS support for the STX project the STX
+developers/users at the community could benefit from the advantages that each
+operating system offers:
+
+- CentOS uses a more conservative approach and uses older versions of packages.
+Many fixes and features are back ported to these versions.
+
+- Ubuntu is more aggressive and uses more recent versions
+
+- Clear Linux OS is an open source, rolling release Linux distribution
+optimized for performance and security for the x86 platforms, since a high
+percentage of the data center servers are based on x86 architectures, enable
+Starling X in an x86 optimized OS could benefit the STX users
+
+To appeal to the broadest community of users, Starling X needs to run a several
+Linux distributions.
 
 Currently the StarlingX build system only generates RPMs specifically for
 CentOS7. The tooling understands how to parse the metadata (srpm_path,
@@ -34,7 +69,7 @@ that are getting patches applied (that may not apply to different version).
 STX build tools currently generate currently only RPMs for CentOS operating
 system due to two main reasons:
 
-- STX RPMs cannot be installed on Ubuntu/Debian
+- RPMs cannot be installed on Ubuntu/Debian
 
 In Ubuntu Linux, installation of software can be done on using  Ubuntu Software
 Center, Synaptic package manager or apt-get command line mode.  Current STX
@@ -62,10 +97,10 @@ RPMs but also Ubuntu base distros based on deb files.
 Use Cases
 =========
 
-a) Developers need to generate an image based on alternate OSes for some End
-User client or Deployer.
+a) End-user can select the Linux OS used for the host OS: If developers need to
+generate an image based on alternate OSes for some End User client or Deployer.
 
-b) If developers need to apply a bug fix, feature, or security fix for the
+b) Developers need to apply a bug fix, feature, or security fix for the
 same package on multiple operating systems.
 
 c) Operators how want alternate Operating System other than CentOS in both the
@@ -75,8 +110,28 @@ host OS and container guest OS.
 Proposed change
 ===============
 
-This specification proposes a step-wise approach with a number of additional
-specification that will break down the steps outlined below.
+If this change is completed the end to end big picture for the developer/user
+will be:
+
+- The user can select the Linux OS used for the host OS
+- The user can select the Linux OS used for the containers used in a starling x
+deployment
+- The selection of the host OS and the container OS is independent
+- The default operating system to build will be CentOS / RHEL.
+- The build system will use the Linux distribution build systems toensure the
+distribution is consistent
+- The nightly build will use the same mechanisms and the developer build to
+ensure consistent build output.
+- Proper documentation to the developer documentation as : STX Developer’s Guide
+- Developer workflow with multi OS will be minimized.
+- The definition of how a package is built for a specific Linux distribution
+will be separated from the actual source code to simplify the addition of other
+Linux distributions.
+
+
+In orer to achieve these goals, this specification proposes a step-wise
+approach with a number of additional specification that will break down the
+steps outlined below:
 
 Reorganize the STX Flock source, a specification will be created to detail the
 implementation. The source and build specific metadata should be separated to
@@ -88,6 +143,11 @@ buildtime dependencies are in place. The "Source Reorg" specification will
 detail the proposed directory layout and tools and build targets. Initially,
 the StarlingX flock could be built manually and installed based on this new
 layout.
+
+Reorganize the StarlingX Integration and packaging repository: specification to
+organize the build managment code for multiple operating systems.This
+specification coudl explain how the patches and spec files coudl be re
+organized inside the stx-integ repository.
 
 The next specification would the "Dependency Generator" specification, which
 would spell out how the dependencies could be generated for multiple packaging
@@ -224,6 +284,8 @@ New documentation will be generated for this multi-OS case
 
 References
 ==========
+
+[1] https://thecloudmarket.com/stats#/by_platform_definition
 
 
 History
