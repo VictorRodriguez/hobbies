@@ -52,16 +52,29 @@ One example of a package with multi OS support could be:
     ├── clear
     │   ├── autospec files
     │   └── cve_fix.patch
-    └── fedora
-        ├── <package_name>.spec
-        └── cve_fix.patch
+    ├── fedora
+    │   ├── <package_name>.spec
+    │   └── cve_fix.patch
+    └── kubernetes
+
+An example of this could be:
+
+https://git.starlingx.io/cgit/stx-integ/stx-nfv
+
+and 
+
+https://git.starlingx.io/cgit/stx-integ/stx-nfv-pkg
+
+where stx-nfv will hold just the source code of the service and stx-nfv-build
+will host the build scripting for multiple operating systems and even
+containers/kubernetes
 
 
 Alternatives
 ============
 
 Keep the existing directory structure and add additional sub-directories for 
-the new Operating Systems, which will clutter the 
+the new Operating Systems, which will clutter the current repositories. 
 
 Data model impact
 =================
@@ -83,13 +96,6 @@ Other end user impact
 =====================
 
 None
-
-In the end, the End user will have:
-
-stx-centos.iso
-stx-ubuntu.iso
-stx-clearlinux.iso
-
 
 Performance Impact
 ==================
@@ -116,32 +122,42 @@ None
 Implementation
 ==============
 
-Implementation will be in parallel to the current build system and will be
-available for the community to be evaluated and used if needed
+Is possible to create separate branch for now and merge until is proved that
+does not break the build or the sanity of the system
 
 Assignee(s)
 ===========
 
-
 Primary assignee:
-   - Victor Rodriguez
+    - Victor Rodriguez
 
 Other contributors:
-   - Jesus Ornelas
-   - Mario Carrillo
 
 Repos Impacted
 ==============
 
-https://git.starlingx.io/cgit/stx-integ/
+https://git.starlingx.io/cgit/stx-integ/stx-clients
+https://git.starlingx.io/cgit/stx-integ/stx-config
+https://git.starlingx.io/cgit/stx-integ/stx-distcloud
+https://git.starlingx.io/cgit/stx-integ/stx-distcloud-client
+https://git.starlingx.io/cgit/stx-integ/stx-fault
+https://git.starlingx.io/cgit/stx-integ/stx-governance
+https://git.starlingx.io/cgit/stx-integ/stx-gplv2
+https://git.starlingx.io/cgit/stx-integ/stx-gplv3
+https://git.starlingx.io/cgit/stx-integ/stx-gui
+https://git.starlingx.io/cgit/stx-integ/stx-ha
+https://git.starlingx.io/cgit/stx-integ/stx-nfv
+https://git.starlingx.io/cgit/stx-integ/stx-update
+https://git.starlingx.io/cgit/stx-integ/stx-upstream
+https://git.starlingx.io/cgit/stx-integ/stx-utils
+
 
 Work Items
 ===========
-
-- Enable Autotools build systems in STX projects: make/make install
-- Generate a tar.gz for every STX source code project
-- Generate .spec and .rules for each package that STX modify or provide
-- Modify the existing build tools to parse the refactored meta-data
+- Create development branch on current repositories
+- Create build managment repositories for each service
+- Move necesary build scripts to build managment repositories
+- Test build managment repositories in package build system
 
 Dependencies
 ============
@@ -150,19 +166,19 @@ Dependencies
 Testing
 =======
 
-- Build and install package for existing CentOS with modified tooling
-- Manually build and install packages for alternate operating systems
+After building a proper image with the re org of the repositories we can:
 
-And then run a basic test that proves:
-
-- Boot
-- Lauch of VMs with Open Stack
-- Minimal STX application
+- Test build managment repositories can generate current RPMs
+- Build an STX image
+- Run sanity tests for generated image
 
 Documentation Impact
 ====================
 
-New documentation will be generated for this multi-OS case
+Create section for developer guide, that guide themhow to do a propper
+development contribution for the project , a good example for this coudl be: 
+
+https://devguide.python.org/
 
 References
 ==========
