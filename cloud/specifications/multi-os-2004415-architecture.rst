@@ -115,20 +115,22 @@ If this change is completed the end to end big picture for the developer/user
 will be:
 
 - The user can select the Linux OS used for the host OS
-- The user can select the Linux OS used for the containers used in a starling x
-deployment
-- The selection of the host OS and the container OS is independent
-- The default operating system to build will be CentOS / RHEL.
-- The build system will use the Linux distribution build systems to ensure the
-distribution is consistent
-- The nightly build will use the same mechanisms and the developer build to
-ensure consistent build output.
-- Proper documentation to the developer documentation as STX Developer’s Guide
-- Developer workflow with multi-OS will be minimized.
-- The definition of how a package is built for a specific Linux distribution
-will be separated from the actual source code to simplify the addition of other
-Linux distributions.
 
+- The user can select the Linux OS used for the containers used in a starling x deployment
+
+- The selection of the host OS and the container OS is independent
+
+- The default operating system to build will be CentOS / RHEL.
+
+- The build system will use the Linux distribution build systems to ensure the distribution is consistent
+
+- The nightly build will use the same mechanisms and the developer build to ensure consistent build output.
+
+- Proper documentation to the developer documentation as STX Developer’s Guide
+
+- Developer workflow with multi-OS will be minimized.
+
+- The definition of how a package is built for a specific Linux distribution will be separated from the actual source code to simplify the addition of other Linux distributions.
 
 In order to achieve these goals, this specification proposes a step-wise
 approach with a number of an additional specification that will break down the
