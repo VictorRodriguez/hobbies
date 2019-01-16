@@ -24,7 +24,7 @@ Currently the StarlingX build system only generates RPMs specifically for
 CentOS7. The tooling understands how to parse the metadata (srpm_path,
 build_srpm) and then patch and re-builds the SRPM, if needed, then the OS and
 StarlingX RPM spec-files are parsed and built. There is a dependency generator
-that can be used after the first complete build to reduce the build time. 
+that can be used after the first complete build to reduce the build time.
 Additionally there are checks to determine if a package needs to be rebuilt.
 
 The existing build system can not modify or build other Linux/GNU based
@@ -49,9 +49,9 @@ that may not match what is contained in other distributions such as Ubuntu or
 Clear. Additionally RPM spec-files may contain commands (pre/post scripts) that
 are not available in other distributions.
 
-The current build system is smart enough to detect missing dependencies and what
-packages to rebuild if one package has a change. This feature should remain on
-any multi OS strategy.
+The current build system is smart enough to detect missing dependencies and
+what packages to rebuild if one package has a change. This feature should
+remain on any multi OS strategy.
 
 STX developers need to have a solid solution for multiple OSes where they want
 to deploy STX solution on either RPMs based or DEBs based OSes. The current STX
@@ -80,8 +80,8 @@ specification that will break down the steps outlined below.
 
 Reorganize the STX Flock source, a specification will be created to detail the
 implementation. The source and build specific metadata should be separated to
-allow for better workflow, this would include creating gits for each flock 
-service sub-component, adding appropriate infrastructure tooling to these 
+allow for better workflow, this would include creating gits for each flock
+service sub-component, adding appropriate infrastructure tooling to these
 sub-components, such as autotools. Autotools provides a mechanism to generate
 OS specific makefiles, setup.py based on templates and ensures the correct
 buildtime dependencies are in place. The "Source Reorg" specification will
@@ -154,7 +154,7 @@ None
 Developer impact
 =================
 
-Developers would need to understand that the tools and metadata now support 
+Developers would need to understand that the tools and metadata now support
 multiple operating systems and the effect that a change they need to make would
 mean on those different OSes.
 
@@ -166,13 +166,14 @@ None
 Implementation
 ==============
 
-Implementation will be the generation of the following additional specifications
+Implementation will be the generation of the following additional
+specifications:
 
 Source Reorg
 Dependency Generator
 Build Tool for MultiOS
 ISO Generation for MultiOS
-Installer for MultiOS 
+Installer for MultiOS
 Configuration management
 Update management
 
