@@ -12,29 +12,31 @@ Starling X is growing as an edge cloud solution, however, the current cloud use
 more than one kind of operating system. The Cloud Market's latest analysis of
 operating systems on the Amazon Elastic Compute Cloud (EC2) shows Ubuntu as the
 most used OS, in the same list we can find CentOS and Red Hat Enterprise Linux
-(RHEL). By having MultiOS support for the STX project the STX
-developers/users at the community could benefit from the advantages that each
-operating system offers.
+(RHEL). By having MultiOS support for the STX project the STX developers/users
+at the community could benefit from the advantages that each operating system
+offers.
 
-Today, Starling X is based on the CentOS operating system, however, we would like
-to support other operating systems such as Ubuntu or Clear Linux (Clear Linux
-OS is an open source, rolling release Linux distribution optimized for
+Today, Starling X is based on the CentOS operating system, however, we would
+like to support other operating systems such as Ubuntu or Clear Linux (Clear
+Linux OS is an open source, rolling release Linux distribution optimized for
 performance and security for the x86 platforms, since a high percentage of the
 data center servers are based on x86 architectures, enable Starling X in an x86
 optimized OS could be an option). The current build system under STX does not
 support the transition to other OS based on rpm or deb files. In order to give
 full support for other operating systems we are proposing to make changes on
-the current build model and generate isolation of source code vs build
-metadata for the STX flock services. All this with the aim of making it easier for others to understand and contribute to our project. The
-order of what operating support first, either Ubuntu or Clear Linux is out of
-the scope of this specification.
+the current build model and generate isolation of source code vs build metadata
+for the STX flock services. All this with the aim of making it easier for
+others to understand and contribute to our project. The order of what operating
+support first, either Ubuntu or Clear Linux is out of the scope of this
+specification.
 
 Problem description
 ===================
 
-Current cloud systems use a different kind of operating system. Among the most used
-OS, CentOS / RHEL. represents approximately 55% of OpenStack and Ubuntu Server
-represents 35% of deployments and a significant amount of the users as a whole.
+Current cloud systems use a different kind of operating system. Among the most
+used OS, CentOS / RHEL. represents approximately 55% of OpenStack and Ubuntu
+Server represents 35% of deployments and a significant amount of the users as a
+whole.
 
 Since Linux distributions have many different approaches to pulling together
 the distribution, by having MultiOS support for the STX project the STX
@@ -90,7 +92,7 @@ remain on any multi-OS strategy.
 STX developers need to have a solid solution for multiple OSes where they want
 to deploy STX solution on either RPMs based or DEBs based OSes. The current STX
 build system only supports the build of a distro based on CentOS and RPMs, this
- specification is written to create a methodology that covers not only CentOS
+specification is written to create a methodology that covers not only CentOS
 RPMs but also Ubuntu based distros based on deb files.
 
 Use Cases
@@ -145,7 +147,8 @@ layout.
 
 Reorganize the StarlingX Integration and packaging repository: specification to
 organize the build management code for multiple operating systems. This
-specification could explain how the patches and spec files could be reorganized inside the stx-integ repository.
+specification could explain how the patches and spec files could be reorganized
+inside the stx-integ repository.
 
 The next specification would the "Dependency Generator" specification, which
 would spell out how the dependencies could be generated for multiple packaging
