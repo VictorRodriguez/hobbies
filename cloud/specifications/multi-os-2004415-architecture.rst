@@ -47,10 +47,7 @@ the operating system offers:
 
 - Ubuntu is more aggressive and uses more recent versions
 
-- Clear Linux OS is an open source, rolling release Linux distribution
-optimized for performance and security for the x86 platforms, since a high
-percentage of the data center servers are based on x86 architectures, enable
-Starling X in an x86 optimized OS could benefit the STX users
+- Clear Linux OS is an open source, rolling release Linux distribution optimized for performance and security for the x86 platforms, since a high percentage of the data center servers are based on x86 architectures, enable Starling X in an x86 optimized OS could benefit the STX users
 
 To appeal to the broadest community of users, Starling X needs to run a several
 Linux distributions.
