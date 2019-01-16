@@ -2,31 +2,43 @@
     License.
     http://creativecommons.org/licenses/by/3.0/legalcode
 
-==============================================
-StarlingX: Reorganize Flock Services Source code
-==============================================
+=============================================================
+StarlingX: Reorganize Flock Services Source Code repositories
+=============================================================
 
 Storyboard: https://storyboard.openstack.org/#!/story/2004792
 
 StarlingX currently combines source code and build meta-data in the same
 directory structure, as we move to support multiple OSes, this structure
-needs to be seperated and further defined.
-
+needs to be seperated and further defined for the benefit of developers in the
+community to keep history and source code separated. Simplifying things to a
+set of common features also had the dual benefit of making is easier for others
+to understand and contribute to our project.
 
 Problem description
 ===================
 
 The current dirtectory structure is based around the build working with CentOS
 OS and the current build tooling, as we add additional OS support, additional
-meta-data is needed and should be added into a new structure.
-
-
+meta-data is needed and should be added into a new structure. We realized we
+needed to standardize the structure of our open source projects in order to
+reduce the amount of time we spent figuring out how things work. Simplifying
+things to a set of common features also had the dual benefit of making is
+easier for others to understand and contribute to our projects. There are some
+Directory Structures that could open source use as standard [1] [2], right
+now we are not using many of that standard directory structure. 
 
 Use Cases
 =========
 
-a) Devepolers need to support multiple OSes beyond the current CentOS
-
+a) Developers want to apply a change in the CentOS spec file but not to the
+Ubuntu rules file.
+b) Developers want to apply a performance change into CentOS but is not
+necesary in Ubuntu.
+c) Developers want to change the installation path at the CentOS spec file but
+not at the Ubuntu build scripts . Developer will not change anything at the src
+code of the service, no need to touch the git history of the source code
+project.
 
 Proposed change
 ===============
@@ -39,7 +51,7 @@ One example of a package with multi OS support could be:
 
 ::
 
-    <package_name>/
+    <flock_package_name>-pkg/
     ├── ubuntu
     │   ├── patches
     │   │   └── cve_fix.patch
@@ -52,16 +64,13 @@ One example of a package with multi OS support could be:
     ├── clear
     │   ├── autospec files
     │   └── cve_fix.patch
-    ├── fedora
-    │   ├── <package_name>.spec
-    │   └── cve_fix.patch
     └── kubernetes
 
-An example of this could be:
+An output of this solution of this could be:
 
 https://git.starlingx.io/cgit/stx-integ/stx-nfv
 
-and 
+and
 
 https://git.starlingx.io/cgit/stx-integ/stx-nfv-pkg
 
@@ -176,13 +185,15 @@ Documentation Impact
 ====================
 
 Create section for developer guide, that guide themhow to do a propper
-development contribution for the project , a good example for this coudl be: 
+development contribution for the project , a good example for this could be: 
 
 https://devguide.python.org/
 
 References
 ==========
 
+[1] https://www.gun.io/blog/maintaining-an-open-source-project
+[2] https://github.com/kriasoft/Folder-Structure-Conventions
 
 History
 =======
