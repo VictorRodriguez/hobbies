@@ -19,7 +19,7 @@ community could benefit from the advantages that each operating system offers.
 The current build system under STX does not support the transition to other OS
 based on rpm or deb files. In order to give full support for another operating
 systems we are proposing to make changes to the current build model and
-generate a speration of source code vs build metadata for the STX flock
+generate a separation of source code vs build metadata for the STX flock
 services. All this with the aim of making it easier for others to understand
 and contribute to our project.
 
