@@ -55,8 +55,8 @@ Operating Systems as they use different packaging systems or versions of
 packages that are getting patches applied (that may not apply to a different
 version).
 
-STX build tools currently generate RPMs for CentOS operating system due to two
-main reasons:
+STX build tools only generate RPMs for CentOS operating system due to two main
+reasons:
 
 - RPMs cannot be installed on Ubuntu/Debian
 
@@ -95,6 +95,14 @@ same package on multiple operating systems.
 c) Operators that want alternate Operating System other than CentOS in both the
 host OS and container guest OS.
 
+d) A developer shall be able to build with unstaged changes for all the
+supported OS using the same toolset in their workstation. (this  sounds similar
+to "b)" but the difference is to point that as part  of the workflow the devs
+needs to test their changes in different  OS and use the same toolset for that
+purpose)
+
+e) The build system shall be able to generate installer files for  all
+supported OS.
 
 Proposed change
 ===============
@@ -124,7 +132,7 @@ In order to achieve these goals, this specification proposes a step-wise
 approach with a number of an additional specification that will break down the
 steps outlined below:
 
-Reorganize the STX Flock source, a specification will be created to detail the
+- Reorganize the STX Flock source, a specification will be created to detail the
 implementation. The source and build specific metadata should be separated to
 allow for better workflow, this would include creating git repos for each flock
 service and their packaging metadata (spec-files, deb rules), adding
@@ -135,20 +143,20 @@ are in place. The "Source Reorg" specification will detail the proposed director
 layout and tools and build targets. Initially, the StarlingX flock could be
 built manually and installed based on this new layout.
 
-Reorganize the StarlingX Integration and packaging repository: specification to
+- Reorganize the StarlingX Integration and packaging repository: specification to
 organize the build management code for multiple operating systems. This
 specification could explain how the patches and spec files could be reorganized
 inside the stx-integ repository.
 
-The next specification would be the "Dependency Generator" specification, which
+- The next specification will be the "Dependency Generator" specification, which
 would spell out how the dependencies could be generated for multiple packaging
 formats or in a package independent fashion.
 
-The existing build tools would also need to be modified to support the new
+- The existing build tools would also need to be modified to support the new
 directory layout, dependency generation and have different packaging support.
 This will also require a specification.
 
-The installer and configuration management would need to be addressed as well
+- The installer and configuration management would need to be addressed as well
 as the updater process, these would need specification as appropriate and will
 be later in the process.
 
@@ -246,7 +254,7 @@ https://git.starlingx.io/cgit/stx-integ/
 Work Items
 ===========
 
-- Create Specifications!
+- Create Specifications listed at Implementation section
 
 Dependencies
 ============
@@ -254,6 +262,8 @@ Dependencies
 
 Testing
 =======
+
+Create unit tests for build system
 
 Generate a CI/CD that builds daily an image of each Linux flavor :
 
