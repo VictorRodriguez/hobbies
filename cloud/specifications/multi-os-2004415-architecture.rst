@@ -132,7 +132,9 @@ In order to achieve these goals, this specification proposes a step-wise
 approach with a number of an additional specification that will break down the
 steps outlined below:
 
-- Reorganize the STX Flock source, a specification will be created to detail the
+- Reorganize the STX Flock source
+
+A specification will be created to detail the
 implementation. The source and build specific metadata should be separated to
 allow for better workflow, this would include creating git repos for each flock
 service and their packaging metadata (spec-files, deb rules), adding
@@ -143,20 +145,25 @@ are in place. The "Source Reorg" specification will detail the proposed director
 layout and tools and build targets. Initially, the StarlingX flock could be
 built manually and installed based on this new layout.
 
-- Reorganize the StarlingX Integration and packaging repository: specification to
-organize the build management code for multiple operating systems. This
-specification could explain how the patches and spec files could be reorganized
-inside the stx-integ repository.
+- Reorganize the StarlingX Integration and packaging repository for 3rd party packages
 
-- The next specification will be the "Dependency Generator" specification, which
-would spell out how the dependencies could be generated for multiple packaging
+A specification to organize the build management code for multiple operating systems. This
+specification could explain how the patches and spec files could be reorganized
+inside the stx-integ repository for 3rd party packages.
+
+- Dependency Generator for multiple OS
+This specification which would spell out how the dependencies could be generated for multiple packaging
 formats or in a package independent fashion.
 
-- The existing build tools would also need to be modified to support the new
+- Build tools for Multiple OS
+
+The existing build tools would also need to be modified to support the new
 directory layout, dependency generation and have different packaging support.
 This will also require a specification.
 
-- The installer and configuration management would need to be addressed as well
+- installer for Multiple OS
+
+The installer and configuration management would need to be addressed as well
 as the updater process, these would need specification as appropriate and will
 be later in the process.
 
