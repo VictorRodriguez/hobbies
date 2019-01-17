@@ -23,12 +23,12 @@ performance and security for the x86 platforms, since a high percentage of the
 data center servers are based on x86 architectures, enable Starling X in an x86
 optimized OS could be an option). The current build system under STX does not
 support the transition to other OS based on rpm or deb files. In order to give
-full support for other operating systems we are proposing to make changes on
-the current build model and generate isolation of source code vs build metadata
-for the STX flock services. All this with the aim of making it easier for
-others to understand and contribute to our project. The order of what operating
-support first, either Ubuntu or Clear Linux is out of the scope of this
-specification.
+full support for another operating systems we are proposing to make changes to
+the current build model and generate a speration of source code vs build
+metadata for the STX flock services. All this with the aim of making it easier
+for others to understand and contribute to our project. The order of what
+operating support first, either Ubuntu or Clear Linux is out of the scope of
+this specification.
 
 Problem description
 ===================
@@ -60,23 +60,24 @@ that can be used after the first complete build to reduce the build time.
 Additionally, there are checks to determine if a package needs to be rebuilt.
 
 The existing build system cannot modify or build other Linux/GNU based
-Operating Systems as they use different packing systems or versions of packages
-that are getting patches applied (that may not apply to a different version).
+Operating Systems as they use different packaging systems or versions of
+packages that are getting patches applied (that may not apply to a different
+version).
 
-STX build tools currently generate currently only RPMs for CentOS operating
-system due to two main reasons:
+STX build tools currently generate RPMs for CentOS operating system due to two
+main reasons:
 
 - RPMs cannot be installed on Ubuntu/Debian
 
-In Ubuntu Linux, installation of software can be done on using  Ubuntu Software
-Center, Synaptic package manager or apt-get command line mode.  Current STX
+In Ubuntu Linux, installation of software can be done on using Ubuntu Software
+Center, Synaptic package manager or apt-get command line mode. Current STX
 solution with YUM or rpm install does not work. Ubuntu documentation recommends
-to use Alien ( described in Alternatives section) tool to transfer RPMs to DEB
-files, however, it can lead to dependency issues or runtime crashes
+to use Alien tool to transfer RPMs to DEB files, however, it can lead to
+dependency issues or runtime crashes
 
 - STX RPMs has hardcoded runtime and build requirements for CentOS
 
-CentOS RPM's can have dependencies on package names and versions of software
+CentOS RPMs can have dependencies on package names and versions of software
 that may not match what is contained in other distributions such as Ubuntu or
 Clear. Additionally RPM spec-files may contain commands (pre/post scripts) that
 are not available in other distributions.
@@ -88,8 +89,8 @@ remain on any multi-OS strategy.
 STX developers need to have a solid solution for multiple OSes where they want
 to deploy STX solution on either RPMs based or DEBs based OSes. The current STX
 build system only supports the build of a distro based on CentOS and RPMs, this
-specification is written to create a methodology that covers not only CentOS
-RPMs but also Ubuntu based distros based on deb files.
+specification is written to create a methodology that covers not only the
+CentOS RPMs but also a Ubuntu distro based on deb files.
 
 Use Cases
 =========
@@ -134,21 +135,21 @@ steps outlined below:
 
 Reorganize the STX Flock source, a specification will be created to detail the
 implementation. The source and build specific metadata should be separated to
-allow for better workflow, this would include creating gits for each flock
-service sub-component, adding appropriate infrastructure tooling to these
-sub-components, such as Autotools. Autotools provides a mechanism to generate
-OS-specific makefiles, setup.py based on templates and ensures the correct
-build-time dependencies are in place. The "Source Reorg" specification will
-detail the proposed directory layout and tools and build targets. Initially,
-the StarlingX flock could be built manually and installed based on this new
-layout.
+allow for better workflow, this would include creating git repos for each flock
+service and their packaging metadata (spec-files, deb rules), adding
+appropriate infrastructure tooling to these components, such as autotools.
+Autotools provides a mechanism to generate OS specific makefiles, python
+setuptools based on templates and ensures the correct build time dependencies
+are in place. The "Source Reorg" specification will detail the proposed directory
+layout and tools and build targets. Initially, the StarlingX flock could be
+built manually and installed based on this new layout.
 
 Reorganize the StarlingX Integration and packaging repository: specification to
 organize the build management code for multiple operating systems. This
 specification could explain how the patches and spec files could be reorganized
 inside the stx-integ repository.
 
-The next specification would the "Dependency Generator" specification, which
+The next specification would be the "Dependency Generator" specification, which
 would spell out how the dependencies could be generated for multiple packaging
 formats or in a package independent fashion.
 
@@ -156,10 +157,9 @@ The existing build tools would also need to be modified to support the new
 directory layout, dependency generation and have different packaging support.
 This will also require a specification.
 
-The installer and configuration would need to be addressed as well as the
-updater process, these would need specification as appropriate and will be
-later in the process.
-
+The installer and configuration management would need to be addressed as well
+as the updater process, these would need specification as appropriate and will
+be later in the process.
 
 Alternatives
 ============
@@ -264,7 +264,7 @@ Dependencies
 Testing
 =======
 
-Generate a CI/CD  that builds daily an image of each Linux flavor :
+Generate a CI/CD that builds daily an image of each Linux flavor :
 
 - Ubuntu
 - CentOS
