@@ -9,48 +9,39 @@ StarlingX: Build system architecture for multiOS
 Storyboard: https://storyboard.openstack.org/#!/story/2004415
 
 Starling X is growing as an edge cloud solution, however, the current cloud use
-more than one kind of operating system. The Cloud Market's latest analysis of
-operating systems on the Amazon Elastic Compute Cloud (EC2) shows Ubuntu as the
-most used OS, in the same list we can find CentOS and Red Hat Enterprise Linux
-(RHEL). By having MultiOS support for the STX project the STX developers/users
-at the community could benefit from the advantages that each operating system
-offers.
+more than one kind of operating system. A recent analysis of  the most used
+operating systems on the Compute Cloud (EC2) [1] shows Ubuntu as the most used
+OS, in the same list we can find CentOS and Red Hat Enterprise Linux (RHEL).
+Today, Starling X is only based on the CentOS operating system, however, by
+having MultiOS support for the STX project the STX developers/users at the
+community could benefit from the advantages that each operating system offers.
 
-Today, Starling X is based on the CentOS operating system, however, we would
-like to support other operating systems such as Ubuntu or Clear Linux (Clear
-Linux OS is an open source, rolling release Linux distribution optimized for
-performance and security for the x86 platforms, since a high percentage of the
-data center servers are based on x86 architectures, enable Starling X in an x86
-optimized OS could be an option). The current build system under STX does not
-support the transition to other OS based on rpm or deb files. In order to give
-full support for another operating systems we are proposing to make changes to
-the current build model and generate a speration of source code vs build
-metadata for the STX flock services. All this with the aim of making it easier
-for others to understand and contribute to our project. The order of what
-operating support first, either Ubuntu or Clear Linux is out of the scope of
-this specification.
+The current build system under STX does not support the transition to other OS
+based on rpm or deb files. In order to give full support for another operating
+systems we are proposing to make changes to the current build model and
+generate a speration of source code vs build metadata for the STX flock
+services. All this with the aim of making it easier for others to understand
+and contribute to our project.
 
 Problem description
 ===================
 
-Current cloud systems use a different kind of operating system. Among the most
-used OS, CentOS / RHEL. represents approximately 55% of OpenStack and Ubuntu
-Server represents 35% of deployments and a significant amount of the users as a
-whole.
+The diversity on the operating systems used at the cloud is not only for the
+guest OS, but also for the host OS. Current cloud systems use a different kind
+of operating system as host for their servers. Among the most used OS,
+CentOS/RHEL represents approximately 55% of OpenStack and Ubuntu Server
+represents 35% of deployments
 
 Since Linux distributions have many different approaches to pulling together
-the distribution, by having MultiOS support for the STX project the STX
+Linux solutions, by having MultiOS support for the STX project the STX
 developers/users at the community could benefit from the advantages that each
 the operating system offers:
 
-- CentOS uses a more conservative approach and uses older versions of packages. Many fixes and features are backported to these versions.
+- CentOS uses a more conservative approach and uses older versions of packages and keep security and stability by  backport many fixes and features to their current version.
 
 - Ubuntu is more aggressive and uses more recent versions
 
 - Clear Linux OS is an open source, rolling release Linux distribution optimized for performance and security for the x86 platforms, since a high percentage of the data center servers are based on x86 architectures, enable Starling X in an x86 optimized OS could benefit the STX users
-
-To appeal to the broadest community of users, Starling X needs to run a several
-Linux distributions.
 
 Currently the StarlingX build system only generates RPMs specifically for
 CentOS7. The tooling understands how to parse the metadata (srpm_path,
