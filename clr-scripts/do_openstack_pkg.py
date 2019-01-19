@@ -10,7 +10,7 @@ import re
 from time import sleep
 
 #http = urllib3.PoolManager()
-http = urllib3.ProxyManager('http://proxy01.jf.intel.com:911/', cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
+http = urllib3.ProxyManager('http://proxy-server.bla.com:port/', cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
 
 processed = dict()
 recursionlimit = 20
