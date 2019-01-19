@@ -42,9 +42,17 @@ def generate_directory(package : str, url : str) -> None:
     except:
         print("[info] Directory for package", package, "already exists")
 
+
     with open(package+"/Makefile", "w") as f:
         f.write("PKG_NAME := " + package +"\n" +
                 "URL = " + url + "\n\n" + "include ../common/Makefile.common")
+
+    with open(package+"/build_pattern", "w") as f:
+        f.write("distutils36")
+
+    with open(package+"/buildreq_add", "w") as f:
+        f.write("openstack-setuptools")
+
     return
 
 def run_autospec(package : str):
@@ -65,7 +73,7 @@ def koji_add(package : str, sync : int) -> None:
     else:
         result = subprocess.run(['make', 'koji'], cwd = package+"/")
 
-def do_package(package : str, sync : int) -> None:
+def do_package(package : str, sync : int, openstack: int) -> None:
     global recursionlimit
     global processed
 
@@ -85,6 +93,8 @@ def do_package(package : str, sync : int) -> None:
     # step 1 : check if it is already in packages (if it is, we're done)
 
     # step 2 : find the CRAN URL
+    if "openstack-" in package:
+        package = package.replace("openstack-","")
     url = find_url(package)
     if url == "":
         return
@@ -101,18 +111,28 @@ def do_package(package : str, sync : int) -> None:
 
     # step 6 : finish up (git push & koji)
     git_push(clr)
-    koji_add(clr, sync)
+    # koji_add(clr, sync)
 
 
 def main():
-    if len(sys.argv) != 2:
-        print("Usage:\n\tcran.py PACKAGE\n")
+    openstack = 0
+    if len(sys.argv) < 2:
+        print("Usage:\n\t%s PACKAGE <openstack>\n" % (sys.argv[0]))
+        print(" if <openstack> then python 3.6 is ussed")
         return
 
     package = sys.argv[1]
 
-    do_package(package, 0)
-#    do_package(package, 1)
+    if sys.argv[2]:
+        if sys.argv[2] == "openstack":
+            package_name = "openstack-"+ package
+        else:
+            package_name = package
+
+    package = package_name
+
+    do_package(package, 0, openstack)
+#   do_package(package, 1)
     return
 
 
