@@ -18,6 +18,8 @@ We can do:
     ./do_openstack_pkg.py <PKG-NAME> openstack
 ```
 
+To work is necesary to apply https://github.com/clearlinux/autospec/pull/331 into your autospec tool
+
 The list of packages for openstack are:
 
 https://github.com/openstack/requirements/blob/master/global-requirements.txt
