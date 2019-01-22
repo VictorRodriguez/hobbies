@@ -8,14 +8,15 @@ import os
 import subprocess
 import re
 from time import sleep
+import argparse
 
-#http = urllib3.PoolManager()
-http = urllib3.ProxyManager('http://proxy-server.bla.com:port/', cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
+proxy = ""
 
 processed = dict()
 recursionlimit = 20
 
 def find_url(package : str) -> str:
+    http = urllib3.ProxyManager(proxy, cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
     response = http.request("GET", "https://pypi.org/project/" + package + "/#files")
     html = response.data
     soup = BeautifulSoup(html, "lxml")
@@ -27,7 +28,6 @@ def find_url(package : str) -> str:
         target = link.get("href")
         if target != None and package in target and ".zip" in target:
             return target
-#        print(link.get("href"))
     return ""
 
 def generate_directory(package : str, url : str) -> None:
@@ -89,7 +89,6 @@ def do_package(package : str, sync : int, openstack: int) -> None:
         return
     recursionlimit = recursionlimit - 1
 
-
     # step 1 : check if it is already in packages (if it is, we're done)
 
     # step 2 : find the CRAN URL
@@ -97,6 +96,7 @@ def do_package(package : str, sync : int, openstack: int) -> None:
         package = package.replace("openstack-","")
     url = find_url(package)
     if url == "":
+        print("\nURL not found\n")
         return
     print("Package found at ", url)
 
@@ -113,26 +113,34 @@ def do_package(package : str, sync : int, openstack: int) -> None:
     git_push(clr)
     # koji_add(clr, sync)
 
-
 def main():
+
+    parser = argparse.ArgumentParser(description='Package a python module')
+    parser.add_argument('--pkg', dest='package',required=True)
+    parser.add_argument('--proxy', dest='proxy')
+    parser.add_argument('--openstack',
+            dest='openstack',action='store_true',help='Enable if is a pkg for Openstack')
+    args = parser.parse_args()
+
+    global proxy
+    sync = 0 # Enable if you want to build in koji
     openstack = 0
-    if len(sys.argv) < 2:
-        print("Usage:\n\t%s PACKAGE <openstack>\n" % (sys.argv[0]))
-        print(" if <openstack> then python 3.6 is ussed")
-        return
 
-    package = sys.argv[1]
-
-    if sys.argv[2]:
-        if sys.argv[2] == "openstack":
-            package_name = "openstack-"+ package
-        else:
-            package_name = package
+    if args.package:
+        package = args.package
+    if args.openstack:
+        package_name = "openstack-"+ package
+        openstack = 1
+    else:
+        package_name = package
 
     package = package_name
 
-    do_package(package, 0, openstack)
-#   do_package(package, 1)
+    if args.proxy:
+        proxy = args.proxy
+
+    do_package(package,sync,openstack)
+
     return
 
 

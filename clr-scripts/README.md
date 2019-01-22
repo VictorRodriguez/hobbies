@@ -15,7 +15,16 @@ From a standard clr developer directory , for example:
 We can do:
 
 ```
-    ./do_openstack_pkg.py <PKG-NAME> openstack
+    $ python do_openstack_pkg.py -h
+    usage: do_openstack_pkg.py [-h] --pkg PACKAGE [--proxy PROXY] [--openstack]
+
+    Package a python module
+
+    optional arguments:
+      -h, --help     show this help message and exit
+      --pkg PACKAGE
+      --proxy PROXY
+      --openstack    Enable if is a pkg for Openstack
 ```
 
 To work is necesary to apply https://github.com/clearlinux/autospec/pull/331 into your autospec tool
