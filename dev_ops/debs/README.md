@@ -5,11 +5,7 @@ experience:
 
 ## How to build a package that already exists in Debian
 
-Following the next link:
-    
-    https://wiki.debian.org/BuildingTutorial
-
-These are the steps
+This tutorial, is based on [1], to begin these are the steps:
  
  * Open your /etc/apt/sources.list file and check if you have one or more lines
    that start with deb-src.
@@ -140,5 +136,9 @@ Examples:
 
  * GLIBC:   https://salsa.debian.org/glibc-team/glibc/tree/sid
  * GCC:     https://salsa.debian.org/toolchain-team/gcc-cross 
+
+### Links
+
+    https://wiki.debian.org/BuildingTutorial
 
 
