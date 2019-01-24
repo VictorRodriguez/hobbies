@@ -1,9 +1,9 @@
 # How to build deb files
 
-These are personal examples to document how to build debian files for my own
+These are personal examples to document how to build Debian files for my own
 experience: 
 
-## How to build a package that already exist in debian
+## How to build a package that already exists in Debian
 
 Following the next link:
     
@@ -25,15 +25,11 @@ These are the steps
  * You have now downloaded the 3 files (.dsc, .tar.gz, .diff.gz), composing the
    Debian source package.
 
- * Once the package is downloaded, you can check the directory where you are ,
-   and you'll find that apart from the 3 files that were downloaded you also
-   have a directory, called fdupes-1.50-PR2. This is the unpacked source of the
+ * Once the package is downloaded, you can check the directory where you are, and you'll find that apart from the 3 files that were downloaded you also have a directory, called fdupes-1.50-PR2. This is the unpacked source of the
    Debian package.
 
  * Every Debian (or Debian derivative) package includes a debian directory,
-   where all the information related to the Debian package is stored. Anything
-   that's outside of that directory, is the upstream code, i.e. the original
-   code released by whoever programmed the software.
+   where all the information related to the Debian package is stored. Anything that's outside of that directory, is the upstream code, i.e. the original code released by whoever programmed the software.
 
  * This is the directory that the package maintainer has added to the source
    code to build the package.
@@ -59,7 +55,7 @@ These are the steps
     sudo dpkg -i ../fdupes_1.50-PR2-3_<your arch>.deb
 ```
 
-At this point you might be wondering what is the difference between: 
+At this point, you might be wondering what is the difference between: 
 
 * debuild - build a Debian package
 https://manpages.debian.org/jessie/devscripts/debuild.1.en.html
