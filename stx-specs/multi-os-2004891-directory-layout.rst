@@ -9,7 +9,7 @@ StarlingX: Define directory layout for MultiOS
 
 Storyboard: https://storyboard.openstack.org/#!/story/2004891
 
-This specification will extend the current directory layout used by the
+This specification will define the current directory layout used by the
 current StarlingX build system to allow for future build system(s). There are
 currently other directories that contain patches or configuration files, these
 files are typically version specific and will need to be considered in any
