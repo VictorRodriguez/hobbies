@@ -34,7 +34,6 @@ This is an initial reorganization of just the StarlingX Flock source a
 subsequent specification the “MultiOS Directory Layout” will further define the
 layout within the sub-component directory structure.
 
-
 Use Cases
 =========
 
@@ -87,6 +86,19 @@ stx-flock/
 With this structure is easy for developers to keep a clean software project in
 the current stx-<flock items> repositories and the capability to change CFLAGS
 or installation paths in stx-flock repository
+
+This structure even gave us the capability to have patches for the flock
+services in cases where we want to add an special change of code only for an
+specific os, an example of this could be a patch necesary to mitigate compiler
+warning/errors generated with  GCC 7 or newer that maybe Ubuntu with
+GCC 5 might not have. Instead of detecting the compiler version on the source
+code with
+
+::
+#if GCC_VERSION > 30200
+
+We can have a patch tath aonly apply the fixes to teh functions in the build
+script that we know is using a version of GCC that generates compile errors.
 
 Alternatives
 ============
@@ -168,7 +180,7 @@ performed along the history of the development
 
 These numbers show us that stx-update might be the only one with more than
 20% of changes related to metadata, which means that most of the changes
-are for pure flock sw code
+are for pure Flock source code.
 
 Upgrade impact
 ===============
