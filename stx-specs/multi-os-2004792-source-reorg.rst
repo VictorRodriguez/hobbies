@@ -52,34 +52,34 @@ Proposed change
 Reorganize the existing source code to separate the build meta-data from the
 base source code, this would leave the existing stx-<flock items> git repos
 with source code and a new stx-flock git (1 git) for the packaging meta-data
-for all the flock subcomponents.
+for all the flock sub-components.
 
 Example of the new stx-flock directory structure::
 
-stx-flock/
-├── fault
-│   ├── fm-api
-│   │   └── centos
-│   │       └── fm-api.spec
-│   ├── fm-common
-│   │   └── centos
-│   │       └── fm-common.spec
-│   ├── fm-mgr
-│   │   └── centos
-│   │       └── fm-mgr.spec
-│   └── fm-restapi
-│       └── centos
-│           └── fm-restapi.spec
-└── nfv
-    ├── guest-agent
-    │   └── centos
-    │       └── guest-agent.spec
-    ├── guest-client
-    │   └── centos
-    │       └── guest-client.spec
-    └── guest-comm
-        └── centos
-            └── guest-comm.spec
+ stx-flock/
+ ├── fault
+ │   ├── fm-api
+ │   │   └── centos
+ │   │       └── fm-api.spec
+ │   ├── fm-common
+ │   │   └── centos
+ │   │       └── fm-common.spec
+ │   ├── fm-mgr
+ │   │   └── centos
+ │   │       └── fm-mgr.spec
+ │   └── fm-restapi
+ │       └── centos
+ │           └── fm-restapi.spec
+ └── nfv
+     ├── guest-agent
+     │   └── centos
+     │       └── guest-agent.spec
+     ├── guest-client
+     │   └── centos
+     │       └── guest-client.spec
+     └── guest-comm
+         └── centos
+             └── guest-comm.spec
 
 
 With this structure is easy for developers to keep a clean software project in
@@ -88,39 +88,38 @@ or installation paths in stx-flock repository
 
 This structure even gave us the capability to have patches for the flock
 services in cases where we want to add an special change of code only for an
-specific os, an example of this could be a patch necesary to mitigate compiler
+specific os, an example of this could be a patch necessary to mitigate compiler
 warning/errors generated with  GCC 7 or newer that maybe Ubuntu with
 GCC 5 might not have. Instead of detecting the compiler version on the source
 code with
 
 ::
-#if GCC_VERSION > 30200
+ #if GCC_VERSION > 30200
 
-We can have a patch tath aonly apply the fixes to teh functions in the build
+We can have a patch that only applies the fixes to the functions in the build
 script that we know is using a version of GCC that generates compile errors.
 
 Alternatives
 ============
 
 - Keep the existing directory structure and add additional sub-directories for
-the new Operating Systems, which will clutter the current repositories.
+  the new Operating Systems, which will clutter the current repositories.
 - Make a split of directories inside each flock service directory, ie::
 
-stx-fault
-    os-packaging/
-    ├── fm-api
-    │   └── centos
-    │   └── ubuntu
-    ├── fm-common
-    │   └── centos
-    │   └── ubuntu
-    ├── fm-mgr
-    │   └── centos
-    │   └── ubuntu
-    └── fm-restapi
-        └── centos
-        └── ubuntu
-
+   stx-fault/
+   └── os-packaging/
+       ├── fm-api
+       │   └── centos
+       │   └── ubuntu
+       ├── fm-common
+       │   └── centos
+       │   └── ubuntu
+       ├── fm-mgr
+       │   └── centos
+       │   └── ubuntu
+       └── fm-restapi
+           └── centos
+           └── ubuntu
 
 Data model impact
 =================
@@ -148,7 +147,7 @@ Performance Impact
 
 None
 
-Other deployer impact
+Other Deployer impact
 =====================
 
 None
@@ -163,9 +162,9 @@ they are built.
 One negative developer impact could be that the changes in packaging source are
 no longer atomic, which means in one single commit in the same repo. Proper
 dependencies and workflow management will be required to ensure this type of
-change goes in at the same time. However, doing a quantitive analysis inside the
-flock repositories show us how often a change in metadata for centOS has been
-performed along the history of the development
+change goes in at the same time. However, doing a quantitative analysis inside
+the flock repositories show us how often a change in metadata for CentOS has
+been performed along the history of the development.
 
 - stx-config = 3.800 %
 - stx-distcloud = 0 %
@@ -190,8 +189,8 @@ Implementation
 ==============
 
 - Create repository stx-flock (1 day)
-- Copy necessary meta data from stx-<flock items> to stx-flock repository (2 days)
-  This in order to do not break the current build system
+- Copy necessary meta data from stx-<flock items> to stx-flock repository
+  This in order to do not break the current build system (2 days)
 
 Assignee(s)
 ===========
@@ -220,12 +219,12 @@ Work Items
 The following items propose an estimated timeline, numbers are not exact:
 
 - Create repository stx-flock (1 day)
-- Copy necessary meta data from stx-<flock items> to stx-flock repository (2 days)
-  This in order to do not break the current build system
+- Copy necessary meta data from stx-<flock items> to stx-flock repository
+  This in order to do not break the current build system (2 days)
 - If a new build system for multiOS is created this should be using the
   stx-flock repository metadata to build the flock services ( 5 days )
-- Adjust the current build system to use the new stx-flock repository, doing the
-  development in a devel branch until tested ( 3 days )
+- Adjust the current build system to use the new stx-flock repository, doing
+  the development in a devel branch until tested ( 3 days )
 - Test build management repositories in the package build system, if
   functionality is tested, merge into master
 - When new MultiOs build system is complete, migrate to just use the MultiOS
