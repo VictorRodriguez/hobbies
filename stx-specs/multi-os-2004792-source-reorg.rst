@@ -54,9 +54,8 @@ base source code, this would leave the existing stx-<flock items> git repos
 with source code and a new stx-flock git (1 git) for the packaging meta-data
 for all the flock subcomponents.
 
-Example of the new stx-flock directory structure:
+Example of the new stx-flock directory structure::
 
-::
 stx-flock/
 ├── fault
 │   ├── fm-api
@@ -105,7 +104,7 @@ Alternatives
 
 - Keep the existing directory structure and add additional sub-directories for
 the new Operating Systems, which will clutter the current repositories.
-- Make a split of directories inside each flock service directory, ie:
+- Make a split of directories inside each flock service directory, ie::
 
 stx-fault
     os-packaging/
