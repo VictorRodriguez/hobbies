@@ -156,15 +156,15 @@ change goes in at the same time. However, doing a quantitive analysis inside the
 flock repositories show us how often a change in metadata for centOS has been
 performed along the history of the development
 
-stx-config = 3.800 %
-stx-distcloud = 0 %
-stx-distcloud-client = 0 %
-stx-fault = 10.200 %
-stx-gui = 1.800 %
-stx-ha = 3.300 %
-stx-nfv = 2.300 %
-stx-update = 22.000 %
-stx-metal = 6.100 %
+- stx-config = 3.800 %
+- stx-distcloud = 0 %
+- stx-distcloud-client = 0 %
+- stx-fault = 10.200 %
+- stx-gui = 1.800 %
+- stx-ha = 3.300 %
+- stx-nfv = 2.300 %
+- stx-update = 22.000 %
+- stx-metal = 6.100 %
 
 These numbers show us that stx-update might be the only one with more than
 20% of changes related to metadata, which means that most of the changes
