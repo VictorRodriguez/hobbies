@@ -42,7 +42,7 @@ Use Cases
 Ubuntu rules file
 
 2. Developers want to apply a performance change into CentOS but is not
-necesary in Ubuntu.
+necessary in Ubuntu.
 
 3. Developers want to change the installation path at the CentOS spec file but
 not at the Ubuntu build scripts
@@ -98,14 +98,14 @@ the new Operating Systems, which will clutter the current repositories.
 stx-fault
     os-packaging/
     ├── fm-api
-    │   └── centos
-    │   └── ubuntu
+    │   └── centos
+    │   └── ubuntu
     ├── fm-common
-    │   └── centos
-    │   └── ubuntu
+    │   └── centos
+    │   └── ubuntu
     ├── fm-mgr
-    │   └── centos
-    │   └── ubuntu
+    │   └── centos
+    │   └── ubuntu
     └── fm-restapi
         └── centos
         └── ubuntu
@@ -149,12 +149,12 @@ Improve developer experience to isolate each package increasing the modularity
 of the development, having delimited the boundaries of each package and how
 they are built.
 
-One negative developer impact coudl be that the changes in packaging source are
+One negative developer impact could be that the changes in packaging source are
 no longer atomic, which means in one single commit in the same repo. Proper
 dependencies and workflow management will be required to ensure this type of
-change goes in at the same time. However doing a quantitive analysis inside the
-flock repositories show us how offen a chane in metadata for centOS has been
-performed along the history of development
+change goes in at the same time. However, doing a quantitive analysis inside the
+flock repositories show us how often a change in metadata for centOS has been
+performed along the history of the development
 
 stx-config = 3.800 %
 stx-distcloud = 0 %
@@ -206,17 +206,17 @@ Repos Impacted
 Work Items
 ===========
 
-The following itmes propouse a estimated timeline, numbers are not exact:
+The following items propose an estimated timeline, numbers are not exact:
 
 - Create repository stx-flock (1 day)
 - Copy necessary meta data from stx-<flock items> to stx-flock repository (2 days)
   This in order to do not break the current build system
 - If a new build system for multiOS is created this should be using the
   stx-flock repository metadata to build the flock services ( 5 days )
-- Adjust current build system to use new stx-flock repository, doing the
+- Adjust the current build system to use the new stx-flock repository, doing the
   development in a devel branch until tested ( 3 days )
 - Test build management repositories in the package build system, if
-  functionaly is tested , merge into master
+  functionality is tested, merge into master
 - When new MultiOs build system is complete, migrate to just use the MultiOS
   build system to avoid duplication of work on build systems
 
