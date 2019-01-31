@@ -38,7 +38,14 @@ layout within the sub-component directory structure.
 Use Cases
 =========
 
-a) The build system will parse the stx-flock directory tree and treat like the stx-integ, sources will be fetched from
+1. Developers want to apply a change in the CentOS spec file but not to the
+Ubuntu rules file
+
+2. Developers want to apply a performance change into CentOS but is not
+necesary in Ubuntu.
+
+3. Developers want to change the installation path at the CentOS spec file but
+not at the Ubuntu build scripts
 
 Proposed change
 ===============
@@ -77,12 +84,32 @@ stx-flock/
             └── guest-comm.spec
 
 
+With this structure is easy for developers to keep a clean software project in
+the current stx-<flock items> repositories and the capability to change CFLAGS
+or installation paths in stx-flock repository
 
 Alternatives
 ============
 
-Keep the existing directory structure and add additional sub-directories for
+- Keep the existing directory structure and add additional sub-directories for
 the new Operating Systems, which will clutter the current repositories.
+- Make a split of directories inside each flock service directory, ie:
+
+stx-fault
+    os-packaging/
+    ├── fm-api
+    │   └── centos
+    │   └── ubuntu
+    ├── fm-common
+    │   └── centos
+    │   └── ubuntu
+    ├── fm-mgr
+    │   └── centos
+    │   └── ubuntu
+    └── fm-restapi
+        └── centos
+        └── ubuntu
+
 
 Data model impact
 =================
@@ -122,6 +149,27 @@ Improve developer experience to isolate each package increasing the modularity
 of the development, having delimited the boundaries of each package and how
 they are built.
 
+One negative developer impact coudl be that the changes in packaging source are
+no longer atomic, which means in one single commit in the same repo. Proper
+dependencies and workflow management will be required to ensure this type of
+change goes in at the same time. However doing a quantitive analysis inside the
+flock repositories show us how offen a chane in metadata for centOS has been
+performed along the history of development
+
+stx-config = 3.800 %
+stx-distcloud = 0 %
+stx-distcloud-client = 0 %
+stx-fault = 10.200 %
+stx-gui = 1.800 %
+stx-ha = 3.300 %
+stx-nfv = 2.300 %
+stx-update = 22.000 %
+stx-metal = 6.100 %
+
+These numbers show us that stx-update might be the only one with more than
+20% of changes related to metadata, which means that most of the changes
+are for pure flock sw code
+
 Upgrade impact
 ===============
 
@@ -130,8 +178,9 @@ None
 Implementation
 ==============
 
-Is possible to create a separate branch for now and merge until is proved that
-does not break the build or the sanity of the system
+- Create repository stx-flock (1 day)
+- Copy necessary meta data from stx-<flock items> to stx-flock repository (2 days)
+  This in order to do not break the current build system
 
 Assignee(s)
 ===========
@@ -156,10 +205,20 @@ Repos Impacted
 
 Work Items
 ===========
-- Create development branch on current repositories
-- Create a build management repositories for each service
-- Copy necessary build scripts to build management repositories
-- Test build management repositories in the package build system
+
+The following itmes propouse a estimated timeline, numbers are not exact:
+
+- Create repository stx-flock (1 day)
+- Copy necessary meta data from stx-<flock items> to stx-flock repository (2 days)
+  This in order to do not break the current build system
+- If a new build system for multiOS is created this should be using the
+  stx-flock repository metadata to build the flock services ( 5 days )
+- Adjust current build system to use new stx-flock repository, doing the
+  development in a devel branch until tested ( 3 days )
+- Test build management repositories in the package build system, if
+  functionaly is tested , merge into master
+- When new MultiOs build system is complete, migrate to just use the MultiOS
+  build system to avoid duplication of work on build systems
 
 Dependencies
 ============
