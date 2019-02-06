@@ -2,45 +2,45 @@
     License.
     http://creativecommons.org/licenses/by/3.0/legalcode
 
-=======================
+======================================
 StarlingX: Multi OS Linux builder tool
-=======================
+======================================
 
 Storyboard: https://storyboard.openstack.org/#!/story/2004471
 
 
-Starling X is based on CentOS operating system, however, is necessary to give
-support of the product in other base OS layers. The current build system under
-STX will not support the transition to other OS based on rpm or deb files. In
-order to give a full support for other operating systems is necessary to create
-a tool that makes linux images based on deb files and in rpms from other Linux
-distributions ( like fedora )
+StarlingX is based on CentOS operating system, however, it is necessary to
+give support of the product in other base OS layers. The current build system
+under STX will not support the transition to other OS based on rpm or deb
+files. In order to give a full support for other operating systems is necessary
+to create a tool that makes Linux images based on deb files and in rpms from
+other Linux distributions ( e.g. Fedora )
 
 
 Problem description
 ===================
 
 STX image creator only supports CentOS based images, users that want to
-generate a different linux image like ubuntu or fedora , will not be able to
-generate the .iso with current tools
+generate a different Linux image like Ubuntu or Fedora , will not be able to
+generate the ISO image with current tools.
 
 Use Cases
 =========
 
-For users that want to install STX solution under ubunut base OS or diferent
-rpm base OS like fedora
+For users that want to install STX solution under Ubuntu base OS or different
+RPM base OS like Fedora
 
 
 Proposed change
 ===============
 
-Linuxbuilder helps stx developers  to create a Linux image based on multiple OS
-flavors . This project is intented for anyone that wants to build a Linux Image
-(img/iso/kvm/cloud) based on RPMs and DEBs.
+Linuxbuilder helps STX developers to create a Linux image based on multiple OS
+flavors . This project is intended for anyone that wants to build a Linux image
+(IMG/ISO/KVM/Cloud) based on RPMs and DEBs.
 
-We create this project to avoid the process of develop your own tools/scripts
-for the creation of your customized distribution, this project provide the
-tools to do that with a simple command line (Make).
+We create this project to avoid the process to develop your own tools/scripts
+for the creation of your customized distribution, this project provides the
+tools to do that with a simple command line (e.g. Make).
 
 POC of the project with README and examples:
 
@@ -49,7 +49,7 @@ https://github.com/VictorRodriguez/linuxbuilder
 Alternatives
 ============
 
-Linaro provides a suite of tools used for creating images (only for debs). The
+Linaro provides a suite of tools used for creating images (only for DEBS). The
 tools create Ubuntu and Android images. The most commonly used tools are
 linaro-media-create and linaro-android-media-create.
 
@@ -79,7 +79,7 @@ None
 In the end, the End user will have:
 
 stx-centos.iso
-stx-ubuntu.iso
+stx-Ubuntu.iso
 stx-clearlinux.iso
 
 
@@ -96,7 +96,7 @@ None
 Developer impact
 =================
 
-Extend functionality of STX developers to ubuntu base systems and other rpm
+Extend functionality of STX developers to Ubuntu base systems and other rpm
 base OSs to take advantage of these other OSs
 
 Upgrade impact
