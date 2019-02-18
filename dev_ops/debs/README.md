@@ -141,8 +141,7 @@ An example of my rule file:
 
 In the end the only file that is necesary is the DSC file
 DSC = Debian source packages' control file format
-Details of each filed on the DSC file at [ubuntu-manpages]
-(http://manpages.ubuntu.com/manpages/bionic/man5/dsc.5.html)
+Details of each filed on the DSC file at [ubuntu-manpages](http://manpages.ubuntu.com/manpages/bionic/man5/dsc.5.html)
 
 
 If you have the DSC file you just need to: 
