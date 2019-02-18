@@ -120,6 +120,43 @@ sudo dpkg -i debhello_0.0-1_amd64.deb
 hello
 ```
 
+An example of my rule file: 
+```
+#!/usr/bin/make -f
+# You must remove unused comment lines for the released package.
+#export DH_VERBOSE = 1
+#export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+#export DEB_CFLAGS_MAINT_APPEND  = -Wall -pedantic
+#export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
+
+%:
+	dh $@
+
+#override_dh_auto_install:
+	dh_auto_install -- prefix=/usr
+
+#override_dh_install:
+	dh_install --list-missing -X.pyc -X.pyo
+```
+
+In the end the only file that is necesary is the DSC file
+DSC = Debian source packages' control file format
+Details of each filed on the DSC file at [ubuntu-manpages]
+(http://manpages.ubuntu.com/manpages/bionic/man5/dsc.5.html)
+
+
+If you have the DSC file you just need to: 
+
+```
+dpkg-source -x foo_version.dsc
+```
+change into the extracted source directory. Then run:
+
+```
+dpkg-buildpackage -rfakeroot -b
+```
+
+
 More info at : 
 https://www.debian.org/doc/manuals/debmake-doc/ch04.en.html
 
