@@ -1,0 +1,12 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: debhello
+Source: <url://example.com>
+
+Files:     Makefile
+           src/hello.c
+Copyright: __NO_COPYRIGHT_NOR_LICENSE__
+License:   __UNKNOWN__
+
+#----------------------------------------------------------------------------
+# Files marked as NO_LICENSE_TEXT_FOUND may be covered by the following
+# license/copyright files.
