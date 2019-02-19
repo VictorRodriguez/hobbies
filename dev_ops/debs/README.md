@@ -114,30 +114,16 @@ tar -czf debhello-0.0.tar.gz debhello-0.0/
 cd debhello-0.0/
 debmake
 vim debian/rules
+
+put this in your debian/rules file override_dh_usrlocal: and this will stop dh_usrlocal from running which i think is actually causing you problems.
+
 dpkg-buildpackage
 cd ..
 sudo dpkg -i debhello_0.0-1_amd64.deb
 hello
 ```
 
-An example of my rule file: 
-```
-#!/usr/bin/make -f
-# You must remove unused comment lines for the released package.
-#export DH_VERBOSE = 1
-#export DEB_BUILD_MAINT_OPTIONS = hardening=+all
-#export DEB_CFLAGS_MAINT_APPEND  = -Wall -pedantic
-#export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
 
-%:
-	dh $@
-
-#override_dh_auto_install:
-	dh_auto_install -- prefix=/usr
-
-#override_dh_install:
-	dh_install --list-missing -X.pyc -X.pyo
-```
 
 In the end the only file that is necesary is the DSC file
 DSC = Debian source packages' control file format
