@@ -65,8 +65,63 @@ build the Debian binary package under the proper environment variables.
 
 ## How to build a package from tar.gz ( simple example ) 
 
+### Big picture
+
+The big picture for building a single non-native Debian package from the upstream tarball debhello-0.0.tar.gz can be summarized as:
+
+* The maintainer obtains the upstream tarball debhello-0.0.tar.gz and untars its contents to the debhello-0.0 directory.
+* The debmake command debianizes the upstream source tree by adding template files only in the debian directory.
+	* The debhello_0.0.orig.tar.gz symlink is created pointing to the debhello-0.0.tar.gz file.
+	* The maintainer customizes template files.
+* The debuild command builds the binary package from the debianized source tree.
+	* debhello-0.0-1.debian.tar.xz is created containing the debian directory.
+
+```
+ $ tar -xzmf debhello-0.0.tar.gz
+ $ cd debhello-0.0
+ $ debmake
+   ... manual customization
+ $ debuild
+   ...
+ ```
+
+The debmake command is the helper script for the Debian packaging.
+
+* It always sets most of the obvious option states and values to reasonable defaults.
+* It generates the upstream tarball and its required symlink if they are missing.
+* It doesn’t overwrite the existing configuration files in the debian/ directory.
+* It supports the multiarch package.
+* It creates good template files such as the debian/copyright file compliant with DEP-5.
+
+After debmake debuild command build the package
+
+### Commands to build:
+
+Here is a summary of commands similar to the debuild command.
+
+* The debian/rules file defines how the Debian binary package is built.
+* The dpkg-buildpackage command is the official command to build the Debian binary package. For normal binary build, it executes roughly:
+	* “dpkg-source --before-build” (apply Debian patches, unless they are already applied)
+	* “fakeroot debian/rules clean”
+	* “dpkg-source --build” (build the Debian source package)
+	* “fakeroot debian/rules build”
+	* “fakeroot debian/rules binary”
+	* “dpkg-genbuildinfo” (generate a *.buildinfo file)
+	* “dpkg-genchanges” (generate a *.changes file)
+	* “fakeroot debian/rules clean”
+	* “dpkg-source --after-build” (unapply Debian patches, if they are applied during --before-build)
+	* “debsign” (sign the *.dsc and *.changes files)
+
+* The debuild command is a wrapper script of the dpkg-buildpackage command to build the Debian binary package under the proper environment variables.
+* The pdebuild command is a wrapper script to build the Debian binary package under the proper chroot environment with the proper environment variables.
+* The git-pbuilder command is another wrapper script to build the Debian binary package under the proper chroot environment with the proper environment variables. This provides an easier command line UI to switch among different build environments.
+
+## Example
+
 Here is an example of creating a simple Debian package from a simple C source
 using the Makefile as its build system.
+
+Structure of directory:
 
 ```
 mkdir debhello-0.0
@@ -74,7 +129,11 @@ mkdir debhello-0.0
 ├── Makefile
 └── src
     └── hello.c
+```
 
+Source code:
+
+```
 $ cat src/hello.c
 #include <stdio.h>
 int
@@ -83,7 +142,10 @@ main()
         printf("Hello, world!\n");
         return 0;
 }
+```
+Makefile:
 
+```
 $ cat Makefile
 prefix = /usr/local
 
@@ -108,17 +170,67 @@ uninstall:
 	-rm -f $(DESTDIR)$(prefix)/bin/hello
 
 .PHONY: all install clean distclean uninstall
-
+```
+Create tarball: 
+```
 tar -czf debhello-0.0.tar.gz debhello-0.0/
+```
 
+After that is possible to start with packaging:
+
+```
 cd debhello-0.0/
 debmake
+
+```
+
+Adjsut the override_dh_usrlocal:
+```
 vim debian/rules
-dpkg-buildpackage
+#!/usr/bin/make -f
+# You must remove unused comment lines for the released package.
+export DH_VERBOSE = 1
+#export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+export DEB_CFLAGS_MAINT_APPEND  = -Wall -pedantic
+export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
+
+%:
+	dh $@
+
+override_dh_usrlocal:
+
+#override_dh_auto_install:
+#	dh_auto_install -- LIBDIR=/usr/local/lib
+
+#override_dh_install:
+#	dh_install --list-missing -X.pyc -X.pyo
+```
+Build 
+dpkg-buildpackage -B
+
+Check that all binaries are installed in DEB
+```
 cd ..
-sudo dpkg -i debhello_0.0-1_amd64.deb
+sudo dpkg -c debhello_0.0-1_amd64.deb
 hello
 ```
+
+In the end the only file that is necesary is the DSC file
+DSC = Debian source packages' control file format
+Details of each filed on the DSC file at [ubuntu-manpages](http://manpages.ubuntu.com/manpages/bionic/man5/dsc.5.html)
+
+
+If you have the DSC file you just need to: 
+
+```
+dpkg-source -x foo_version.dsc
+```
+change into the extracted source directory. Then run:
+
+```
+dpkg-buildpackage -rfakeroot -b
+```
+
 
 More info at : 
 https://www.debian.org/doc/manuals/debmake-doc/ch04.en.html
