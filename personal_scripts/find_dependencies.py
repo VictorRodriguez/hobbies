@@ -24,7 +24,7 @@ for r, d, f in os.walk(repo_path):
                 line = fp.readline()
                 while line:
                     if pkg_name in line:
-                        pkgs_affected.append(os.path.join(r, file))
+                        pkgs_affected.append(file_name)
                     line = fp.readline()
 
 if build_requirements:
