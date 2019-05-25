@@ -37,13 +37,34 @@ def find_pkgs_to_build(patern):
 
     return pkg_info_files
 
+def find_src_to_build(master_path):
+    build_srpm_data = "%s/centos/build_srpm.data" % (master_path)
+    if os.path.isfile(build_srpm_data):
+        if grep(build_srpm_data,"SRC_DIR"):
+            src_dir = grep(build_srpm_data,"SRC_DIR").strip().split('=')[1]
+            src_dir = src_dir.strip('"')
+            if src_dir == ".":
+                src_dir = ""
+            if "PKG_BASE" in src_dir:
+                src_dir = src_dir.split("/")[1]
+            if os.path.isdir(master_path + src_dir):
+                return (master_path + src_dir)
+            else:
+                print("ERROR: path does not exist %s" % \
+                    os.path.join(master_path + src_dir))
+        else:
+            print("ERROR: no src dir found in %s" % (master_path))
+            return None
+
 def main():
     clone_repos()
-    pkg_info_files = find_pkgs_to_build("PKG-INFO")
+    patern = "PKG-INFO"
+    pkg_info_files = find_pkgs_to_build(patern)
     pkg_info_files = filter(None, pkg_info_files)
     for item in pkg_info_files:
         pkg_info = {}
         pkg_info["pkg_info_path"] = item
+        pkg_info["pkg_path"] = item.replace(patern,"")
         if (grep(item,"Name")):
             pkg_info["pkg_name"] = pkg_name = grep(item,"Name").\
                 split(":")[1].strip()
@@ -51,6 +72,9 @@ def main():
         if (grep(item,"Version")):
             pkg_info["pkg_version"] = pkg_name = grep(item,"Version").\
                 split(":")[1].strip()
+        if (find_src_to_build(pkg_info["pkg_path"])):
+            pkg_info["pkg_src"] = find_src_to_build(pkg_info["pkg_path"])
+
 if __name__== "__main__":
     main()
 
