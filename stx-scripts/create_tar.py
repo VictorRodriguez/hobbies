@@ -56,6 +56,13 @@ def find_src_to_build(master_path):
             print("ERROR: no src dir found in %s" % (master_path))
             return None
 
+def find_tis_version(master_path):
+    build_srpm_data = "%s/centos/build_srpm.data" % (master_path)
+    if os.path.isfile(build_srpm_data):
+        if grep(build_srpm_data,"TIS_PATCH_VER"):
+            tis_patch_version = grep(build_srpm_data,"TIS_PATCH_VER").strip()
+            tis_patch_version = tis_patch_version.split('=')[1]
+            return tis_patch_version
 def main():
     clone_repos()
     patern = "PKG-INFO"
@@ -68,13 +75,17 @@ def main():
         if (grep(item,"Name")):
             pkg_info["pkg_name"] = pkg_name = grep(item,"Name").\
                 split(":")[1].strip()
-
         if (grep(item,"Version")):
             pkg_info["pkg_version"] = pkg_name = grep(item,"Version").\
                 split(":")[1].strip()
         if (find_src_to_build(pkg_info["pkg_path"])):
             pkg_info["pkg_src"] = find_src_to_build(pkg_info["pkg_path"])
+        if (find_tis_version(pkg_info["pkg_path"])):
+            pkg_info["pkg_tis_version"] = find_tis_version(pkg_info["pkg_path"])
 
+        print(pkg_info)
+
+        # TODO now that we have all the info create the tar ball and mock :)
 if __name__== "__main__":
     main()
 
