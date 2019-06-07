@@ -2,8 +2,8 @@
 #include <unistd.h>
 
 
-#define LOOPS 1000000000000
-#define THREADS 48
+//#define LOOPS 1000000000000
+#define THREADS 2
 
 void *foo(){
 
@@ -28,7 +28,7 @@ int main(){
         pthread_create(&tid, NULL,foo,NULL);
 	}
 
-    sleep(5);
+    sleep(10);
     return 0;
 
     //pthread_exit(NULL);
