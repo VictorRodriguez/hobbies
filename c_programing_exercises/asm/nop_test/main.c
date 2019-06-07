@@ -3,7 +3,7 @@
 
 
 //#define LOOPS 1000000000000
-#define THREADS 2
+#define THREADS 48
 
 void *foo(){
 
