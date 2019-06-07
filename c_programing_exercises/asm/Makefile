@@ -1,6 +1,9 @@
-all:
+asm:
 	nasm -felf64 hello.asm
 	ld hello.o -o hello
+	nasm -felf64 loop.asm
+	ld loop.o -o loop
+all:
 	gcc basic_add_asm.c -o basic_add_asm
 	gcc basic_sub_asm.c -o basic_sub_asm
 	gcc basic_mul_asm.c -o basic_mul_asm
