@@ -237,3 +237,108 @@ $1 = 80
 
 ```
 
+## Debuging forks
+
+Lets imagine that we have a fork() inside aour code:
+
+```
+```
+
+We want to debug the inner loop that the child process has:
+
+```
+int main() {
+    int var = 0;
+	pid_t pid;
+
+	printf("Main Process PID = %d\n", getpid());
+	/* fork a child process */
+	pid = fork();
+
+	if (pid < 0) {
+		/* error occurred */
+		fprintf(stderr, "Fork Failed");
+		exit (-1) ;
+	}
+    else if (pid == 0) {
+		/* child process */
+	    printf("[child] Parent PID = %d\n", getppid());
+		printf("[child] Current PID = %d\n", getpid());
+        for(int i = 0;i<10;i++){
+            var = var +10;
+        }
+        printf("[child] var = %d\n",var);
+	}
+	else {
+		/* parent process */
+		/* parent will wait for the child to complete */
+		wait(NULL);
+		printf("Child Complete\n");
+	}
+
+    printf("var = %d\n",var);
+}
+```
+
+``
+gdb ./simple_fork
+```
+
+We set a breakpoint at main:
+
+```
+(gdb) b main
+```
+
+Now here comes the secret, by default, when a program forks, gdb will continue
+to debug the parent process and the child process will run unimpeded.
+
+If you want to follow the child process instead of the parent process, use the
+command set follow-fork-mode.
+
+* set follow-fork-mode mode :
+    * Set the debugger response to a program call of fork or vfork. A call to
+    fork or vfork creates a new process. The mode argument can be:
+        * parent The original process is debugged after a fork. The child
+          process runs unimpeded. This is the default.
+        * child The new process is debugged after a fork. The parent process
+          runs unimpeded.
+
+```
+(gdb) set follow-fork-mode child
+(gdb) run
+Starting program: /home/vmrod/hobbies/c_programing_exercises/gdb/simple_fork
+
+Breakpoint 1, main () at simple_fork.c:10
+10	    int var = 0;
+(gdb) n
+13		printf("Main Process PID = %d\n", getpid());
+(gdb) n
+Main Process PID = 24237
+15		pid = fork();
+(gdb) n
+[New process 24241]
+[Switching to process 24241]
+main () at simple_fork.c:17
+17		if (pid < 0) {
+(gdb) n
+22	    else if (pid == 0) {
+(gdb) n
+24		    printf("[child] Parent PID = %d\n", getppid());
+(gdb) n
+[child] Parent PID = 24237
+25			printf("[child] Current PID = %d\n", getpid());
+(gdb) n
+[child] Current PID = 24241
+26	        for(int i = 0;i<10;i++){
+(gdb) n
+27	            var = var +10;
+(gdb) n
+26	        for(int i = 0;i<10;i++){
+(gdb) n
+27	            var = var +10;
+(gdb) p var
+$1 = 10
+```
+
+[1] https://www-zeuthen.desy.de/unix/unixguide/infohtml/gdb/Forks.html
