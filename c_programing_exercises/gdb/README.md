@@ -151,3 +151,89 @@ segfault:
 0x0000555555554611 in foo () at segfaul.c:8
 ```
 
+## More complete debug view
+
+GDB provides a nice view of the code while we walk through the source:
+
+Example code:
+
+```
+int main() {
+    int count=0;
+    for (int i=0;i<10;i++){
+        count = count +10;
+    }
+	return 0;
+}
+```
+
+Compile and run the debug as:
+
+```
+gcc -g loop.c -o loop
+gdb ./loop -tui
+```
+This will present a really nice view of the code at the time we set brakpoints
+and are able to print each variable:
+
+```
+b main  \\ breakpoint at main
+run     \\ run the code
+n       \\ next
+p count \\
+
+(gdb) p count
+$3 = 10
+(gdb) p count
+$4 = 10
+(gdb) n
+(gdb) n
+(gdb) n
+(gdb) p count
+$5 = 30
+```
+
+To clear the breakpoints:
+
+clear:
+
+Delete any breakpoints at the next instruction to be executed in the selected
+stack frame (see section Selecting a frame). When the innermost frame is
+selected, this is a good way to delete a breakpoint where your program just
+stopped.
+
+clear function
+clear filename:function
+
+Delete any breakpoints set at entry to the function function.
+clear linenum
+clear filename:linenum
+Delete any breakpoints set at or within the code of the specified line. delete
+[breakpoints] [range...]
+
+Delete the breakpoints, watchpoints, or catchpoints of the breakpoint ranges
+specified as arguments. If no argument is specified, delete all breakpoints
+(GDB asks confirmation, unless you have set confirm off). You can abbreviate
+this command as d.
+
+For example:
+
+```
+(gdb) clear main
+Deleted breakpoint 1
+```
+
+And we can now set a breakpoint with condition:
+
+```
+(gdb) break 5 if count=80
+Breakpoint 1 at 0x60e: file loop.c, line 5.
+(gdb) run
+Starting program: /home/vmrod/hobbies/c_programing_exercises/gdb/loop
+
+Breakpoint 1, main () at loop.c:5
+(gdb) p count
+$1 = 80
+
+```
+
