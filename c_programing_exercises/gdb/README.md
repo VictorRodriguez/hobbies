@@ -280,10 +280,6 @@ int main() {
 }
 ```
 
-``
-gdb ./simple_fork
-```
-
 We set a breakpoint at main:
 
 ```
@@ -340,5 +336,6 @@ main () at simple_fork.c:17
 (gdb) p var
 $1 = 10
 ```
+
 
 [1] https://www-zeuthen.desy.de/unix/unixguide/infohtml/gdb/Forks.html
