@@ -8,7 +8,7 @@ learnings:
 
 Lets imagine we have the following code:
 
-```
+```C
 #include <stdio.h>
 
 int main() {
@@ -24,7 +24,7 @@ int main() {
 
 if we compile and run, we will get:
 
-```
+```shell
 Segmentation fault (core dumped)
 ```
 
@@ -32,26 +32,26 @@ How to debug this , very simple:
 
 * compile with the -g option:
 
-```
+```shell
     gcc -g segfaul.c -o segfault
 ```
 
 Then run the binary with gdb:
 
-```
+```shell
 gdb ./segfault
 ```
 
 Be aware that the symbols are loaded:
 
-```
+```gdb
 Type "apropos word" to search for commands related to "word"...
 Reading symbols from ./segfault...done.
 ```
 
 Then just run:
 
-```
+```gdb
 (gdb) run
 Starting program: /home/vmrod/hobbies/c_programing_exercises/gdb/segfault
 
@@ -65,14 +65,14 @@ Which makes sence on the line of code with the error
 ## Saving the error in a coredump
 
 After the error, occurs:
-```
+```gdb
 (gdb) generate-core-file
 Saved corefile core.22663
 ```
 
 This file can be used latter for future debug:
 
-```
+```gdb
 gdb ./segfault core.22663
 
 [...]
@@ -94,7 +94,7 @@ A backtrace is a summary of how your program got where it is. It shows one line
 per frame, for many frames, starting with the currently executing frame (frame
 zero), followed by its caller (frame one), and on up the stack.
 
-```
+```gdb
 (gdb) bt
 #0  0x0000555555554611 in main () at segfaul.c:8
 (gdb) bt full
@@ -105,7 +105,7 @@ zero), followed by its caller (frame one), and on up the stack.
 Even if we have nested functions:
 
 
-```
+```C
 #include <stdio.h>
 
 void foo(){
@@ -124,7 +124,7 @@ int main() {
 
 gdb backtrace is able to do the debug:
 
-```
+```gdb
 (gdb) run
 Starting program: /home/vmrod/hobbies/c_programing_exercises/gdb/segfault
 
@@ -138,7 +138,7 @@ Program received signal SIGSEGV, Segmentation fault.
 
 ## info registers
 
-```
+```gdb
 (gdb) info registers
 
 rip            0x555555554611	0x555555554611 <foo+23>
@@ -147,7 +147,7 @@ rip            0x555555554611	0x555555554611 <foo+23>
 As we can see the addrs: 0x555555554611 match with the one reported by
 segfault:
 
-```
+```gdb
 0x0000555555554611 in foo () at segfaul.c:8
 ```
 
@@ -157,7 +157,7 @@ GDB provides a nice view of the code while we walk through the source:
 
 Example code:
 
-```
+```C
 int main() {
     int count=0;
     for (int i=0;i<10;i++){
@@ -169,14 +169,14 @@ int main() {
 
 Compile and run the debug as:
 
-```
+```gdb
 gcc -g loop.c -o loop
 gdb ./loop -tui
 ```
 This will present a really nice view of the code at the time we set brakpoints
 and are able to print each variable:
 
-```
+```gdb
 b main  \\ breakpoint at main
 run     \\ run the code
 n       \\ next
@@ -195,37 +195,27 @@ $5 = 30
 
 To clear the breakpoints:
 
-clear:
-
+* clear:
 Delete any breakpoints at the next instruction to be executed in the selected
 stack frame (see section Selecting a frame). When the innermost frame is
 selected, this is a good way to delete a breakpoint where your program just
 stopped.
 
-clear function
-clear filename:function
-
+* clear function
+* clear filename:function
 Delete any breakpoints set at entry to the function function.
-clear linenum
-clear filename:linenum
-Delete any breakpoints set at or within the code of the specified line. delete
-[breakpoints] [range...]
 
-Delete the breakpoints, watchpoints, or catchpoints of the breakpoint ranges
-specified as arguments. If no argument is specified, delete all breakpoints
-(GDB asks confirmation, unless you have set confirm off). You can abbreviate
-this command as d.
 
 For example:
 
-```
+```gdb
 (gdb) clear main
 Deleted breakpoint 1
 ```
 
 And we can now set a breakpoint with condition:
 
-```
+```gdb
 (gdb) break 5 if count=80
 Breakpoint 1 at 0x60e: file loop.c, line 5.
 (gdb) run
@@ -239,14 +229,10 @@ $1 = 80
 
 ## Debuging forks
 
-Lets imagine that we have a fork() inside aour code:
+Lets imagine that we have a fork() inside aour code and
+we want to debug the inner loop that the child process has:
 
-```
-```
-
-We want to debug the inner loop that the child process has:
-
-```
+```C
 int main() {
     int var = 0;
 	pid_t pid;
@@ -282,7 +268,7 @@ int main() {
 
 We set a breakpoint at main:
 
-```
+```gdb
 (gdb) b main
 ```
 
@@ -300,7 +286,7 @@ command set follow-fork-mode.
         * child The new process is debugged after a fork. The parent process
           runs unimpeded.
 
-```
+```gdb
 (gdb) set follow-fork-mode child
 (gdb) run
 Starting program: /home/vmrod/hobbies/c_programing_exercises/gdb/simple_fork
