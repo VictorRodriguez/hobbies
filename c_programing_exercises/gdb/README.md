@@ -323,5 +323,11 @@ main () at simple_fork.c:17
 $1 = 10
 ```
 
+* TODO
+
+** Debug in an exec
+** Debug a thread
+** Debug in multiple cores
+** Debug shared libraries
 
 [1] https://www-zeuthen.desy.de/unix/unixguide/infohtml/gdb/Forks.html
