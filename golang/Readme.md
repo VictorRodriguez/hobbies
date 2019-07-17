@@ -13,6 +13,9 @@ $ ./hello
 hello world
 ```
 
+NOTES:
+
+	* constant.go has to be build
 
 # References:
 
