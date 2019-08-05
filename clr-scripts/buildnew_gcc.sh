@@ -78,8 +78,8 @@ function build(){
                 echo
                 echo "Copy RPMS to repo"
                 echo
-                cp results/*.rpm /home/repo
-                createrepo_c /home/repo
+                cp results/*.rpm ~/repo
+                createrepo_c ~/repo
             fi
         popd
     else
@@ -89,5 +89,6 @@ function build(){
     fi
 }
 
+mkdir -p ~/repo
 build_lfs
 
