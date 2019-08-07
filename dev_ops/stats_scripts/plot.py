@@ -15,6 +15,9 @@ else:
 
 h = sorted(my_data)
 fit = stats.norm.pdf(h, np.mean(h), np.std(h))
-pl.plot(h,fit,'-o')
-pl.hist(h,normed=True)
+pl.plot(h,fit, color='coral')
+pl.grid()
+pl.title('Normal Distribution of data',fontsize=10)
+pl.xlabel('x')
+pl.ylabel('Normal Distribution')
 pl.show()
