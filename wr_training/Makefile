@@ -1,8 +1,8 @@
 all:
-	gcc -O0 add.c -o add
-	gcc -O3 add.c -o add_03
-	gcc -O3 -march=haswell add.c -o add_03_haswell
+	export CFLAGS= && gcc -O0 basic_add.c -o basic_add
+	gcc -O3 basic_add.c -o basic_add_03
+	gcc -O3 -march=haswell basic_add.c -o basic_add_03_haswell
 
 clean:
-	rm -rf add add_03
+	rm -rf basic_add basic_add_03 basic_add_03_haswell
 
