@@ -8,7 +8,7 @@ void foo() {
     int i,x;
     for (x=0; x<MAX; x++){
         for (i=0; i<256; i++){
-            a[i] = b[i] + c[i];
+            a[i] = (c[i] * b[i]) + c[i];
         }
      }
 }

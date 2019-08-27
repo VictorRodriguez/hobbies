@@ -1,8 +1,11 @@
 all:
-	export CFLAGS= && gcc -O0 basic_add.c -o basic_add
-	gcc -O3 basic_add.c -o basic_add_03
-	gcc -O3 -march=haswell basic_add.c -o basic_add_03_haswell
-
+	gcc -O2 -ftree-vectorize add.c -fopt-info-vec
+basic:
+	gcc -O0 add.c
+haswell:
+	gcc -O2 -ftree-vectorize -march=haswell add.c -fopt-info-vec
+FMV:
+	gcc -O2 -ftree-vectorize fmv.c
 clean:
-	rm -rf basic_add basic_add_03 basic_add_03_haswell
+	rm -rf a.out
 
