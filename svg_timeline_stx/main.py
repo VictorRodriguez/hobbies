@@ -1,5 +1,8 @@
 import json
 
+log = "kcm-0.log"
+json_result = "result.json"
+
 data = {}
 
 data["time_unit"] = "ms"
@@ -11,22 +14,17 @@ data['segments'].append({
     'time_end': 90
 })
 
-data['segments'].append({
-    'group': 1,
-    'text': 'task 1',
-    'time_start': 15,
-    'time_end': 60
-})
+def write_json(data):
+    with open(json_result, 'w') as fout:
+        json.dump(data, fout)
 
-data['segments'].append({
-    'group': 2,
-    'text': 'task 2',
-    'time_start': 65,
-    'time_end': 80
-})
-#time_unit = {"time_unit":"ms"}
+def main():
+    with open(log, 'r') as fin:
+        lines = fin.readlines()
+        for line in lines:
+            if "E" in line or "I" in line or "W" in line:
+                clean_line = line.strip()
+                print(clean_line.split(" ")[1])
 
-with open('in.json', 'w') as fout:
-    json.dump(data, fout)
-
-
+if __name__ == "__main__":
+    main()
