@@ -7,6 +7,7 @@ data = {}
 
 data["time_unit"] = "ms"
 data['segments'] = []
+
 data['segments'].append({
     'group': 0,
     'text': 'task 0',
@@ -53,6 +54,12 @@ def main():
 
                 next_date = (next_clean_line.split(" ")[1])
                 end_time = (time_normalize(next_date))
+                delta = end_time - start_time
+
+                if delta < 0:
+                    cp_end_time = end_time
+                    end_time = start_time
+                    start_time = cp_end_time
 
                 delta = end_time - start_time
                 print("%d   %s : %s :  %s" % (event_id,date,next_date,delta))
