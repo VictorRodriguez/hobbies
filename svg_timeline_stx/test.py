@@ -5,15 +5,15 @@ json_result = "result.json"
 
 data = {}
 
-data['time_unit'] = 'ms'
+data['time_unit'] = 's'
 data['segments'] = []
 
-data['segments'].append({
-    'group': 0,
-    'text': 'task 0',
-    'time_start': 10,
-    'time_end': 90
-})
+# data['segments'].append({
+#     'group': 0,
+#     'text': 'task 0',
+#     'time_start': 10,
+#     'time_end': 90
+# })
 
 
 def write_json(data):
@@ -61,18 +61,21 @@ def main():
                     end_time = start_time
                     start_time = cp_end_time
 
+                if start_time == start_time:
+                    start_time = start_time
+                    end_time = end_time + 0.01
+
                 text = "task_%s" % (event_id)
-               # data['segments'].append({
-               #     'group': event_id,
-               #     'text': "'%s'" % (text),
-               #     'time_start':start_time,
-               #     'time_end': end_time
-               # })
+                data['segments'].append({
+                    'group': event_id,
+                    'text': "'%s'" % (text),
+                    'time_start':start_time,
+                    'time_end': end_time
+                })
 
+                #delta = end_time - start_time
+                #print("%d   %s : %s :  %s" % (event_id,date,next_date,delta))
     print(json.dumps(data))
-
-                # delta = end_time - start_time
-                # print("%d   %s : %s :  %s" % (event_id,date,next_date,delta))
 
 if __name__ == "__main__":
     main()
