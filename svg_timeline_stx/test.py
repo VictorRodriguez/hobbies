@@ -6,14 +6,14 @@ json_result = "result.json"
 data = {}
 
 data["time_unit"] = "ms"
-data['segments'] = []
+data["segments"] = []
 
-data['segments'].append({
-    'group': 0,
-    'text': 'task 0',
-    'time_start': 10,
-    'time_end': 90
-})
+# data['segments'].append({
+#     'group': 0,
+#     'text': 'task 0',
+#     'time_start': 10,
+#     'time_end': 90
+# })
 
 
 def write_json(data):
@@ -27,7 +27,7 @@ def time_normalize(date):
     seconds = float(date.split(":")[2]) - (ms/1000)
 
     date_ms = (seconds)*1000 + (minutes)*60000 + (hour*3600000) + ms
-    return date_ms
+    return date_ms / 1000 # return in seconds
 
 def main():
 
@@ -61,8 +61,18 @@ def main():
                     end_time = start_time
                     start_time = cp_end_time
 
-                delta = end_time - start_time
-                print("%d   %s : %s :  %s" % (event_id,date,next_date,delta))
+                text = "task_%s" % (event_id)
+                data['segments'].append({
+                    'group': event_id,
+                    'text': "'%s'" % (text),
+                    'time_start':start_time,
+                    'time_end': end_time
+                })
+
+    print(data)
+
+                # delta = end_time - start_time
+                # print("%d   %s : %s :  %s" % (event_id,date,next_date,delta))
 
 if __name__ == "__main__":
     main()
