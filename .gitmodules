@@ -1,0 +1,3 @@
+[submodule "svg_timeline_stx/thread-time"]
+	path = svg_timeline_stx/thread-time
+	url = https://github.com/PicoJr/thread-time.git
