@@ -1,15 +1,16 @@
-
-filename="new.csv"
-
 """
-get_cvss : CVSS, Common Vulnerability Scoring System, is a vulnerability
-scoring system designed to provide an open and standardized method for rating
-IT vulnerabilities. CVSS helps organizations prioritize and coordinate a joint
-response to security vulnerabilities by communicating the base, temporal and
-environmental properties of a vulnerability.
+Implement policy based on
+https://wiki.openstack.org/wiki/StarlingX/Security/CVE_Support_Policy
 """
 
 def get_cvss(cve_id,filename):
+    """
+    get_cvss : CVSS, Common Vulnerability Scoring System, is a vulnerability
+    scoring system designed to provide an open and standardized method for
+    rating IT vulnerabilities. CVSS helps organizations prioritize and
+    coordinate a joint response to security vulnerabilities by communicating
+    the base, temporal and environmental properties of a vulnerability.
+    """
     with open(filename,'r') as fh:
         lines = fh.readlines()
         for line in lines:
@@ -29,18 +30,14 @@ def get_cves_id(filename):
                     cve_ids.append(cve_id)
     return cve_ids
 
-"""
-Implement policy based on
-https://wiki.openstack.org/wiki/StarlingX/Security/CVE_Support_Policy
-"""
 
-cve_ids = get_cves_id(filename)
+if __name__ == '__main__':
 
-for cve_id in cve_ids:
-    cvss = float(get_cvss(cve_id,filename))
-    if  cvss > 7.0:
-        print(cve_id + ": " + str(cvss))
+    filename="new.csv"
+    cve_ids = get_cves_id(filename)
 
-
-
+    for cve_id in cve_ids:
+        cvss = float(get_cvss(cve_id,filename))
+        if  cvss > 7.0:
+            print(cve_id + ": " + str(cvss))
 
