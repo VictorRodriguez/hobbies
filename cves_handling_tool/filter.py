@@ -1,7 +1,10 @@
 """
 Implement policy based on
 https://wiki.openstack.org/wiki/StarlingX/Security/CVE_Support_Policy
+
+Document as pydoc -w filter
 """
+
 
 def get_cvss(cve_id,filename):
     """
@@ -106,6 +109,6 @@ if __name__ == '__main__':
             cve["ai"] = ai
             cves_valid.append(cve)
 
-for cve in cves_valid:
-    print(cve)
+    for cve in cves_valid:
+        print(cve)
 
