@@ -106,5 +106,6 @@ if __name__ == '__main__':
             cve["ai"] = ai
             cves_valid.append(cve)
 
-    print(cves_valid)
+for cve in cves_valid:
+    print(cve)
 
