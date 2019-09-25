@@ -25,6 +25,20 @@ def get_cvss(cve_id,filename):
                     cvss = (line.strip().split("|")[4])
                     return cvss
 
+def get_cves_status(cve_id,filename):
+    """
+    Get the CVEs status : fixed/unfixed
+    :return cve_status
+    """
+    cve_ids = []
+    with open(filename,'r') as fh:
+        lines = fh.readlines()
+        for line in lines:
+            if "CVE" in line and not "CVE-ID" in line:
+                if cve_id in line:
+                    cve_status = line.strip().split("|")[2].strip()
+                    return cve_status
+
 def get_cves_id(filename):
     """
     Get the CVEs ids from the vulscan document
@@ -87,7 +101,8 @@ if __name__ == '__main__':
 
     if not os.path.isfile(cves_report_list_file) or \
     not os.path.isfile(cves_report_full_file):
-        print("ERROR: cves_report_full.txt and cves_report_list.txt must exist")
+        print("ERROR: cves_report_full.txt and \
+        cves_report_list.txt must exist")
         sys.exit(-1)
 
     cve_ids = get_cves_id(cves_report_list_file)
@@ -97,7 +112,7 @@ if __name__ == '__main__':
 
         cvss = float(get_cvss(cve_id,cves_report_list_file))
         av,ac,au,ai = get_base_vector(cve_id,cves_report_full_file)
-
+        cve_status = get_cves_status(cve_id,cves_report_list_file)
         """
         Following rules from:
         https://wiki.openstack.org/wiki/StarlingX/Security/CVE_Support_Policy
@@ -114,6 +129,7 @@ if __name__ == '__main__':
             cve["ac"] = ac
             cve["au"] = au
             cve["ai"] = ai
+            cve["status"] = cve_status
             cves_valid.append(cve)
 
     for cve in cves_valid:
