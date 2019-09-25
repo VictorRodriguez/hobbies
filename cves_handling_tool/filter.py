@@ -4,7 +4,8 @@ https://wiki.openstack.org/wiki/StarlingX/Security/CVE_Support_Policy
 
 Document as pydoc -w filter
 """
-
+import os
+import sys
 
 def get_cvss(cve_id,filename):
     """
@@ -81,21 +82,27 @@ if __name__ == '__main__':
 
     cves_valid = []
 
-    filename="new.csv"
-    data_file="full.txt"
+    cves_report_full_file = "cves_report_full.txt"
+    cves_report_list_file = "cves_report_list.txt"
 
-    cve_ids = get_cves_id(filename)
+    if not os.path.isfile(cves_report_list_file) or \
+    not os.path.isfile(cves_report_full_file):
+        print("ERROR: cves_report_full.txt and cves_report_list.txt must exist")
+        sys.exit(-1)
+
+    cve_ids = get_cves_id(cves_report_list_file)
 
     for cve_id in cve_ids:
         cve = {}
 
-        cvss = float(get_cvss(cve_id,filename))
-        av,ac,au,ai = get_base_vector(cve_id,data_file)
+        cvss = float(get_cvss(cve_id,cves_report_list_file))
+        av,ac,au,ai = get_base_vector(cve_id,cves_report_full_file)
 
         """
         Following rules from:
         https://wiki.openstack.org/wiki/StarlingX/Security/CVE_Support_Policy
         """
+
         if  cvss >= 7.0\
         and av == "N"\
         and ac == "L"\
