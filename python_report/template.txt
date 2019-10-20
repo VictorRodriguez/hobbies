@@ -1,0 +1,17 @@
+<head></head>
+<body>
+    <h1>Interest Rate: {{ interest_rate * 100 }}%</h1>
+	<table>
+        <tr>
+		{% for key, value in dict_item.items() %}
+		<th>{{key}}</th>
+   		{% endfor %}
+        </tr>
+
+        <tr>
+		{% for key, value in dict_item.items() %}
+		<td>{{value}}</td>
+		{% endfor %}
+        </tr>
+    </table>
+</body>
