@@ -1,11 +1,11 @@
 # filter script for CVEs in STX
 
-## Run
+## How to Run
 ```
-python filter.py
+python main.py <result.json>  <list.txt>
 ```
 
-### IMPORTANT
+* result.json = json file generated from: vuls report -format-json
+* list.txt = txt file generated from: vuls report -format-list
 
-s_report_full.txt and cves_report_list.txt must exist, you can get them from
-vulscan
+
