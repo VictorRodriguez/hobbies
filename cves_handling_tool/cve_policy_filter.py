@@ -1,5 +1,8 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+# Copyright (C) 2019 Intel Corporation
+#
 
 """
 Implement policy based on
@@ -24,7 +27,7 @@ def print_html_report(cves_report, title):
     output_text = template.render(cves_to_fix=cves_report["cves_to_fix"],\
         cves_to_track=cves_report["cves_to_track"],\
         cves_w_errors=cves_report["cves_w_errors"],\
-        cves_to_ommit=cves_report["cves_to_ommit"],\
+        cves_to_omit=cves_report["cves_to_omit"],\
         heads=heads,\
         title=title)
     report_title = 'report_%s.html' % (title)
@@ -129,6 +132,7 @@ def main():
     cves_w_errors = []
     cves_to_omit = []
     cves_report = {}
+    cves_fixed_list = []
 
     if len(sys.argv) < 3:
         print("\nERROR : Missing arguments, the expected arguments are:")
@@ -140,9 +144,23 @@ def main():
     if os.path.isfile(sys.argv[1]):
         results_json = sys.argv[1]
     else:
+        print("%s is not a file" % sys.argv[1])
         sys.exit(0)
 
     title = sys.argv[2]
+
+    if len(sys.argv) == 4:
+        if os.path.isfile(sys.argv[3]):
+            cves_fixed = sys.argv[3]
+        else:
+            print("%s is not a file" % sys.argv[4])
+            sys.exit(0)
+        try:
+            with open(cves_fixed) as cves_fixed_f:
+                for line in cves_fixed_f.readlines():
+                    cves_fixed_list.append(line.strip())
+        except ValueError as error:
+            print(error)
 
     try:
         with open(results_json) as json_file:
@@ -193,7 +211,8 @@ def main():
                 and ("N" in cve["au"] or "S" in cve["au"])
                 and ("P" in cve["ai"] or "C" in cve["ai"])):
             if cve["status"] == "fixed":
-                cves_to_fix.append(cve)
+                if cve["id"] not in cves_fixed_list:
+                    cves_to_fix.append(cve)
             else:
                 cves_to_track.append(cve)
         else:
@@ -202,7 +221,7 @@ def main():
     cves_report["cves_to_fix"] = cves_to_fix
     cves_report["cves_to_track"] = cves_to_track
     cves_report["cves_w_errors"] = cves_w_errors
-    cves_report["cves_to_ommit"] = cves_to_omit
+    cves_report["cves_to_omit"] = cves_to_omit
 
     print_report(cves_report, title)
     print_html_report(cves_report, title)
