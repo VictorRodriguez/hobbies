@@ -132,7 +132,6 @@ def main():
     cves_w_errors = []
     cves_to_omit = []
     cves_report = {}
-    cves_fixed_list = []
 
     if len(sys.argv) < 3:
         print("\nERROR : Missing arguments, the expected arguments are:")
@@ -148,19 +147,6 @@ def main():
         sys.exit(0)
 
     title = sys.argv[2]
-
-    if len(sys.argv) == 4:
-        if os.path.isfile(sys.argv[3]):
-            cves_fixed = sys.argv[3]
-        else:
-            print("%s is not a file" % sys.argv[4])
-            sys.exit(0)
-        try:
-            with open(cves_fixed) as cves_fixed_f:
-                for line in cves_fixed_f.readlines():
-                    cves_fixed_list.append(line.strip())
-        except ValueError as error:
-            print(error)
 
     try:
         with open(results_json) as json_file:
@@ -211,8 +197,7 @@ def main():
                 and ("N" in cve["au"] or "S" in cve["au"])
                 and ("P" in cve["ai"] or "C" in cve["ai"])):
             if cve["status"] == "fixed":
-                if cve["id"] not in cves_fixed_list:
-                    cves_to_fix.append(cve)
+                cves_to_fix.append(cve)
             else:
                 cves_to_track.append(cve)
         else:
