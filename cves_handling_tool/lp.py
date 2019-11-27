@@ -12,7 +12,7 @@ from os import path
 from launchpadlib.launchpad import Launchpad
 
 
-# These filter the types of bugs open)
+# These filter the open bugs
 STATUSES = [
     'New',
     'Incomplete',
@@ -26,12 +26,18 @@ STATUSES = [
 CVES_FILE = 'cves_open.json'
 
 def get_cves_file(file_name):
+    """
+    Get the cves from prev craeted json file
+    """
     data = []
     if path.isfile(file_name):
         data = json.load(open(file_name, "r"))
     return data
 
 def search_upstrem_lps():
+    """
+    Search for launchpads open with CVE or cve in title
+    """
     data = []
     cachedir = "/home/vrodri3/.launchpadlib/cache/"
     launchpad = Launchpad.login_anonymously\
@@ -53,12 +59,18 @@ def search_upstrem_lps():
     return data
 
 def find_cve(cve_id, data):
+    """
+    Find if CVE exist in list
+    """
     for bug in data:
         if cve_id in bug["title"]:
             return bug
     return None
 
 def cve_assigned(cve_id):
+    """
+    Check if CVE exist in json file, if not search in upstream launchpad
+    """
     data = get_cves_file(CVES_FILE)
     bug = find_cve(cve_id, data)
     if bug:
@@ -74,12 +86,14 @@ def cve_assigned(cve_id):
 
 def main():
 
-    cve_id = "CVE-2018-15686"
-
+    """
+    Sanity test
+    """
     cve_ids = ["CVE-2019-0160",\
         "CVE-2019-11810",\
-        "CVE-2019-11811"
-    ]
+        "CVE-2019-11811",\
+        "CVE-2018-15686",\
+        "CVE-2019-10126"]
 
     for cve_id in cve_ids:
         bug = cve_assigned(cve_id)

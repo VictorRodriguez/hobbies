@@ -12,6 +12,7 @@ Create documentation as pydoc -w cve_policy_filter
 import json
 import sys
 import os
+from lp import cve_assigned
 
 def print_html_report(cves_report, title):
     """
@@ -25,6 +26,7 @@ def print_html_report(cves_report, title):
     template = template_env.get_template(template_file)
     heads = ["cve_id", "status", "cvss2Score", "av", "ac", "au", "ai"]
     output_text = template.render(cves_to_fix=cves_report["cves_to_fix"],\
+        cves_to_fix_lp=cves_report["cves_to_fix_lp"],\
         cves_to_track=cves_report["cves_to_track"],\
         cves_w_errors=cves_report["cves_w_errors"],\
         cves_to_omit=cves_report["cves_to_omit"],\
@@ -56,6 +58,15 @@ def print_report(cves_report, title):
         print(cve["summary"])
         if cve["sourcelink"]:
             print(cve["sourcelink"])
+
+    print("\nCVEs to fix with launchpad open: %d \n" \
+        % (len(cves_report["cves_to_fix_lp"])))
+    for cve in cves_report["cves_to_fix_lp"]:
+        cve_line = []
+        for key, value in cve.items():
+            if key != "summary":
+                cve_line.append(key + ":" + str(value))
+        print(cve_line)
 
     print("\nCVEs to track for incoming fix: %d \n" \
         % (len(cves_report["cves_to_track"])))
@@ -118,6 +129,14 @@ def get_status(status_list):
         status = "fixed"
     return status
 
+def lp_exist(cve):
+    cve_id = cve["id"]
+    bug = cve_assigned(cve_id)
+    if bug:
+        return True
+    else:
+        return False
+
 def main():
     """
     main function
@@ -128,6 +147,7 @@ def main():
     cves = []
     cves_valid = []
     cves_to_fix = []
+    cves_to_fix_lp = []
     cves_to_track = []
     cves_w_errors = []
     cves_to_omit = []
@@ -203,7 +223,12 @@ def main():
         else:
             cves_to_omit.append(cve)
 
+    for cve in cves_to_fix:
+        if lp_exist(cve):
+            cves_to_fix_lp.append(cve)
+
     cves_report["cves_to_fix"] = cves_to_fix
+    cves_report["cves_to_fix_lp"] = cves_to_fix_lp
     cves_report["cves_to_track"] = cves_to_track
     cves_report["cves_w_errors"] = cves_w_errors
     cves_report["cves_to_omit"] = cves_to_omit
