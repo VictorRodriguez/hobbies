@@ -75,11 +75,19 @@ def cve_assigned(cve_id):
 def main():
 
     cve_id = "CVE-2018-15686"
-    bug = cve_assigned(cve_id)
-    if bug:
-        print(bug)
-    else:
-        print("%s has no LP assigned" % (cve_id))
+
+    cve_ids = ["CVE-2019-0160",\
+        "CVE-2019-11810",\
+        "CVE-2019-11811"
+    ]
+
+    for cve_id in cve_ids:
+        bug = cve_assigned(cve_id)
+        if bug:
+            print("\n")
+            print(bug)
+        else:
+            print("\n%s has no LP assigned\n" % (cve_id))
 
 if __name__ == "__main__":
     main()
