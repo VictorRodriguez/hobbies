@@ -4,11 +4,11 @@ import (
 	"bufio"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"regexp"
 	"strconv"
 	"strings"
+	"text/tabwriter"
 )
 
 type process struct {
@@ -29,13 +29,19 @@ func check(e error) {
 // Memory in => /proc/%i/smaps
 
 func main() {
-	var directory string
-	directory = "/proc/"
-	files, err := ioutil.ReadDir(directory)
-	if err != nil {
-		log.Fatal(err)
-	}
+	w := new(tabwriter.Writer)
+	w.Init(os.Stdout, 8, 8, 0, '\t', 0)
 
+	defer w.Flush()
+
+	fmt.Fprintf(w, "\n %s\t%s\t%s\t", "Process Name", "PID", "PSS Memory")
+	fmt.Fprintf(w, "\n %s\t%s\t%s\t", "------------", "----", "---------")
+
+	directory := "/proc/"
+	var total_PSS_kb uint64
+	total_PSS_kb = 0
+	files, err := ioutil.ReadDir(directory)
+	check(err)
 	for _, f := range files {
 		if f.IsDir() {
 			if pid, err := strconv.Atoi(f.Name()); err == nil {
@@ -47,9 +53,7 @@ func main() {
 				p.name = strings.TrimSuffix(string(dat), "\n")
 
 				file, err := os.Open(directory + f.Name() + "/smaps")
-				if err != nil {
-					log.Fatal(err)
-				}
+				check(err)
 				defer file.Close()
 
 				scanner := bufio.NewScanner(file)
@@ -62,12 +66,14 @@ func main() {
 						pss, err := strconv.ParseUint(pss_s, 10, 64)
 						check(err)
 						p.PSS_kb += pss
-
 					}
 				}
 
-				fmt.Println(p.name, " PID: ", p.pid, " = ", p.PSS_kb)
+				total_PSS_kb += p.PSS_kb
+				fmt.Fprintf(w, "\n %s\t%d\t%d\t", p.name, p.pid, p.PSS_kb)
 			}
 		}
 	}
+
+	fmt.Fprintf(w, "\n\n %s\t%d\t%s\t\n", "Total", total_PSS_kb, " Kb")
 }
