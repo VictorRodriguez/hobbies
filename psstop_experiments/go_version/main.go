@@ -35,8 +35,8 @@ func main() {
 
 	defer w.Flush()
 
-	fmt.Fprintf(w, "\n %s\t%s\t%s\t", "Process Name", "PID", "PSS Memory")
-	fmt.Fprintf(w, "\n %s\t%s\t%s\t", "------------", "----", "---------")
+	fmt.Fprintf(w, "\n %s\t%s\t%s\t", "Process Name", "PID", "PSS Memory (Kb)")
+	fmt.Fprintf(w, "\n %s\t%s\t%s\t", "------------", "----", "--------------")
 
 	directory := "/proc/"
 
