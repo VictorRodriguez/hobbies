@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"text/tabwriter"
@@ -38,8 +39,11 @@ func main() {
 	fmt.Fprintf(w, "\n %s\t%s\t%s\t", "------------", "----", "---------")
 
 	directory := "/proc/"
+
 	var total_PSS_kb uint64
 	total_PSS_kb = 0
+	var slices_process []process
+
 	files, err := ioutil.ReadDir(directory)
 	check(err)
 	for _, f := range files {
@@ -68,11 +72,18 @@ func main() {
 						p.PSS_kb += pss
 					}
 				}
-
+				slices_process = append(slices_process, p)
 				total_PSS_kb += p.PSS_kb
-				fmt.Fprintf(w, "\n %s\t%d\t%d\t", p.name, p.pid, p.PSS_kb)
 			}
 		}
+	}
+
+	sort.SliceStable(slices_process, func(i, j int) bool {
+		return slices_process[i].PSS_kb < slices_process[j].PSS_kb
+	})
+
+	for _, proc := range slices_process {
+		fmt.Fprintf(w, "\n %s\t%d\t%d\t", proc.name, proc.pid, proc.PSS_kb)
 	}
 
 	fmt.Fprintf(w, "\n\n %s\t%d\t%s\t\n", "Total", total_PSS_kb, " Kb")
