@@ -87,4 +87,6 @@ func main() {
 	}
 
 	fmt.Fprintf(w, "\n\n %s\t%d\t%s\t\n", "Total", total_PSS_kb, " Kb")
+	fmt.Fprintf(w, " %s\t%d\t%s\t\n", "Total", total_PSS_kb/1000, " Mb")
+	fmt.Fprintf(w, " %s\t%d\t\n", "Total number of processes: ", len(slices_process))
 }
