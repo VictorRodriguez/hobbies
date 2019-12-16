@@ -83,7 +83,7 @@ func main() {
 	})
 
 	for _, proc := range slices_process {
-		fmt.Fprintf(w, "\n %s\t%d\t%d\t", proc.name, proc.pid, proc.PSS_kb)
+		fmt.Fprintf(w, "\n %s\t%d\t%d%s", proc.name, proc.pid, proc.PSS_kb, " Kb")
 	}
 
 	fmt.Fprintf(w, "\n\n %s\t%d\t%s\t\n", "Total", total_PSS_kb, " Kb")
