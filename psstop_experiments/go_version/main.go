@@ -30,8 +30,16 @@ func check(e error) {
 // Memory in => /proc/%i/smaps
 
 func main() {
+
 	w := new(tabwriter.Writer)
 	w.Init(os.Stdout, 8, 8, 0, '\t', 0)
+
+	var process_name string
+	process_name = ""
+
+	if len(os.Args) >= 2 {
+		process_name = os.Args[1]
+	}
 
 	defer w.Flush()
 
@@ -72,8 +80,16 @@ func main() {
 						p.PSS_kb += pss
 					}
 				}
-				slices_process = append(slices_process, p)
-				total_PSS_kb += p.PSS_kb
+				if process_name == "" {
+					slices_process = append(slices_process, p)
+					total_PSS_kb += p.PSS_kb
+				} else {
+					if process_name == p.name {
+						slices_process = append(slices_process, p)
+						total_PSS_kb += p.PSS_kb
+					}
+
+				}
 			}
 		}
 	}
@@ -83,10 +99,12 @@ func main() {
 	})
 
 	for _, proc := range slices_process {
-		fmt.Fprintf(w, "\n %s\t%d\t%d%s", proc.name, proc.pid, proc.PSS_kb, " Kb")
+		fmt.Fprintf(w, "\n %s\t%d\t%d%s", proc.name,
+			proc.pid, proc.PSS_kb, " Kb")
 	}
 
 	fmt.Fprintf(w, "\n\n %s\t%d\t%s\t\n", "Total", total_PSS_kb, " Kb")
 	fmt.Fprintf(w, " %s\t%d\t%s\t\n", "Total", total_PSS_kb/1000, " Mb")
-	fmt.Fprintf(w, " %s\t%d\t\n", "Total number of processes: ", len(slices_process))
+	fmt.Fprintf(w, " %s\t%d\t\n", "Total number of processes: ",
+		len(slices_process))
 }
