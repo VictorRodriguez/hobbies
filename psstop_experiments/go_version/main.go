@@ -25,6 +25,13 @@ func check(e error) {
 	}
 }
 
+func print_help() {
+	fmt.Println("\n Help:")
+	fmt.Println("\n psstop <1>")
+	fmt.Println("\n 	<1>: Process name to measure memory usage")
+	os.Exit(0)
+}
+
 // Name in => /proc/%i/comm
 // command line in => /proc/%i/cmdline
 // Memory in => /proc/%i/smaps
@@ -39,6 +46,9 @@ func main() {
 
 	if len(os.Args) >= 2 {
 		process_name = os.Args[1]
+		if process_name == "-h" {
+			print_help()
+		}
 	}
 
 	defer w.Flush()
