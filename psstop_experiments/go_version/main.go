@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -26,9 +27,7 @@ func check(e error) {
 }
 
 func print_help() {
-	fmt.Println("\n Help:")
-	fmt.Println("\n psstop <1>")
-	fmt.Println("\n 	<1>: Process name to measure memory usage")
+	flag.Usage()
 	os.Exit(0)
 }
 
@@ -44,11 +43,18 @@ func main() {
 	var process_name string
 	process_name = ""
 
-	if len(os.Args) >= 2 {
-		process_name = os.Args[1]
-		if process_name == "-h" {
-			print_help()
-		}
+	monitorPtr := flag.Bool("m", false, "Monitor Mode")
+	process_namePtr := flag.String("p", "",
+		"Process name to measure PSS memory")
+	flag.Parse()
+
+	if *process_namePtr != "" {
+		process_name = *process_namePtr
+	}
+
+	if *monitorPtr {
+		//TODO implement a thread that monitor every X seconds/ms
+		print_help()
 	}
 
 	defer w.Flush()
