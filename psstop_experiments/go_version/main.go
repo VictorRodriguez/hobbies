@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"strings"
 	"text/tabwriter"
+	"time"
 )
 
 type process struct {
@@ -35,27 +36,17 @@ func print_help() {
 // command line in => /proc/%i/cmdline
 // Memory in => /proc/%i/smaps
 
-func main() {
+func monitor(delay int, process_name string) {
+	for {
+		time.Sleep(time.Duration(delay) * time.Millisecond)
+		scan(process_name)
+	}
+}
+
+func scan(process_name string) {
 
 	w := new(tabwriter.Writer)
 	w.Init(os.Stdout, 8, 8, 0, '\t', 0)
-
-	var process_name string
-	process_name = ""
-
-	monitorPtr := flag.Bool("m", false, "Monitor Mode")
-	process_namePtr := flag.String("p", "",
-		"Process name to measure PSS memory")
-	flag.Parse()
-
-	if *process_namePtr != "" {
-		process_name = *process_namePtr
-	}
-
-	if *monitorPtr {
-		//TODO implement a thread that monitor every X seconds/ms
-		print_help()
-	}
 
 	defer w.Flush()
 
@@ -128,4 +119,30 @@ func main() {
 		fmt.Println("Process not found")
 		print_help()
 	}
+}
+
+func main() {
+
+	var process_name string
+	var delay int
+
+	process_name = ""
+	delay = 1000
+
+	monitorPtr := flag.Bool("m", false, "Monitor Mode")
+	process_namePtr := flag.String("p", "",
+		"Process name to measure PSS memory")
+	flag.Parse()
+
+	if *process_namePtr != "" {
+		process_name = *process_namePtr
+	}
+
+	if *monitorPtr {
+		//TODO implement a thread that monitor every X seconds/ms
+		monitor(delay, process_name)
+		os.Exit(0)
+	}
+
+	scan(process_name)
 }
