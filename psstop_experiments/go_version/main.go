@@ -2,9 +2,11 @@ package main
 
 import (
 	"bufio"
+	"encoding/csv"
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"regexp"
 	"sort"
@@ -27,6 +29,12 @@ func check(e error) {
 	}
 }
 
+func checkError(message string, err error) {
+	if err != nil {
+		log.Fatal(message, err)
+	}
+}
+
 func print_help() {
 	flag.Usage()
 	os.Exit(0)
@@ -35,6 +43,24 @@ func print_help() {
 // Name in => /proc/%i/comm
 // command line in => /proc/%i/cmdline
 // Memory in => /proc/%i/smaps
+
+func write_csv() {
+
+	//TODO convert slice process into by dimentional array and save in csv
+	var data = [][]string{{"Line1", "Hello Readers of"},
+		{"Line2", "golangcode.com"}}
+	file, err := os.Create("result.csv")
+	checkError("Cannot create file", err)
+	defer file.Close()
+
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+
+	for _, value := range data {
+		err := writer.Write(value)
+		checkError("Cannot write to file", err)
+	}
+}
 
 func monitor(delay int, process_name string) {
 	for {
@@ -109,6 +135,7 @@ func scan(process_name string) {
 		fmt.Fprintf(w, "\n %s\t%d\t%d%s", proc.name,
 			proc.pid, proc.PSS_kb, " Kb")
 	}
+	write_csv()
 
 	if (len(slices_process)) > 0 {
 		fmt.Fprintf(w, "\n\n %s\t%d\t%s\t\n", "Total", total_PSS_kb, " Kb")
