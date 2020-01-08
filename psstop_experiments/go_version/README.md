@@ -1,7 +1,51 @@
 # PSSTOP
 
-PSSTOP is a tool to detect and track process with eavy use of memory.It runson
-baremetal , virtual machines or contianers.
+PSSTOP is a tool to detect and track process with eavy use of memory. It runs
+on baremetal, virtual machines or contianers.
+
+
+## Architecture
+
+PSSTOP try to follow the philosophy of do one thing and do it well.
+
+* Run on all in one systems:
+	```
+	$ psstop
+	[short example list]
+
+	Process Name		PID		PSS Memory (Kb)
+	------------		----	--------------
+	vim					50300	9236 Kb
+	systemd-resolve		46529	9842 Kb
+	psstop				50324	10288 Kb
+	NetworkManager		238		10443 Kb
+
+ 	Total						87319	 Kb
+	Total						87	 	Mb
+	Total number of processes: 	87
+	```
+
+* Monitor just one process:
+	```
+	$ psstop -p  systemd
+
+	 Process Name	PID		PSS Memory (Kb)
+	 ------------	----	--------------
+	 systemd		596		2986 Kb
+	 systemd		1		4642 Kb
+
+	 Total							7628	 Kb
+	 Total							7	 Mb
+	 Total number of processes: 	2
+	```
+
+TODO:
+
+* Run as a service and save the data in a time series DB (influx DB) in a
+	server system
+
+* Use statistics algorithms to detect regresions on client system under
+analysis
 
 ## Getting Started
 
@@ -18,7 +62,6 @@ run inside the system under analysis.
 
 
 ```
-./configure
 make static
 make install
 ```
