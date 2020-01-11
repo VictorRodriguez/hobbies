@@ -44,12 +44,17 @@ func print_help() {
 // command line in => /proc/%i/cmdline
 // Memory in => /proc/%i/smaps
 
-func write_csv() {
+func write_csv(process_list []process, file_name string) {
 
-	//TODO convert slice process into by dimentional array and save in csv
-	var data = [][]string{{"Line1", "Hello Readers of"},
-		{"Line2", "golangcode.com"}}
-	file, err := os.Create("result.csv")
+	var data = [][]string{}
+
+	for _, proc := range process_list {
+		tmp := []string{proc.name, strconv.Itoa(proc.pid),
+			strconv.FormatUint(proc.PSS_kb, 10)}
+		data = append(data, tmp)
+	}
+
+	file, err := os.Create(file_name)
 	checkError("Cannot create file", err)
 	defer file.Close()
 
@@ -63,21 +68,9 @@ func write_csv() {
 }
 
 func monitor(delay int, process_name string) {
-	for {
-		time.Sleep(time.Duration(delay) * time.Millisecond)
-		scan(process_name)
-	}
 }
 
-func scan(process_name string) {
-
-	w := new(tabwriter.Writer)
-	w.Init(os.Stdout, 8, 8, 0, '\t', 0)
-
-	defer w.Flush()
-
-	fmt.Fprintf(w, "\n %s\t%s\t%s\t", "Process Name", "PID", "PSS Memory (Kb)")
-	fmt.Fprintf(w, "\n %s\t%s\t%s\t", "------------", "----", "--------------")
+func scan(process_name string) ([]process, uint64) {
 
 	directory := "/proc/"
 
@@ -131,17 +124,29 @@ func scan(process_name string) {
 		return slices_process[i].PSS_kb < slices_process[j].PSS_kb
 	})
 
-	for _, proc := range slices_process {
+	return slices_process, total_PSS_kb
+}
+
+func print_list(process_list []process, total_PSS_kb uint64) {
+
+	w := new(tabwriter.Writer)
+	w.Init(os.Stdout, 8, 8, 0, '\t', 0)
+
+	defer w.Flush()
+
+	fmt.Fprintf(w, "\n %s\t%s\t%s\t", "Process Name", "PID", "PSS Memory (Kb)")
+	fmt.Fprintf(w, "\n %s\t%s\t%s\t", "------------", "----", "--------------")
+
+	for _, proc := range process_list {
 		fmt.Fprintf(w, "\n %s\t%d\t%d%s", proc.name,
 			proc.pid, proc.PSS_kb, " Kb")
 	}
-	write_csv()
 
-	if (len(slices_process)) > 0 {
+	if (len(process_list)) > 0 {
 		fmt.Fprintf(w, "\n\n %s\t%d\t%s\t\n", "Total", total_PSS_kb, " Kb")
 		fmt.Fprintf(w, " %s\t%d\t%s\t\n", "Total", total_PSS_kb/1000, " Mb")
 		fmt.Fprintf(w, " %s\t%d\t\n", "Total number of processes: ",
-			len(slices_process))
+			len(process_list))
 	} else {
 		fmt.Println("Process not found")
 		print_help()
@@ -151,25 +156,42 @@ func scan(process_name string) {
 func main() {
 
 	var process_name string
+	var csv_file_name string
 	var delay int
+	var process_list []process
 
 	process_name = ""
+	csv_file_name = ""
 	delay = 1000
+
+	var total_PSS_kb uint64
+	total_PSS_kb = 0
 
 	monitorPtr := flag.Bool("m", false, "Monitor Mode")
 	process_namePtr := flag.String("p", "",
 		"Process name to measure PSS memory")
+	csv_filePtr := flag.String("f", "",
+		"File name of CSV to save result")
 	flag.Parse()
 
 	if *process_namePtr != "" {
 		process_name = *process_namePtr
 	}
-
 	if *monitorPtr {
 		//TODO implement a thread that monitor every X seconds/ms
-		monitor(delay, process_name)
+		for {
+			time.Sleep(time.Duration(delay) * time.Millisecond)
+			process_list, total_PSS_kb = scan(process_name)
+			print_list(process_list, total_PSS_kb)
+		}
 		os.Exit(0)
 	}
 
-	scan(process_name)
+	process_list, total_PSS_kb = scan(process_name)
+	print_list(process_list, total_PSS_kb)
+
+	if *csv_filePtr != "" {
+		csv_file_name = *csv_filePtr
+		write_csv(process_list, csv_file_name)
+	}
 }
