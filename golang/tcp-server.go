@@ -3,31 +3,52 @@ package main
 import "net"
 import "fmt"
 import "bufio"
-import "log"
 import "strings" // only needed below for sample processing
+
+func handleConnection(c net.Conn) {
+	fmt.Printf("Serving %s\n", c.RemoteAddr().String())
+	for {
+
+		netData, err := bufio.NewReader(c).ReadString('\n')
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		temp := strings.TrimSpace(string(netData))
+		if temp == "STOP" {
+			break
+		}
+
+		// output message received
+		fmt.Print("Message Received:", string(netData))
+		// sample process for string received
+		newmessage := strings.ToUpper(netData)
+		// send new string back to client
+		c.Write([]byte(newmessage + "\n"))
+	}
+	c.Close()
+}
 
 func main() {
 
 	fmt.Println("Launching server...")
 
 	// listen on all interfaces
-	ln, _ := net.Listen("tcp", ":8081")
+	ln, err := net.Listen("tcp", ":8081")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer ln.Close()
 
-	// accept connection on port
-	conn, _ := ln.Accept()
-
-	// run loop forever (or until ctrl-c)
 	for {
-		// will listen for message to process ending in newline (\n)
-		message, err := bufio.NewReader(conn).ReadString('\n')
+		conn, err := ln.Accept()
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
+			return
 		}
-		// output message received
-		fmt.Print("Message Received:", string(message))
-		// sample process for string received
-		newmessage := strings.ToUpper(message)
-		// send new string back to client
-		conn.Write([]byte(newmessage + "\n"))
+		go handleConnection(conn)
+
 	}
 }
