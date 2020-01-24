@@ -1,7 +1,21 @@
 #!/bin/bash
 
+# 4. Set the number of cores, for example
+cores=$(lscpu | egrep 'CPU\(s\)' | head -1 | cut -d':' -f2 | xargs)
+
+echo "Number of cores: " $cores
+
 # 1. Run cyclictest
-cyclictest -l100000000 -m -Sp90 -i200 -h400 -q >output 
+sudo cyclictest -l100000000 -m -Sp90 -i200 -h400 -q >output 
+
+if [ $? -eq 0 ]
+then
+	echo "Successfully created cyclictest file"
+else
+	echo "Could not create file" >&2
+	exit -1
+fi
+
 
 # 2. Get maximum latency
 max=`grep "Max Latencies" output | tr " " "\n" | sort -n | tail -1 | sed s/^0*//`
@@ -9,8 +23,6 @@ max=`grep "Max Latencies" output | tr " " "\n" | sort -n | tail -1 | sed s/^0*//
 # 3. Grep data lines, remove empty lines and create a common field separator
 grep -v -e "^#" -e "^$" output | tr " " "\t" >histogram 
 
-# 4. Set the number of cores, for example
-cores=4
 
 # 5. Create two-column data sets with latency classes and frequency values for each core, for example
 for i in `seq 1 $cores`
