@@ -1,6 +1,6 @@
 /*
 * Test Name: cblas_dgemm
-* Based on : https://www.openblas.net/
+* Based on : https://github.com/xianyi/OpenBLAS/wiki/User-Manual
 * Author: Victor Rodriguez
 * Gloal: Review that optimized blas lib works with presition
 */
