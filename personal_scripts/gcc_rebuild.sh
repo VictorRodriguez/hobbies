@@ -43,6 +43,7 @@ declare -a arr=("binutils"\
     "perl" \
     "pkg-config" \
     "tcl" \
+    "nss" \
     "systemd" \
     )
 
@@ -56,6 +57,7 @@ done
 function build_all() {
 for package in `find packages/ -type d -maxdepth 1`
 do
+    make clone_$package
     build $package
 done
 }
