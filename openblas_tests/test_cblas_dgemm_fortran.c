@@ -3,6 +3,8 @@
 #include "sys/time.h"
 #include "time.h"
 
+#define MAX_LOOP 10000000
+
 extern void dgemm_(char*, char*, int*, int*,int*, double*, double*, int*, double*, int*, double*, double*, int*);
 
 int main(int argc, char* argv[])
@@ -42,23 +44,24 @@ int main(int argc, char* argv[])
 
   for (i=0; i<sizeofc; i++)
     C[i] = i%3+1;//(rand()%100)/10.0;
-  //#if 0
+
   printf("m=%d,n=%d,k=%d,alpha=%lf,beta=%lf,sizeofc=%d\n",m,n,k,alpha,beta,sizeofc);
+
   gettimeofday(&start, NULL);
-  dgemm_(&ta, &tb, &m, &n, &k, &alpha, A, &m, B, &k, &beta, C, &m);
+
+  for (int count = 0; count < MAX_LOOP; count++){
+	dgemm_(&ta, &tb, &m, &n, &k, &alpha, A, &m, B, &k, &beta, C, &m);
+  }
+
   gettimeofday(&finish, NULL);
-
   duration = ((double)(finish.tv_sec-start.tv_sec)*1000000 + (double)(finish.tv_usec-start.tv_usec)) / 1000000;
-  double gflops = 2.0 * m *n*k;
-  gflops = gflops/duration*1.0e-6;
+  double gflops = 2.0 * m *n*k * MAX_LOOP;
+  gflops = (gflops/duration*1.0e-9);
 
-  FILE *fp;
-  fp = fopen("timeDGEMM.txt", "a");
-  fprintf(fp, "%dx%dx%d\t%lf s\t%lf MFLOPS\n", m, n, k, duration, gflops);
-  fclose(fp);
-
+  printf("%dx%dx%d\t%lf s\t%lf GFLOPS\n", m, n, k, duration, gflops);
   free(A);
   free(B);
   free(C);
+
   return 0;
 }
