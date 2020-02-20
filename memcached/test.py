@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 from pymemcache.client import base
 import sys
 
@@ -30,12 +32,8 @@ def get_test(client):
         print("GET FAIL")
 
 def main():
-    try:
-        client = base.Client(('localhost', 11211))
-    except Exception as e:
-        print(e)
-        sys.exit(-1)
 
+    client = base.Client(('localhost', 11211))
     set_test(client)
     get_test(client)
 
