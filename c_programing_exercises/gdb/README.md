@@ -2,7 +2,7 @@
 
 GDB is a powerfull tool to debug your c code when things got complicated, it is
 really powerfull and the aim of this tutorial is to walk over my personal
-learnings:
+learnings ([presentation](https://drive.google.com/open?id=1aaExMhw1xqWeX8uiUNKiuDD1ZWlIcm5v3wWCn1rlc-w)):
 
 ## Segfault
 
