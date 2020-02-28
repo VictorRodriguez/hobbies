@@ -323,9 +323,87 @@ main () at simple_fork.c:17
 $1 = 10
 ```
 
+On Linux, if you want to debug both the parent and child processes, use the
+command set detach-on-fork.
+
+```
+set detach-on-fork mode
+```
+
+Tells gdb whether to detach one of the processes after a fork, or retain
+debugger control over them both.
+
+* on: The child process (or parent process, depending on the value of
+follow-fork-mode) will be detached and allowed to run independently. This is
+the default.
+
+* off: Both processes will be held under the control of GDB. One process
+(child or parent, depending on the value of follow-fork-mode) is debugged as
+usual, while the other is held suspended.
+
+## Debug in an exec
+
+If you ask to debug a child process and a vfork is followed by an exec, GDB
+executes the new target up to the first breakpoint in the new target. If you
+have a breakpoint set on main in your original program, the breakpoint will
+also be set on the child process’s main.
+
+On some systems, when a child process is spawned by vfork, you cannot debug the
+child or parent until an exec call completes.
+
+If you issue a run command to GDB after an exec call executes, the new target
+restarts. To restart the parent process, use the file command with the parent
+executable name as its argument. By default, after an exec call executes, GDB
+discards the symbols of the previous executable image. You can change this
+behaviour with the set follow-exec-mode command.
+
+```
+set follow-exec-mode mode
+```
+
+Set debugger response to a program call of exec. An exec call replaces the
+program image of a process.
+
+follow-exec-mode can be:
+
+* new: GDB creates a new inferior and rebinds the process to this new inferior.
+The program the process was running before the exec call can be restarted
+afterwards by restarting the original inferior
+
+
+* same : GDB keeps the process bound to the same inferior. The new executable
+image replaces the previous executable loaded in the inferior. Restarting the
+inferior after the exec call, with e.g., the run command, restarts the
+executable the process was running after the exec call. This is the default
+mode.
+
+
+You can use the catch command to make GDB stop whenever a fork, vfork, or exec
+call is made. There is a
+[list](https://sourceware.org/gdb/onlinedocs/gdb/Set-Catchpoints.html) of
+events of what we can catch
+
+```
+(gdb) catch fork
+Catchpoint 2 (fork)
+```
+
+```
+(gdb) n
+
+Catchpoint 2 (forked process 901721), 0x00007ffff7e804d2 in fork () from /usr/lib64/haswell/libc.so.6
+(gdb) nint 1, main () at simple_fork.c:9
+Single stepping until exit from function fork,
+which has no line number information.
+[Attaching after process 901630 fork to child process 901721]
+[New inferior 3 (process 901721)]
+[Detaching after fork from parent process 901630]
+[Inferior 2 (process 901630) detached]
+0x00007ffff7e2f660 in ?? () from /usr/lib64/haswell/libc.so.6
+```
+
 * TODO
 
-	* Debug in an exec
 	* Debug a thread
 	* Debug in multiple cores
 	* Debug shared libraries
