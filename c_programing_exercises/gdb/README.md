@@ -432,12 +432,12 @@ private memory.
 
 GDB provides these facilities for debugging multi-thread programs:
 
-	* automatic notification of new threads
-	* thread thread-id’, a command to switch among threads
-	* info threads’, a command to inquire about existing threads
-	* thread apply [thread-id-list | all] args’, a command to apply a command
+* automatic notification of new threads
+* thread thread-id’, a command to switch among threads
+* info threads’, a command to inquire about existing threads
+* thread apply [thread-id-list | all] args’, a command to apply a command
 to a list of threads thread-specific breakpoints
-	* set print thread-events’, which controls printing of messages on thread
+* set print thread-events’, which controls printing of messages on thread
 start and exit.
 
 
