@@ -4,6 +4,7 @@ all:
 	gcc -g malloc.c -o malloc
 	gcc -g simple_fork.c -o simple_fork
 	gcc -g simple_exec.c -o simple_exec
+	gcc -g simple_thread.c -o simple_thread -lpthread
 
 clean:
 	rm -rf segfault
