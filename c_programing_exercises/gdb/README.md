@@ -377,6 +377,22 @@ inferior after the exec call, with e.g., the run command, restarts the
 executable the process was running after the exec call. This is the default
 mode.
 
+```
+(gdb) catch exec
+Catchpoint 1 (exec)
+(gdb) run
+Starting program: /home/vrodri3/devel/hobbies/c_programing_exercises/gdb/simple_exec
+[Detaching after fork from child process 916988]
+[Detaching after fork from child process 916989]
+core.892746			     loop    Makefile  malloc.c   segfaul.c  simple_exec    simple_fork    simple_thread
+glibc-debuginfo-2.30-310.x86_64.rpm  loop.c  malloc    README.md  segfault   simple_exec.c  simple_fork.c  simple_thread.c
+/home/vrodri3/devel/hobbies/c_programing_exercises/gdb
+Child Complete
+[Inferior 1 (process 916954) exited normally]
+
+```
+
+
 
 You can use the catch command to make GDB stop whenever a fork, vfork, or exec
 call is made. There is a
@@ -388,7 +404,7 @@ events of what we can catch
 Catchpoint 2 (fork)
 ```
 
-```
+``` gdb
 (gdb) n
 
 Catchpoint 2 (forked process 901721), 0x00007ffff7e804d2 in fork () from /usr/lib64/haswell/libc.so.6
@@ -402,9 +418,77 @@ which has no line number information.
 0x00007ffff7e2f660 in ?? () from /usr/lib64/haswell/libc.so.6
 ```
 
+
+## Debug a thread
+
+
+In some operating systems, such as GNU/Linux and Solaris, a single program may
+have more than one thread of execution. The precise semantics of threads differ
+from one operating system to another, but in general the threads of a single
+program are akin to multiple processes—except that they share one address space
+(that is, they can all examine and modify the same variables). On the other
+hand, each thread has its own registers and execution stack, and perhaps
+private memory.
+
+GDB provides these facilities for debugging multi-thread programs:
+
+	* automatic notification of new threads
+	* thread thread-id’, a command to switch among threads
+	* info threads’, a command to inquire about existing threads
+	* thread apply [thread-id-list | all] args’, a command to apply a command
+to a list of threads thread-specific breakpoints
+	* set print thread-events’, which controls printing of messages on thread
+start and exit.
+
+
+```gdb
+(gdb) break main
+Breakpoint 1 at 0x118b: file simple_thread.c, line 24.
+(gdb) run
+Starting program: /home/vrodri3/devel/hobbies/c_programing_exercises/gdb/simple_thread
+warning: Unable to find libthread_db matching inferior's thread library, thread debugging will not be available.
+Breakpoint 1, main (argc=1, argv=0x7fffffffc3f8) at simple_thread.c:24
+24	{
+(gdb) info threads
+  Id   Target Id                      Frame
+* 1    process 913921 "simple_thread" main (argc=1, argv=0x7fffffffc3f8) at simple_thread.c:24
+```
+
+```gdb
+(gdb) n
+30	    for(t=0;t<NUM_THREADS;t++){
+(gdb) n
+31	        printf("In main: creating thread %ld\n", t);
+(gdb) n
+In main: creating thread 0
+32	        rc = pthread_create(&threads[t], NULL, PrintHello, (void *)t);
+(gdb) n
+[New LWP 914083]
+Hello World! It's me, thread #0!
+33	        if (rc){
+```
+
+```gdb
+(gdb) info threads
+  Id   Target Id                  Frame
+* 1    LWP 913921 "simple_thread" main (argc=<optimized out>, argv=<optimized out>) at simple_thread.c:33
+  2    LWP 914083 "simple_thread" __GI__dl_debug_state () at dl-debug.c:73
+(gdb) thread 2
+[Switching to thread 2 (LWP 914083)]
+#0  __GI__dl_debug_state () at dl-debug.c:73
+73	dl-debug.c: No such file or directory.
+(gdb) n
+In main: creating thread 1
+[New LWP 914228]
+In main: creating thread 2
+Hello World! It's me, thread #1!
+[New LWP 914229]
+74	in dl-debug.c
+```
+
+
 * TODO
 
-	* Debug a thread
 	* Debug in multiple cores
 	* Debug shared libraries
 
