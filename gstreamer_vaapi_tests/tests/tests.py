@@ -12,6 +12,24 @@ plugin_location = "/usr/local/lib64/gstreamer-1.0"
 plugin_location_ubuntu = "/usr/lib/x86_64-linux-gnu/gstreamer-1.0"
 
 
+def inspect_plugin_elements():
+    """
+    gst-inspect-1.0 /usr/local/lib64/gstreamer-1.0/libgstvaapi.so
+    """
+    ret = False
+    function_name = inspect.currentframe().f_code.co_name
+    path_lib = "/usr/lib/x86_64-linux-gnu/gstreamer-1.0/libgstvaapi.so"
+    if isfile(path_lib):
+        cmd = "gst-inspect-1.0 " + path_lib + " > log"
+        os.system(cmd)
+        fp = open("log", 'r')
+        lines = fp.readlines()
+        for line in lines:
+            if "Name" in line and "vaapi" in line:
+                ret = True
+
+    print(function_name + " : " + str(ret))
+
 def inspect_plugin():
     """
     gst-inspect-1.0 <path to .so> must return 0 as RC
@@ -28,7 +46,6 @@ def inspect_plugin():
         else:
             ret = True
     print(function_name + " : " + str(ret))
-    return ret
 
 def check_plugin_location():
     """
@@ -54,6 +71,7 @@ def main():
     print("Basic Gstreamer vaapi Test Cases:\n")
     check_plugin_location()
     inspect_plugin()
+    inspect_plugin_elements()
 
 if __name__== "__main__":
   main()
