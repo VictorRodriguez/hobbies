@@ -12,6 +12,15 @@ plugin_location = "/usr/local/lib64/gstreamer-1.0"
 plugin_location_ubuntu = "/usr/lib/x86_64-linux-gnu/gstreamer-1.0"
 
 
+def inspect_vaapih264enc():
+    """
+    gst-inspect-1.0 vaapih264enc must return 0 as RC
+    """
+    function_name = inspect.currentframe().f_code.co_name
+    cmd = "gst-inspect-1.0 vaapih264enc"
+    ret = os.system(cmd)
+    print(function_name + " : " + str(bool(not ret)))
+
 def inspect_plugin_elements():
     """
     gst-inspect-1.0 /usr/local/lib64/gstreamer-1.0/libgstvaapi.so
@@ -72,6 +81,7 @@ def main():
     check_plugin_location()
     inspect_plugin()
     inspect_plugin_elements()
+    inspect_vaapih264enc()
 
 if __name__== "__main__":
   main()
