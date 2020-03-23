@@ -27,7 +27,8 @@ def inspect_plugin_elements():
     """
     ret = False
     function_name = inspect.currentframe().f_code.co_name
-    path_lib = "/usr/lib/x86_64-linux-gnu/gstreamer-1.0/libgstvaapi.so"
+    plugin_location = check_plugin_location()
+    path_lib = join(plugin_location,"libgstvaapi.so")
     if isfile(path_lib):
         cmd = "gst-inspect-1.0 " + path_lib + " > log"
         os.system(cmd)
@@ -44,11 +45,10 @@ def inspect_plugin():
     gst-inspect-1.0 <path to .so> must return 0 as RC
     """
     function_name = inspect.currentframe().f_code.co_name
-
-    path_lib = "/usr/lib/x86_64-linux-gnu/gstreamer-1.0/"
-    libs = os.listdir(path_lib)
+    plugin_location = check_plugin_location()
+    libs = os.listdir(plugin_location)
     for lib in libs:
-        cmd = "gst-inspect-1.0 %s" % join(path_lib, lib)
+        cmd = "gst-inspect-1.0 %s" % join(plugin_location, lib)
         if os.system(cmd + " > /dev/null 2>&1"):
             ret = False
             break
@@ -67,6 +67,8 @@ def check_plugin_location():
         location = plugin_location
     ret = path.exists(location)
     print(function_name + " : " + str(ret))
+
+    return location
 
 def get_os_name():
     global os_name
