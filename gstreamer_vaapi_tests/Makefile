@@ -13,5 +13,6 @@ debug:
 		--device /dev/snd $(IMG_NAME) bash
 
 test_audio:
-	docker run --rm --device /dev/snd ubuntu_gstreamer_vaapi:test speaker-test
+	docker run --rm --device /dev/snd ubuntu_gstreamer_vaapi:test \
+	speaker-test --channels=2 --nloops=1 --test=wav --device=default
 
