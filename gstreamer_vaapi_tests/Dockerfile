@@ -5,5 +5,5 @@ RUN apt-get install -y libgstreamer1.0-0 gstreamer1.0-plugins-base gstreamer1.0-
 RUN apt-get install -y python3
 RUN apt-get install -y gstreamer1.0-vaapi
 RUN apt-get install -y python3-pip
-RUN apt-get install -y apt-get install alsa alsa-tools
+RUN apt-get install -y alsa alsa-tools
 RUN pip3 install distro

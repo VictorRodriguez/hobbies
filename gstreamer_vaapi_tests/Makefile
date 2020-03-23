@@ -9,5 +9,9 @@ debug:
 	docker run -it \
 		-e DISPLAY=$DISPLAY \
 		-v /tmp/.X11-unix:/tmp/.X11-unix \
+		-v $(PWD)/tests:/tests \
 		--device /dev/snd $(IMG_NAME) bash
+
+test_audio:
+	docker run --rm --device /dev/snd ubuntu_gstreamer_vaapi:test speaker-test
 
