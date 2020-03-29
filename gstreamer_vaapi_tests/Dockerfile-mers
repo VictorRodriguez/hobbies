@@ -1,0 +1,7 @@
+FROM stacks-mers:cdcc8d3
+USER 0
+RUN swupd clean
+RUN swupd bundle-add python-basic
+RUN pip3 install distro
+USER mers-user
+

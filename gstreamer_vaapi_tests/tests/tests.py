@@ -18,7 +18,7 @@ def inspect_vaapih264enc():
     """
     function_name = inspect.currentframe().f_code.co_name
     cmd = "gst-inspect-1.0 vaapih264enc"
-    ret = os.system(cmd)
+    ret = os.system(cmd + " > /dev/null 2>&1")
     print(function_name + " : " + str(bool(not ret)))
 
 def inspect_plugin_elements():
@@ -48,12 +48,14 @@ def inspect_plugin():
     plugin_location = check_plugin_location()
     libs = os.listdir(plugin_location)
     for lib in libs:
-        cmd = "gst-inspect-1.0 %s" % join(plugin_location, lib)
-        if os.system(cmd + " > /dev/null 2>&1"):
-            ret = False
-            break
-        else:
-            ret = True
+        if lib.endswith(".so"):
+            cmd = "gst-inspect-1.0 %s" % join(plugin_location, lib)
+            if os.system(cmd + " > /dev/null 2>&1"):
+                ret = False
+                print(cmd)
+                break
+            else:
+                ret = True
     print(function_name + " : " + str(ret))
 
 def check_plugin_location():

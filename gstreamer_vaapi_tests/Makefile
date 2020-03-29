@@ -1,11 +1,14 @@
 IMG_NAME=ubuntu_gstreamer_vaapi:test
-
+IMG_NAME_MRS=clr-mers:test
 build:
 	docker build -t ubuntu_gstreamer_vaapi:test .
 build_mers:
 	docker build -t clr-mers:test -f Dockerfile-mers .
 test:
-	docker run --rm -v $(PWD)/tests:/tests $(IMG_NAME) /tests/tests.py
+	docker run --rm -v $(PWD)/tests:/tests --device=/dev/dri -e QSV_DEVICE=/dev/dri/renderD128  $(IMG_NAME_MRS) /tests/tests.py
+
+debug_test:
+	docker run -it -v $(PWD)/tests:/tests --device=/dev/dri -e QSV_DEVICE=/dev/dri/renderD128  $(IMG_NAME_MRS) bash
 
 debug:
 	docker run -it \
