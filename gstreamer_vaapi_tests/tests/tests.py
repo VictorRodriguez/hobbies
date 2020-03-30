@@ -11,6 +11,14 @@ os_name = "general"
 plugin_location = "/usr/local/lib64/gstreamer-1.0"
 plugin_location_ubuntu = "/usr/lib/x86_64-linux-gnu/gstreamer-1.0"
 
+def vaapijpegenc():
+    """
+    vaapijpegenc: VA-API JPEG enc
+    """
+    function_name = inspect.currentframe().f_code.co_name
+    cmd = "bash /tests/vaapijpegenc.sh"
+    ret = os.system(cmd + " > /dev/null 2>&1")
+    print(function_name + " : " + str(bool(not ret)))
 
 def inspect_vaapih264enc():
     """
@@ -86,6 +94,7 @@ def main():
     inspect_plugin()
     inspect_plugin_elements()
     inspect_vaapih264enc()
+    vaapijpegenc()
 
 if __name__== "__main__":
   main()
