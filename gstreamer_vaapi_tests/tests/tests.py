@@ -11,6 +11,33 @@ os_name = "general"
 plugin_location = "/usr/local/lib64/gstreamer-1.0"
 plugin_location_ubuntu = "/usr/lib/x86_64-linux-gnu/gstreamer-1.0"
 
+def vaapimpeg2dec():
+    """
+    vaapimpeg2de: VA-API MPEG2 decoder
+    """
+    function_name = inspect.currentframe().f_code.co_name
+    cmd = "bash /tests/vaapimpeg2dec.sh"
+    ret = os.system(cmd + " > /dev/null 2>&1")
+    print(function_name + " : " + str(bool(not ret)))
+
+def vaapimpeg2enc():
+    """
+    vaapimpeg2enc: VA-API MPEG2 encoder
+    """
+    function_name = inspect.currentframe().f_code.co_name
+    cmd = "bash /tests/vaapimpeg2enc.sh"
+    ret = os.system(cmd + " > /dev/null 2>&1")
+    print(function_name + " : " + str(bool(not ret)))
+
+def vaapijpegdec():
+    """
+    vaapijpegdec: VA-API JPEG decoder
+    """
+    function_name = inspect.currentframe().f_code.co_name
+    cmd = "bash /tests/vaapijpegdec.sh"
+    ret = os.system(cmd + " > /dev/null 2>&1")
+    print(function_name + " : " + str(bool(not ret)))
+
 def vaapijpegenc():
     """
     vaapijpegenc: VA-API JPEG enc
@@ -95,6 +122,9 @@ def main():
     inspect_plugin_elements()
     inspect_vaapih264enc()
     vaapijpegenc()
+    vaapijpegdec()
+    vaapimpeg2enc()
+    vaapimpeg2dec()
 
 if __name__== "__main__":
   main()
