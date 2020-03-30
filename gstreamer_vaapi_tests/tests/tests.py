@@ -11,6 +11,15 @@ os_name = "general"
 plugin_location = "/usr/local/lib64/gstreamer-1.0"
 plugin_location_ubuntu = "/usr/lib/x86_64-linux-gnu/gstreamer-1.0"
 
+def vaapidecodebin():
+    """
+    vaapidecodebin
+    """
+    function_name = inspect.currentframe().f_code.co_name
+    cmd = "bash /tests/vaapidecodebin.sh"
+    ret = os.system(cmd + " > /dev/null 2>&1")
+    print(function_name + " : " + str(bool(not ret)))
+
 def vaapipostproc():
     """
     vaapipostproc
@@ -174,6 +183,7 @@ def main():
     vaapivc1dec()
     vaapih265dec()
     vaapipostproc()
+    vaapidecodebin()
 
 if __name__== "__main__":
   main()
