@@ -11,6 +11,33 @@ os_name = "general"
 plugin_location = "/usr/local/lib64/gstreamer-1.0"
 plugin_location_ubuntu = "/usr/lib/x86_64-linux-gnu/gstreamer-1.0"
 
+def vaapih264feienc():
+    """
+    vaapih264feienc
+    """
+    function_name = inspect.currentframe().f_code.co_name
+    cmd = "bash /tests/vaapih264feienc.sh"
+    ret = os.system(cmd + " > /dev/null 2>&1")
+    print(function_name + " : " + str(bool(not ret)))
+
+def vaapivp8enc():
+    """
+    vaapivp8enc
+    """
+    function_name = inspect.currentframe().f_code.co_name
+    cmd = "bash /tests/vaapivp8enc.sh"
+    ret = os.system(cmd + " > /dev/null 2>&1")
+    print(function_name + " : " + str(bool(not ret)))
+
+def vaapih265enc():
+    """
+    vaapih265enc
+    """
+    function_name = inspect.currentframe().f_code.co_name
+    cmd = "bash /tests/vaapih265enc.sh"
+    ret = os.system(cmd + " > /dev/null 2>&1")
+    print(function_name + " : " + str(bool(not ret)))
+
 def vaapidecodebin():
     """
     vaapidecodebin
@@ -184,6 +211,9 @@ def main():
     vaapih265dec()
     vaapipostproc()
     vaapidecodebin()
+    vaapih265enc()
+    vaapivp8enc()
+    vaapih264feienc()
 
 if __name__== "__main__":
   main()
