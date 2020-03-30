@@ -11,6 +11,16 @@ os_name = "general"
 plugin_location = "/usr/local/lib64/gstreamer-1.0"
 plugin_location_ubuntu = "/usr/lib/x86_64-linux-gnu/gstreamer-1.0"
 
+
+def vaapih265dec():
+    """
+    vaapih265dec
+    """
+    function_name = inspect.currentframe().f_code.co_name
+    cmd = "bash /tests/vaapih265dec.sh"
+    ret = os.system(cmd + " > /dev/null 2>&1")
+    print(function_name + " : " + str(bool(not ret)))
+
 def vaapivc1dec():
     """
     vaapivc1dec
@@ -154,6 +164,7 @@ def main():
     vaapivp8dec()
     vaapivp9dec()
     vaapivc1dec()
+    vaapih265dec()
 
 if __name__== "__main__":
   main()
