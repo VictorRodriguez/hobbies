@@ -11,6 +11,24 @@ os_name = "general"
 plugin_location = "/usr/local/lib64/gstreamer-1.0"
 plugin_location_ubuntu = "/usr/lib/x86_64-linux-gnu/gstreamer-1.0"
 
+def vaapivc1dec():
+    """
+    vaapivc1dec
+    """
+    function_name = inspect.currentframe().f_code.co_name
+    cmd = "bash /tests/vaapivc1dec.sh"
+    ret = os.system(cmd + " > /dev/null 2>&1")
+    print(function_name + " : " + str(bool(not ret)))
+
+def vaapivp9dec():
+    """
+    vaapivp9dec
+    """
+    function_name = inspect.currentframe().f_code.co_name
+    cmd = "bash /tests/vaapivp9dec.sh"
+    ret = os.system(cmd + " > /dev/null 2>&1")
+    print(function_name + " : " + str(bool(not ret)))
+
 def vaapivp8dec():
     """
     vaapivp8dec
@@ -97,7 +115,6 @@ def inspect_plugin():
             if os.system(cmd + " > /dev/null 2>&1"):
                 ret = False
                 print(cmd)
-                break
             else:
                 ret = True
     print(function_name + " : " + str(ret))
@@ -135,6 +152,8 @@ def main():
     vaapimpeg2enc()
     vaapimpeg2dec()
     vaapivp8dec()
+    vaapivp9dec()
+    vaapivc1dec()
 
 if __name__== "__main__":
   main()
