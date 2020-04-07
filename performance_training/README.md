@@ -20,4 +20,7 @@ perf report
 ```
 make graph
 ```
+## TODO
+
+http://sandsoftwaresound.net/perf/perf-tutorial-hot-spots/
 
