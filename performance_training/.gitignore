@@ -1,0 +1,4 @@
+FlameGraph
+out.perf-folded
+*.data
+*.svg
