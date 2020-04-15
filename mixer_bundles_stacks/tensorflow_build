@@ -1,0 +1,30 @@
+# [TITLE]: tensorflow_build
+# [DESCRIPTION]: SW needed to build tensorflow
+# [STATUS]: WIP
+# [CAPABILITIES]: Build TensorFlow
+# [MAINTAINER]: Victor Rodriguez <victor.rodriguez.bahena@intel.com>
+# 
+# List packages one per line.
+# includes have format:            include(bundle)
+# also-adds have format:           also-add(bundle)
+# content chroots have format:     content(path)
+# un-exportable files have format: un-export(path)
+
+include(c-basic)
+include(python-basic)
+include(package-utils)
+setuptools
+wheel
+openjdk
+openjdk-dev
+numpy
+bazel
+Keras
+Keras_Applications
+Keras_Preprocessing
+mkl-dnn-dev
+c-ares-dev
+git
+wget
+curl
+which

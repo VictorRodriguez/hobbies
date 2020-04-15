@@ -1,0 +1,20 @@
+# [TITLE]: dars_mkl
+# [DESCRIPTION]: Run Hadoop and Spark w/ MKL engine
+# [STATUS]: WIP
+# [CAPABILITIES]: Run Hadoop and Spark w/ OpenBLAS engine
+# [MAINTAINER]: Victor Rodriguez <victor.rodriguez.bahena@intel.com>
+#
+# List packages one per line.
+# includes have format:            include(bundle)
+# also-adds have format:           also-add(bundle)
+# content chroots have format:     content(path)
+# un-exportable files have format: un-export(path)
+
+openjdk11
+curl
+R
+libgfortran-avx
+glibc-lib-avx2
+gcc-libs-math
+which
+python3-core
