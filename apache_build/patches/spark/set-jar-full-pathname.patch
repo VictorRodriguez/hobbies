@@ -1,0 +1,39 @@
+From d20ca274746b7f2cc1e6e9f2fb38731920ae11ac Mon Sep 17 00:00:00 2001
+From: Leonardo Sandoval <leonardo.sandoval.gonzalez@linux.intel.com>
+Date: Thu, 4 Apr 2019 14:49:40 -0600
+Subject: [PATCH] Set jar full pathname
+
+---
+ R/install-dev.sh            | 2 +-
+ R/install-source-package.sh | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/R/install-dev.sh b/R/install-dev.sh
+index 9fbc999f2e..0fb6ec6224 100755
+--- a/R/install-dev.sh
++++ b/R/install-dev.sh
+@@ -45,6 +45,6 @@ pushd "$FWDIR" > /dev/null
+ 
+ # Zip the SparkR package so that it can be distributed to worker nodes on YARN
+ cd "$LIB_DIR"
+-jar cfM "$LIB_DIR/sparkr.zip" SparkR
++$JAVA_HOME/bin/jar cfM "$LIB_DIR/sparkr.zip" SparkR
+ 
+ popd > /dev/null
+diff --git a/R/install-source-package.sh b/R/install-source-package.sh
+index 8de3569d1d..4ee0cd5e5a 100755
+--- a/R/install-source-package.sh
++++ b/R/install-source-package.sh
+@@ -51,7 +51,7 @@ mkdir -p "$LIB_DIR"
+ 
+ # Zip the SparkR package so that it can be distributed to worker nodes on YARN
+ pushd "$LIB_DIR" > /dev/null
+-jar cfM "$LIB_DIR/sparkr.zip" SparkR
++$JAVA_HOME/bin/jar cfM "$LIB_DIR/sparkr.zip" SparkR
+ popd > /dev/null
+ 
+ popd
+-- 
+2.21.0
+
+

@@ -1,0 +1,25 @@
+From f597ad1b942469f48cbb0ae5d10c8e598902cac0 Mon Sep 17 00:00:00 2001
+From: Athenas Jimenez <athenas.jimenez.gonzalez@intel.com>
+Date: Wed, 6 Mar 2019 23:06:52 +0000
+Subject: [PATCH] Dont generate SparkR docs
+
+---
+ dev/make-distribution.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dev/make-distribution.sh b/dev/make-distribution.sh
+index 84f4ae9..38cdbe4 100755
+--- a/dev/make-distribution.sh
++++ b/dev/make-distribution.sh
+@@ -246,7 +246,7 @@ if [ "$MAKE_R" == "true" ]; then
+   pushd "$SPARK_HOME/R" > /dev/null
+   # Build source package and run full checks
+   # Do not source the check-cran.sh - it should be run from where it is for it to set SPARK_HOME
+-  NO_TESTS=1 "$SPARK_HOME/R/check-cran.sh"
++  NO_TESTS=1 NO_MANUAL=1 "$SPARK_HOME/R/check-cran.sh"
+ 
+   # Move R source package to match the Spark release version if the versions are not the same.
+   # NOTE(shivaram): `mv` throws an error on Linux if source and destination are same file
+-- 
+2.20.1
+

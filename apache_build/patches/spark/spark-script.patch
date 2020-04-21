@@ -1,0 +1,23 @@
+From 7dd7c8f19667848851590cdf73bbc254f6066cb1 Mon Sep 17 00:00:00 2001
+From: Athenas Jimenez <athenas.jimenez.gonzalez@intel.com>
+Date: Wed, 6 Mar 2019 23:28:32 +0000
+Subject: [PATCH] spark-script
+
+---
+ spark-script | 4 ++++
+ 1 file changed, 4 insertions(+)
+ create mode 100644 spark-script
+
+diff --git a/spark-script b/spark-script
+new file mode 100644
+index 0000000..b2d906b
+--- /dev/null
++++ b/spark-script
+@@ -0,0 +1,4 @@
++#!/bin/sh
++
++export SPARK_HOME="${SPARK_HOME:-/usr/share/apache-spark}"
++$SPARK_HOME/bin/@@CMD@@ "$@"
+-- 
+2.20.1
+

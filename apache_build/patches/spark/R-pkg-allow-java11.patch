@@ -1,0 +1,25 @@
+From eaca33df1f5d172dbafd79d47c48bf77a4bcf208 Mon Sep 17 00:00:00 2001
+From: Leonardo Sandoval <leonardo.sandoval.gonzalez@linux.intel.com>
+Date: Wed, 27 Mar 2019 16:08:56 -0600
+Subject: [PATCH] R/pkg/DESCRIPTION: allow java11
+
+---
+ R/pkg/DESCRIPTION | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/R/pkg/DESCRIPTION b/R/pkg/DESCRIPTION
+index f52d785e05..c82ce8d3e4 100644
+--- a/R/pkg/DESCRIPTION
++++ b/R/pkg/DESCRIPTION
+@@ -13,7 +13,7 @@ Authors@R: c(person("Shivaram", "Venkataraman", role = c("aut", "cre"),
+ License: Apache License (== 2.0)
+ URL: http://www.apache.org/ http://spark.apache.org/
+ BugReports: http://spark.apache.org/contributing.html
+-SystemRequirements: Java (== 8)
++SystemRequirements: Java (== 11.0.2-internal)
+ Depends:
+     R (>= 3.0),
+     methods
+-- 
+2.21.0
+

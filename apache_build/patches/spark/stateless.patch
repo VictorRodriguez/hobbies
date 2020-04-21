@@ -1,0 +1,68 @@
+From bba7481a981f4e8ee80af0c41216db9f603a70c1 Mon Sep 17 00:00:00 2001
+From: Athenas Jimenez <athenas.jimenez.gonzalez@intel.com>
+Date: Tue, 19 Mar 2019 19:19:48 +0000
+Subject: [PATCH] Stateless
+
+---
+ bin/load-spark-env.sh | 10 +++++++++-
+ sbin/spark-config.sh  |  9 ++++++++-
+ sbin/spark-daemon.sh  |  2 +-
+ 3 files changed, 18 insertions(+), 3 deletions(-)
+
+diff --git a/bin/load-spark-env.sh b/bin/load-spark-env.sh
+index 0b5006d..6150626 100644
+--- a/bin/load-spark-env.sh
++++ b/bin/load-spark-env.sh
+@@ -29,7 +29,15 @@ fi
+ if [ -z "$SPARK_ENV_LOADED" ]; then
+   export SPARK_ENV_LOADED=1
+ 
+-  export SPARK_CONF_DIR="${SPARK_CONF_DIR:-"${SPARK_HOME}"/conf}"
++  if [[ "x${SPARK_CONF_DIR}" = "x" ]]; then
++    if [[ -e "/etc/spark/spark-defaults.conf" ]]; then
++      export SPARK_CONF_DIR="/etc/spark"
++    else
++      export SPARK_CONF_DIR="/usr/share/defaults/spark/"
++    fi
++  fi
++
++  echo "Config directory: $SPARK_CONF_DIR" 1>&2
+ 
+   if [ -f "${SPARK_CONF_DIR}/spark-env.sh" ]; then
+     # Promote all variable declarations to environment (exported) variables
+diff --git a/sbin/spark-config.sh b/sbin/spark-config.sh
+index bf3da18..0ed3b41 100755
+--- a/sbin/spark-config.sh
++++ b/sbin/spark-config.sh
+@@ -24,7 +24,14 @@ if [ -z "${SPARK_HOME}" ]; then
+   export SPARK_HOME="$(cd "`dirname "$0"`"/..; pwd)"
+ fi
+ 
+-export SPARK_CONF_DIR="${SPARK_CONF_DIR:-"${SPARK_HOME}/conf"}"
++if [[ "x${SPARK_CONF_DIR}" = "x" ]]; then
++  if [[ -e "/etc/spark/spark-defaults.conf" ]]; then
++    export SPARK_CONF_DIR="/etc/spark"
++  else
++    export SPARK_CONF_DIR="/usr/share/defaults/spark/"
++  fi
++fi
++
+ # Add the PySpark classes to the PYTHONPATH:
+ if [ -z "${PYSPARK_PYTHONPATH_SET}" ]; then
+   export PYTHONPATH="${SPARK_HOME}/python:${PYTHONPATH}"
+diff --git a/sbin/spark-daemon.sh b/sbin/spark-daemon.sh
+index 6de67e0..599bbba 100755
+--- a/sbin/spark-daemon.sh
++++ b/sbin/spark-daemon.sh
+@@ -99,7 +99,7 @@ export SPARK_PRINT_LAUNCH_COMMAND="1"
+ 
+ # get log directory
+ if [ "$SPARK_LOG_DIR" = "" ]; then
+-  export SPARK_LOG_DIR="${SPARK_HOME}/logs"
++  export SPARK_LOG_DIR="/var/log/spark"
+ fi
+ mkdir -p "$SPARK_LOG_DIR"
+ touch "$SPARK_LOG_DIR"/.spark_test > /dev/null 2>&1
+-- 
+2.20.1
+
