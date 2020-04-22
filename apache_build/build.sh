@@ -48,10 +48,14 @@ cd hadoop-$HADOOP_VERSION-src && \
 
 cd ../
 
-export MVN_OPTS="-Dhttp.proxyHost=proxy-chain.intel.com -Dhttp.proxyPort=911 -Dhttps.proxyHost=proxy-chain.intel.com -Dhttps.proxyPort=912"
+PROXY_HOST=$(env|grep http_proxy|cut -d/ -f2-|cut -d/ -f2 |cut -d: -f1)
+HTTP_PORT=$(env|grep http_proxy|cut -d/ -f2-|cut -d/ -f2 |cut -d: -f2)
+HTTPS_PORT=$(env|grep https_proxy|cut -d/ -f2-|cut -d/ -f2 |cut -d: -f2)
+export MVN_OPTS=-Dhttp.proxyHost=$PROXY_HOST -Dhttp.proxyPort=$HTTP_PORT -Dhttps.proxyHost=$PROXY_HOST -Dhttps.proxyPort=$HTTPS_PORT
+#export MVN_OPTS="-Dhttp.proxyHost=proxy-chain.intel.com -Dhttp.proxyPort=911 -Dhttps.proxyHost=proxy-chain.intel.com -Dhttps.proxyPort=912"
 
 cd hadoop-$HADOOP_VERSION-src && \
-    mvn package -q -fae -Pnative -Pdist -DskipTests -Dtar -Danimal.sniffer.skip=true -Dmaven.javadoc.skip=true \
-    -Djavac.version=11 -Dguava.version=19.0 -Dmaven.plugin-tools.version=3.6.0
+    mvn package -fae -Pnative -Pdist -DskipTests -Dtar -Danimal.sniffer.skip=true -Dmaven.javadoc.skip=true \
+    -Djavac.version=11 -Dguava.version=19.0 -Dmaven.plugin-tools.version=3.6.0 -X
 
 
