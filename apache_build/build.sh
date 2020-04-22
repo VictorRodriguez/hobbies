@@ -48,6 +48,8 @@ cd hadoop-$HADOOP_VERSION-src && \
 
 cd ../
 
+export MVN_OPTS="-Dhttp.proxyHost=proxy-chain.intel.com -Dhttp.proxyPort=911 -Dhttps.proxyHost=proxy-chain.intel.com -Dhttps.proxyPort=912"
+
 cd hadoop-$HADOOP_VERSION-src && \
     mvn package -q -fae -Pnative -Pdist -DskipTests -Dtar -Danimal.sniffer.skip=true -Dmaven.javadoc.skip=true \
     -Djavac.version=11 -Dguava.version=19.0 -Dmaven.plugin-tools.version=3.6.0
