@@ -23,6 +23,19 @@ PATH="${PATH}:/opt/apache-maven-$MAVEN_VERSION/bin"
 ln -sf /opt/apache-maven-$MAVEN_VERSION/bin/mvn /usr/bin/mvn
 
 export JAVA_HOME='/usr/lib/jvm/java-1.11.0-openjdk'
+ln -sf ${JAVA_HOME}/bin/java /usr/bin/java
+
+# get right protobuf version compatible to build hadoop 3.2.0
+
+'''
+wget https://github.com/protocolbuffers/protobuf/releases/download/v3.6.1/protobuf-all-3.6.1.tar.gz && \
+	tar xzf protobuf-all-3.6.1.tar.gz && \
+	cd protobuf-3.6.1 && \
+	./configure && \
+	make -j$(nproc) && \
+	make install && \
+	ldconfig
+'''
 
 if [ -d hadoop-3.2.0-src ]; then
 rm -rf hadoop-3.2.0-src
@@ -51,7 +64,7 @@ cd ../
 PROXY_HOST=$(env|grep http_proxy|cut -d/ -f2-|cut -d/ -f2 |cut -d: -f1)
 HTTP_PORT=$(env|grep http_proxy|cut -d/ -f2-|cut -d/ -f2 |cut -d: -f2)
 HTTPS_PORT=$(env|grep https_proxy|cut -d/ -f2-|cut -d/ -f2 |cut -d: -f2)
-export MVN_OPTS=-Dhttp.proxyHost=$PROXY_HOST -Dhttp.proxyPort=$HTTP_PORT -Dhttps.proxyHost=$PROXY_HOST -Dhttps.proxyPort=$HTTPS_PORT
+#export MVN_OPTS=-Dhttp.proxyHost=$PROXY_HOST -Dhttp.proxyPort=$HTTP_PORT -Dhttps.proxyHost=$PROXY_HOST -Dhttps.proxyPort=$HTTPS_PORT
 #export MVN_OPTS="-Dhttp.proxyHost=proxy-chain.intel.com -Dhttp.proxyPort=911 -Dhttps.proxyHost=proxy-chain.intel.com -Dhttps.proxyPort=912"
 
 cd hadoop-$HADOOP_VERSION-src && \
