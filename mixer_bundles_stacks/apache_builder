@@ -3,21 +3,14 @@
 # [STATUS]: WIP
 # [CAPABILITIES]: Build Spark and Hadoop
 # [MAINTAINER]: Victor Rodriguez <victor.rodriguez.bahena@intel.com>
-# 
-# List packages one per line.
-# includes have format:            include(bundle)
-# also-adds have format:           also-add(bundle)
-# content chroots have format:     content(path)
-# un-exportable files have format: un-export(path)
+#
 
 openjdk11
 openjdk11-dev
 openssl
 openssl-dev
-curl
-patch
-python3-core
-python3-dev
+python37-core
+python37-dev
 cyrus-sasl
 cyrus-sasl-dev
 protobuf
