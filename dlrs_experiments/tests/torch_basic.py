@@ -29,24 +29,24 @@ def torchvision_models():
 
     print(function_name + " : " + str(bool(ret)))
 
-def torchvision_mean_std():
+def FastRCNNPredictor():
     """
-    obtaining mean and std
+    FastRCNNPredictor
     """
     ret = True
-    from torchvision import datasets, transforms as T
-    transform = T.Compose([T.Resize(256), T.CenterCrop(224), T.ToTensor()])
-    dataset = datasets.ImageNet(".", split="train", transform=transform)
+    function_name = inspect.currentframe().f_code.co_name
+    from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 
-    means = []
-    stds = []
+    # load a model pre-trained pre-trained on COCO
+    model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True)
 
-    for img in subset(dataset):
-        means.append(torch.mean(img))
-        stds.append(torch.std(img))
-
-    mean = torch.mean(torch.tensor(means))
-    std = torch.mean(torch.tensor(stds))
+    # replace the classifier with a new one, that has
+    # num_classes which is user-defined
+    num_classes = 2  # 1 class (person) + background
+    # get number of input features for the classifier
+    in_features = model.roi_heads.box_predictor.cls_score.in_features
+    # replace the pre-trained head with a new one
+    model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
 
     print(function_name + " : " + str(bool(ret)))
 
@@ -54,7 +54,7 @@ def main():
     print("Basic Torchvision Test Cases:\n")
     get_version()
     torchvision_models()
-    torchvision_mean_std()
+    FastRCNNPredictor()
 
 if __name__== "__main__":
   main()
