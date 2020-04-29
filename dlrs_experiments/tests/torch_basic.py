@@ -9,7 +9,7 @@ def get_version():
     function_name = inspect.currentframe().f_code.co_name
     version = (torchvision.__version__)
     print("Torchvision Version: " + version )
-    if version == "0.6.0":
+    if version == "0.5.0":
         ret = True
     else:
         ret = False
