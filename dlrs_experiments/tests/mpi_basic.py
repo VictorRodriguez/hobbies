@@ -2,6 +2,7 @@ import subprocess
 import inspect
 import os
 import sys
+import re
 
 version = "4.0.2"
 
@@ -14,7 +15,10 @@ def get_version():
                          stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
-    if version in str(stdout):
+    version_num = re.sub('[^0-9]','',str(stdout))
+    current_version = int(version_num)
+    desired_version = int(re.sub('[^0-9]','',version))
+    if current_version >= desired_version:
         ret = True
     else:
         ret = False
