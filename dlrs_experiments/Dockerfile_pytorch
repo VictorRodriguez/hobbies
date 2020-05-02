@@ -1,5 +1,5 @@
 FROM clearlinux:latest
-RUN swupd bundle-add --skip-optional machine-learning-pytorch vim git sudo
+RUN swupd bundle-add --skip-optional machine-learning-pytorch vim git python-extras
 RUN rm -rf /var/lib/swupd/
 RUN useradd -ms /bin/bash newuser
 USER newuser
