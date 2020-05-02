@@ -21,10 +21,11 @@ cd gcc-build
 ../gcc-${GCC_VERSION}/configure                      \
     --prefix=${INSTALLDIR}                           \
     --enable-shared                                  \
+	--with-system-zlib								 \
     --enable-threads=posix                           \
     --enable-__cxa_atexit                            \
     --enable-clocale=gnu                             \
-    --enable-languages=all                           \
+    --enable-languages="c,c++,fortran"               \
 && make \
 && make install
 
