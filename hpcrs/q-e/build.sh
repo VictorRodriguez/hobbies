@@ -18,6 +18,6 @@ if [ ! -d "q-e" ]; then
 fi
 
 cd q-e/
-./configure
+./configure $Q_E_ARGS
 make all
 
