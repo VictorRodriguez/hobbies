@@ -1,5 +1,5 @@
 all:
-	icc test.c -o test
+	icc basic.cpp -o basic
 run:
-	./test
+	./basic
 
