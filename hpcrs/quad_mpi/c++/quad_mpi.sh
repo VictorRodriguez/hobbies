@@ -15,6 +15,6 @@ rm quad_mpi.o
 mv a.out quad_mpi
 #
 
-mpiexec quad_mpi
+mpiexec ./quad_mpi
 echo "Normal end of execution."
 
