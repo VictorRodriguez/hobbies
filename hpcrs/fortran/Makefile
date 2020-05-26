@@ -8,8 +8,11 @@ full:
 	cd /opt/intel/compilers_and_libraries_2020.1.217/linux/mpi/test && mpirun ./a.out
 	mpif90 -fopenmp omp_dotprod_hybrid.f -o omp_dotprod_hybrid
 	mpirun ./omp_dotprod_hybrid
+	git clone https://github.com/scivision/fortran2018-examples/
+	cd fortran2018-examples/ && ctest -S setup.cmake -VV
 run:
 	./hello_basic
 clean:
 	rm -rf hello_basic
 	rm -rf omp_dotprod_hybrid
+	rm -rf fortran2018-examples/
