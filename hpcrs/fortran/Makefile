@@ -9,7 +9,7 @@ full:
 	mpif90 -fopenmp omp_dotprod_hybrid.f -o omp_dotprod_hybrid
 	mpirun ./omp_dotprod_hybrid
 	git clone https://github.com/scivision/fortran2018-examples/
-	cd fortran2018-examples/ && ctest -S setup.cmake -VV
+	cd fortran2018-examples/ && ctest -S setup.cmake -VV 2>&1 | tee fortran2018-examples.log
 run:
 	./hello_basic
 clean:
