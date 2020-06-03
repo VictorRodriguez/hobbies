@@ -1,5 +1,5 @@
 all:
-	icc basic.cpp -o basic
+	icc basic.cpp -o basic && ./basic
 full:
 	cd /opt/intel/documentation_2020/en/mpi/examples/ && make
 	cd /opt/intel/documentation_2020/en/mpi/examples/ && ./async_progress

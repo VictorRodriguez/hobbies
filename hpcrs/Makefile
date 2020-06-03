@@ -7,6 +7,7 @@ debug:
 	docker run -it -v /intel/licenses:/intel/licenses -v $(shell pwd):/tests amr-registry-pre.caas.intel.com/sysstacks/hpc_qe:v0.1.0-rc1 /bin/bash
 test:
 	echo "Testing ..."
+	export I_MPI_PIN_DOMAIN=node
 	for dir in $(SUBDIRS); do \
 		$(MAKE) -C $$dir; \
 	done
