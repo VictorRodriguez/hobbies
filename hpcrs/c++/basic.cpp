@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 int main(int argc, char *argv[]) {
-  fputs ("Success\n", stdout);
+  fputs ("Success test pass\n", stdout);
 
   return 0;
 }
