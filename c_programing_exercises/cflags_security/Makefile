@@ -13,7 +13,7 @@ rop:
 	export CXXFLAGS=""
 	export FCFLAGS=""
 	export FFLAGS=""
-	gcc -m32 -O0 vuln.c -o vuln
+	gcc -m32 -O0 vuln.c -o vuln -fno-stack-protector --static -fno-pic
 
 clean:
 	rm -rf main
