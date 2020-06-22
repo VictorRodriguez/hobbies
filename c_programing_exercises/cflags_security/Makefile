@@ -8,6 +8,13 @@ all:
 	gcc -D_FORTIFY_SOURCE=2 -Wall -g -O2 bench_mem_test.c -o bench_mem_test-forty-2
 	gcc -Wall -Wextra -Wformat-security  printf-secure.c -o printf-secure
 
+rop:
+	export CFLAGS=""
+	export CXXFLAGS=""
+	export FCFLAGS=""
+	export FFLAGS=""
+	gcc -m32 -O0 vuln.c -o vuln -fno-stack-protector --static -fno-pic
+
 clean:
 	rm -rf main
 	rm -rf bench-fstack-protection-all
