@@ -1,3 +1,3 @@
 all:
-	docker build -t clear_python_profiling .
+	docker build -t ubuntu_python_profiling .
 
