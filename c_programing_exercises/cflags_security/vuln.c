@@ -9,6 +9,11 @@
  * python2 -c 'import struct; print "l"*32+struct.pack("i",0x08049db5)' | ./vuln
  */
 
+void second_secret_Funtion()
+{
+	printf("Second functon reach !!");
+}
+
 void secretFunction_mul(int a, int b)
 {
       printf("The answer is %d\n", a*b);

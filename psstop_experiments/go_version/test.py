@@ -3,7 +3,7 @@ import argparse
 from influxdb import InfluxDBClient
 
 
-def main(host='localhost', port=8086):
+def main(host='workstation.zpn.intel.com', port=8086):
     """Instantiate a connection to the InfluxDB."""
     user = 'root'
     password = 'root'
@@ -35,9 +35,6 @@ def main(host='localhost', port=8086):
 
     print("Create database: " + dbname)
     client.create_database(dbname)
-
-    print("Switch user: " + dbuser)
-    client.switch_user(dbuser, dbuser_password)
 
     print("Write points: {0}".format(json_body_2))
     client.write_points(json_body_2)
