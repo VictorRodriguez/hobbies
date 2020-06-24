@@ -3,19 +3,18 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update
 RUN apt-get install curl --assume-yes
 RUN apt-get install xz-utils --assume-yes
-RUN apt-get install build-essential --assume-yes
-RUN cp /etc/apt/sources.list /etc/apt/sources.list~
-RUN sed -Ei 's/^# deb-src /deb-src /' /etc/apt/sources.list
+RUN echo "deb-src http://archive.ubuntu.com/ubuntu/ bionic main" >> /etc/apt/sources.list
 RUN apt-get update
-RUN apt-get build-dep python3 --assume-yes
-RUN apt-get install zlib1g-dev --assume-yes
+RUN apt-get build-dep python3.6 --assume-yes
 RUN curl -O -L https://www.python.org/ftp/python/3.8.3/Python-3.8.3.tar.xz
 RUN tar -xvf Python-3.8.3.tar.xz
-RUN mkdir /build
+
+#RUN mkdir /build
 #COPY patches/AVX2-and-AVX512-support.patch /
 #COPY patches/Build-avx2-and-avx512-versions-of-the-math-library.patch /
 #RUN cd Python-3.8.3/ && patch -p1 < ../AVX2-and-AVX512-support.patch
 #RUN cd Python-3.8.3/ && patch -p1 < ../Build-avx2-and-avx512-versions-of-the-math-library.patch
+
 RUN export LANG=C && \
 	export CFLAGS="$CFLAGS -O3" \
 	export CFLAGS="$CFLAGS -march=haswell -mfma  " \
