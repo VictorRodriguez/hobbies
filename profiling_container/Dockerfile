@@ -10,10 +10,10 @@ RUN curl -O -L https://www.python.org/ftp/python/3.8.3/Python-3.8.3.tar.xz
 RUN tar -xvf Python-3.8.3.tar.xz
 
 #RUN mkdir /build
-#COPY patches/AVX2-and-AVX512-support.patch /
-#COPY patches/Build-avx2-and-avx512-versions-of-the-math-library.patch /
-#RUN cd Python-3.8.3/ && patch -p1 < ../AVX2-and-AVX512-support.patch
-#RUN cd Python-3.8.3/ && patch -p1 < ../Build-avx2-and-avx512-versions-of-the-math-library.patch
+COPY patches/AVX2-and-AVX512-support.patch /
+COPY patches/Build-avx2-and-avx512-versions-of-the-math-library.patch /
+RUN cd Python-3.8.3/ && patch -p1 < ../AVX2-and-AVX512-support.patch
+RUN cd Python-3.8.3/ && patch -p1 < ../Build-avx2-and-avx512-versions-of-the-math-library.patch
 
 RUN export LANG=C && \
 	export CFLAGS="$CFLAGS -O3" \
