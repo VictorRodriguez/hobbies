@@ -16,8 +16,6 @@ COPY patches/Build-avx2-and-avx512-versions-of-the-math-library.patch /
 RUN cd Python-3.8.3/ && patch -p1 < ../AVX2-and-AVX512-support.patch
 RUN cd Python-3.8.3/ && patch -p1 < ../Build-avx2-and-avx512-versions-of-the-math-library.patch
 
-RUN mkdir /build
-
 RUN export LANG=C && \
 	export CFLAGS="$CFLAGS -O2  -ftree-vectorize -fopt-info-vec" \
 	export CFLAGS="$CFLAGS -march=haswell -mfma  " \
@@ -29,7 +27,7 @@ RUN export LANG=C && \
 	--with-pymalloc \
 	--without-cxx-main \
 	--enable-ipv6=yes \
-	--prefix=/build/ \
+	--prefix=/usr \
 	ac_cv_header_bluetooth_bluetooth_h=no \
 	ac_cv_header_bluetooth_h=no \
 	--with-system-ffi \
@@ -40,5 +38,3 @@ RUN export LANG=C && \
 	--enable-optimizations \
 	&& make -j8\
 	&& make install
-RUN rm -rf /usr/bin/python3
-run ln -s /build/bin/python3 /usr/bin/python3
