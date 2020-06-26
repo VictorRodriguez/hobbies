@@ -19,7 +19,7 @@ RUN cd Python-3.8.3/ && patch -p1 < ../Build-avx2-and-avx512-versions-of-the-mat
 RUN mkdir /build
 
 RUN export LANG=C && \
-	export CFLAGS="$CFLAGS -O3" \
+	export CFLAGS="$CFLAGS -O2  -ftree-vectorize -fopt-info-vec" \
 	export CFLAGS="$CFLAGS -march=haswell -mfma  " \
 	export CXXFLAGS="$CXXFLAGS -march=haswell -mfma" \
 	&& echo $CFLAGS \
