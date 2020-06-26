@@ -7,14 +7,17 @@ RUN echo "deb-src http://archive.ubuntu.com/ubuntu/ bionic main" >> /etc/apt/sou
 RUN apt-get update
 RUN apt-get build-dep python3.6 --assume-yes
 RUN curl -O -L https://www.python.org/ftp/python/3.8.3/Python-3.8.3.tar.xz
-RUN curl -O -L http://www.phoronix-test-suite.com/benchmark-files/pybench-2018-02-16.tar.gz
 RUN tar -xvf Python-3.8.3.tar.xz
 
 #RUN mkdir /build
 COPY patches/AVX2-and-AVX512-support.patch /
 COPY patches/Build-avx2-and-avx512-versions-of-the-math-library.patch /
+COPY patches/Add-pybench-for-pgo-optimization.patch /
+COPY patches/use-pybench-to-optimize-python.patch /
 RUN cd Python-3.8.3/ && patch -p1 < ../AVX2-and-AVX512-support.patch
 RUN cd Python-3.8.3/ && patch -p1 < ../Build-avx2-and-avx512-versions-of-the-math-library.patch
+RUN cd Python-3.8.3/ && patch -p1 < ../Add-pybench-for-pgo-optimization.patch
+RUN cd Python-3.8.3/ && patch -p1 < ../use-pybench-to-optimize-python.patch
 
 RUN export LANG=C && \
 	export CFLAGS="$CFLAGS -O2  -ftree-vectorize -fopt-info-vec" \
