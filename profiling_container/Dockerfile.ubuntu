@@ -1,0 +1,43 @@
+FROM ubuntu:latest
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update
+RUN apt-get install curl --assume-yes
+RUN apt-get install xz-utils --assume-yes
+RUN echo "deb-src http://archive.ubuntu.com/ubuntu/ bionic main" >> /etc/apt/sources.list
+RUN apt-get update
+RUN apt-get build-dep python3.6 --assume-yes
+RUN curl -O -L https://www.python.org/ftp/python/3.8.3/Python-3.8.3.tar.xz
+RUN tar -xvf Python-3.8.3.tar.xz
+
+COPY patches/AVX2-and-AVX512-support.patch /
+COPY patches/Build-avx2-and-avx512-versions-of-the-math-library.patch /
+COPY patches/Add-pybench-for-pgo-optimization.patch /
+COPY patches/use-pybench-to-optimize-python.patch /
+RUN cd Python-3.8.3/ && patch -p1 < ../AVX2-and-AVX512-support.patch
+RUN cd Python-3.8.3/ && patch -p1 < ../Build-avx2-and-avx512-versions-of-the-math-library.patch
+RUN cd Python-3.8.3/ && patch -p1 < ../Add-pybench-for-pgo-optimization.patch
+RUN cd Python-3.8.3/ && patch -p1 < ../use-pybench-to-optimize-python.patch
+
+RUN export LANG=C
+RUN export CFLAGS="$CFLAGS -O2  -ftree-vectorize -fopt-info-vec"
+RUN export CFLAGS="$CFLAGS -march=haswell -mfma  "
+RUN export CXXFLAGS="$CXXFLAGS -march=haswell -mfma"
+
+RUN cd Python-3.8.3/ && ./configure \
+	LDFLAGS="-Wa,-mbranches-within-32B-boundaries" \
+	--with-pymalloc \
+	--without-cxx-main \
+	--enable-ipv6=yes \
+	--prefix=/usr \
+	ac_cv_header_bluetooth_bluetooth_h=no \
+	ac_cv_header_bluetooth_h=no \
+	--with-system-ffi \
+	--with-system-expat \
+	--with-lto=8 \
+	--with-computed-gotos \
+	--without-ensurepip \
+	--enable-optimizations
+RUN make -j8
+RUN make install

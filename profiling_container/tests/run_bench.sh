@@ -9,6 +9,8 @@ if [ $retval -ne 0 ]; then
 	apt-get install curl --assume-yes
 	apt-get install xz-utils --assume-yes
 	apt-get install python3 --assume-yes
+	yum update -y
+	yum install -y python3
 fi
 
 echo "Running bench"
