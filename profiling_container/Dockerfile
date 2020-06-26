@@ -25,19 +25,18 @@ RUN export LANG=C && \
 	&& echo $CFLAGS \
 	&& cd Python-3.8.3/ \
 	&& ./configure \
-#	LDFLAGS="-Wa,-mbranches-within-32B-boundaries" \
-#	--with-pymalloc \
-#	--without-cxx-main \
-#	--enable-ipv6=yes \
-#	--libdir=/usr/lib \
+	LDFLAGS="-Wa,-mbranches-within-32B-boundaries" \
+	--with-pymalloc \
+	--without-cxx-main \
+	--enable-ipv6=yes \
 	--prefix=/build/ \
-#	ac_cv_header_bluetooth_bluetooth_h=no \
-#	ac_cv_header_bluetooth_h=no \
-#	--with-system-ffi \
-#	--with-system-expat \
-#	--with-lto=8 \
-#	--with-computed-gotos \
-#	--without-ensurepip \
+	ac_cv_header_bluetooth_bluetooth_h=no \
+	ac_cv_header_bluetooth_h=no \
+	--with-system-ffi \
+	--with-system-expat \
+	--with-lto=8 \
+	--with-computed-gotos \
+	--without-ensurepip \
 	--enable-optimizations \
 	&& make -j8\
 	&& make install
