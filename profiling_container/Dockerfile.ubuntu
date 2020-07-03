@@ -39,5 +39,5 @@ RUN cd Python-3.8.3/ && ./configure \
 	--with-computed-gotos \
 	--without-ensurepip \
 	--enable-optimizations
-RUN make -j8
-RUN make install
+RUN cd Python-3.8.3/ && make -j8
+RUN cd Python-3.8.3/ && make install
