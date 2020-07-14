@@ -1,4 +1,4 @@
-FROM centos:latest
+FROM centos AS builder
 
 RUN yum -y update
 RUN yum -y install wget yum-utils gcc openssl-devel bzip2-devel libffi-devel
@@ -18,13 +18,14 @@ RUN cd Python-3.8.3/ && patch -p1 < ../use-pybench-to-optimize-python.patch
 RUN export LANG=C
 RUN export CFLAGS="$CFLAGS -O2  -ftree-vectorize -fopt-info-vec"
 RUN export CXXFLAGS="$CXXFLAGS -march=haswell -mfma"
+RUN mkdir /opt/build/
 
 RUN cd Python-3.8.3/ && ./configure  \
 	LDFLAGS="-Wa,-mbranches-within-32B-boundaries" \
 	--with-pymalloc \
 	--without-cxx-main \
 	--enable-ipv6=yes \
-	--prefix=/usr \
+	--prefix=/opt/build/ \
 	ac_cv_header_bluetooth_bluetooth_h=no \
 	ac_cv_header_bluetooth_h=no \
 	--with-system-ffi \
@@ -35,3 +36,8 @@ RUN cd Python-3.8.3/ && ./configure  \
 	--enable-optimizations
 RUN cd Python-3.8.3/ && make -j8
 RUN cd Python-3.8.3/ && make install
+
+FROM centos:latest
+WORKDIR /root/
+COPY --from=builder /opt/build/ /opt/
+ENV PATH=/opt/bin:$PATH
