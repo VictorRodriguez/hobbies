@@ -24,14 +24,14 @@ RUN export LANG=C
 RUN export CFLAGS="$CFLAGS -O2  -ftree-vectorize -fopt-info-vec"
 RUN export CFLAGS="$CFLAGS -march=haswell -mfma  "
 RUN export CXXFLAGS="$CXXFLAGS -march=haswell -mfma"
-RUN mkdir /tmp/build/
+RUN mkdir /opt/build/
 
 RUN cd Python-3.8.3/ && ./configure \
 	LDFLAGS="-Wa,-mbranches-within-32B-boundaries" \
 	--with-pymalloc \
 	--without-cxx-main \
 	--enable-ipv6=yes \
-	--prefix=/tmp/build/ \
+	--prefix=/opt/build/ \
 	ac_cv_header_bluetooth_bluetooth_h=no \
 	ac_cv_header_bluetooth_h=no \
 	--with-system-ffi \
@@ -45,4 +45,5 @@ RUN cd Python-3.8.3/ && make install
 
 FROM ubuntu:latest
 WORKDIR /root/
-COPY --from=builder /tmp/build/* /usr/
+COPY --from=builder /opt/build/ /opt/
+ENV PATH=/opt/bin:$PATH
