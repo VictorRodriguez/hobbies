@@ -1,5 +1,4 @@
-```assambly
-
+```assembly
 000000000000122e <B>:
 122e:	push   %r15
 1230:	push   %r14
