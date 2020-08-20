@@ -31,23 +31,23 @@ def build_basic():
     build basic mpi hellow world
     """
     function_name = inspect.currentframe().f_code.co_name
-    ret = os.system("cd mpi/ && make")
+    ret = os.system("cd src/ && make")
     print(function_name + " : " + str(bool(not(ret))))
     if ret:
         sys.exit(ret)
-    ret = os.system("cd mpi/ && make clean")
+    ret = os.system("cd src/ && make clean")
 
 def run_basic():
     """
     run basic mpi hellow world
     """
     function_name = inspect.currentframe().f_code.co_name
-    ret = os.system("cd mpi/ && make")
-    ret = os.system("cd mpi/ && mpiexec ./mpi_hello_world")
+    ret = os.system("cd src/ && make")
+    ret = os.system("cd src/ && mpiexec ./mpi_hello_world")
     print(function_name + " : " + str(bool(not(ret))))
     if ret:
         sys.exit(ret)
-    ret = os.system("cd mpi/ && make clean")
+    ret = os.system("cd src/ && make clean")
 
 def main():
     print("Basic MPI Test Cases:\n")
