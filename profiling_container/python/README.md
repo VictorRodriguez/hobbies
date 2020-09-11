@@ -40,7 +40,7 @@ root@8f7fd5f2497a:/Python-3.8.3# objdump -d /build/lib/python3.8/lib-dynload/_sh
     1463:   c4 e2 65 00 c2          vpshufb %ymm2,%ymm3,%ymm0
  ```
  
-Multiple external benchmarks has shown that the correct use of AVX technology could boost the performance of numerical applications ( Deep learning, data analytics and other examples ) up to 3X
+Multiple external benchmarks has shown that the correct use of AVX technology could boost the performance of numerical applications ( Deep learning, data analytics and other examples )
  
 ## How to build:
  
@@ -53,6 +53,4 @@ Multiple external benchmarks has shown that the correct use of AVX technology co
  
 Do multistage for size reduction
 Build GLIBC with CLR optimizations on top of these stacks
-Build Open Blas with CLR optimizations on top of these stacks
-Build ZLIB with CLR optimizations on top of these stacks
 Build NumPy/Panda/Sci-kit learn with CLR optimizations on top of these stacks
