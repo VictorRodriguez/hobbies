@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 INSTALLDIR=$(pwd)"/install-dir"
 mkdir -p $INSTALLDIR
 
@@ -15,6 +17,7 @@ fi
 
 # download the prerequisites
 cd gcc/
+patch -p1 < ../amx-runtime.patch
 ./contrib/download_prerequisites
 
 # create the build directory
@@ -61,4 +64,3 @@ cd gcc-build
 #   --enable-languages=c,c++,fortran,go,objc,obj-c++:
 #       This command identifies which languages to build. You may modify this
 #       command to remove undesired language
-
