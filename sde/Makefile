@@ -12,3 +12,6 @@ test:
 	make runner
 	docker run -env -v $(PWD)/tests/:/opt/build sde_runner:latest
 
+clean:
+	rm -rf $(PWD)/tests/build/
+
