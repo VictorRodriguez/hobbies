@@ -9,6 +9,17 @@
  * python2 -c 'import struct; print "l"*32+struct.pack("i",0x08049db5)' | ./vuln
  */
 
+
+int modified = 0;
+
+void secretFunction_variable(){
+	if(modified != 0) {
+		printf("you have changed the 'modified' variable\n");
+	} else {
+		printf("Try again?\n");
+	}
+}
+
 void secretFunction_mul(int a, int b)
 {
       printf("The answer is %d\n", a*b);
