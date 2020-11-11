@@ -1,12 +1,12 @@
 #! /bin/bash
 
-GCC_VERSION="5.2.0"
+GCC_VERSION="10.2.0"
 WORKDIR="$HOME/src/"
 INSTALLDIR="/platform"
 
 cd $WORKDIR
-wget http://www.netgull.com/gcc/releases/gcc-${GCC_VERSION}/gcc-${GCC_VERSION}.tar.bz2
-tar -xf gcc-${GCC_VERSION}.tar.bz2
+wget https://bigsearcher.com/mirrors/gcc/releases/gcc-$(GCC_VERSION)/gcc-$(GCC_VERSION).tar.gz
+tar -xf gcc-${GCC_VERSION}.tar.gz
 
 # download the prerequisites
 cd gcc-${GCC_VERSION}
@@ -18,16 +18,19 @@ mkdir gcc-build
 cd gcc-build
 
 # build
-../gcc-${GCC_VERSION}/configure                      \
-    --prefix=${INSTALLDIR}                           \
-    --enable-shared                                  \
-	--with-system-zlib								 \
-    --enable-threads=posix                           \
-    --enable-__cxa_atexit                            \
-    --enable-clocale=gnu                             \
-    --enable-languages="c,c++,fortran"               \
-&& make \
+../gcc/configure			\
+    --prefix=${INSTALLDIR}		\
+    --enable-shared			\
+    --with-system-zlib			\
+    --enable-threads=posix		\
+    --enable-__cxa_atexit		\
+    --enable-clocale=gnu		\
+    --disable-multilib			\
+    --disable-multiarch			\
+    --enable-languages="c"		\
+&& make -j8				\
 && make install
+
 
 # Notes
 #
