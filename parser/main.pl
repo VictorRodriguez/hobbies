@@ -5,7 +5,7 @@ $x = 10;
 use warnings;
 
 
-my $filename = 'test.txt';
+my $filename = 'logs/test.txt';
 
 open(FH, '<', $filename) or die $!;
 
