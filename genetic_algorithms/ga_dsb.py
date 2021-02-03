@@ -6,9 +6,10 @@ def f(X):
     latency = 0
     threads = X[0]
     connections = X[1]
-    if connections<threads:
+    if connections<=threads:
         latency = 100000
-    latency=(connections/(2*threads)) + pen
+    else:
+        latency=(connections/(2*threads))
     return latency
 
 varbound=np.array([[1,127],[1,255]])
