@@ -28,6 +28,7 @@ model=ga(function=f,\
     dimension=2,\
     variable_type_mixed=vartype,\
     algorithm_parameters=algorithm_param,\
-    variable_boundaries=varbound)
+    variable_boundaries=varbound,\
+    function_timeout=20.0)
 
 model.run()
