@@ -1,5 +1,7 @@
 import numpy as np
 from geneticalgorithm import geneticalgorithm as ga
+import multiprocessing
+
 
 def f(X):
     pen = 0
@@ -30,5 +32,9 @@ model=ga(function=f,\
     algorithm_parameters=algorithm_param,\
     variable_boundaries=varbound,\
     function_timeout=20.0)
+
+
+cpu_count = multiprocessing.cpu_count()
+print("This genetic algorithm runs on %s CPUs" % (cpu_count))
 
 model.run()
