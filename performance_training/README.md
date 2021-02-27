@@ -1,13 +1,11 @@
 # Perf training
 
 
-1 Record Perf
+1 Build
 
 ```
-sudo make
+make
 ```
-
-* we need sudo for perf record
 
 2 Check the record and see if match
 
