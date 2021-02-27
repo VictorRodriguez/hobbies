@@ -1,6 +1,16 @@
 all:
 	cd stress_code && make
+
+record-bin:
+	# Sample CPU stack traces for the entire system, at 99 Hertz (< Linux 4.11):
 	sudo perf record -F 99 -a -g ./stress_code/add
+
+record-image:
+	# Sample CPU stack traces for the entire system, at 99 Hertz (< Linux 4.11):
+	sudo perf record -F 99 -a -g docker run add_perf_test
+
+image:
+	 docker build -t add_perf_test .
 
 strace:
 	strace -T -o debug.txt ./stress_code/add
@@ -9,6 +19,9 @@ timechart:
 	sudo perf timechart record ./stress_code/add
 	sudo perf timechart
 
+timechart-image:
+	sudo perf timechart record  docker run add_perf_test
+	sudo perf timechart
 graph:
 	if [ ! -d "FlameGraph" ]; then git clone https://github.com/brendangregg/FlameGraph.git ; fi
 	sudo perf script | ./FlameGraph/stackcollapse-perf.pl > out.perf-folded
