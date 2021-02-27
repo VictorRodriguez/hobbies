@@ -1,5 +1,6 @@
-FROM clearlinux:latest
-COPY stress_code/add /tmp/add
-COPY stress_code/malloc /tmp/malloc
-#CMD /tmp/add
-CMD /tmp/malloc
+FROM centos:latest
+RUN yum groupinstall 'Development Tools' -y
+COPY stress_code/ /src/
+
+RUN cd /src/ && make
+CMD /src/add
