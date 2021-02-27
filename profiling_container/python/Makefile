@@ -3,9 +3,11 @@ IMG_TRG=centos
 SEC_FLAGS=--security-opt seccomp=unconfined
 
 ubuntu: clean_ubuntu
+	cp -rf ../patches .
 	docker build -t ubuntu_python_profiling -f Dockerfile.ubuntu .
 
 centos: clean_centos
+	cp -rf ../patches .
 	docker build -t centos_python_profiling -f Dockerfile.centos .
 
 test:

@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+// https://www.idnt.net/en-GB/kb/941772
+
 int main(void)
 {
     long double a[4], b[4], loadavg;
