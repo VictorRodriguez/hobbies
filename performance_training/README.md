@@ -22,3 +22,8 @@ make graph
 
 http://sandsoftwaresound.net/perf/perf-tutorial-hot-spots/
 
+In order to generate a log easy to parse:
+
+'''
+perf report --stdio > log
+'''
