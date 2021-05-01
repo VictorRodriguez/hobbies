@@ -1,6 +1,19 @@
 all:
 	cd stress_code && make
 
+static:
+	cd stress_code && make static
+
+icx:
+	cd stress_code && make icx
+
+icx-static:
+	cd stress_code && make icx-static
+
+image:
+	 docker build -t add_perf_test .
+
+
 record-bin:
 	# Sample CPU stack traces for the entire system, at 99 Hertz (< Linux 4.11):
 	sudo perf record -F 99 -a -g ./stress_code/add
@@ -8,9 +21,6 @@ record-bin:
 record-image:
 	# Sample CPU stack traces for the entire system, at 99 Hertz (< Linux 4.11):
 	sudo perf record -F 99 -a -g docker run add_perf_test
-
-image:
-	 docker build -t add_perf_test .
 
 strace:
 	strace -T -o debug.txt ./stress_code/add
