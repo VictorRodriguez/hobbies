@@ -22,3 +22,4 @@ clean:
 	rm -rf add malloc branches
 	rm -rf *.gcno *.gcda
 	rm -rf *.c.gcov
+	rm -rf perf.data*
