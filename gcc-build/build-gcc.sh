@@ -17,7 +17,6 @@ fi
 
 # download the prerequisites
 cd gcc/
-#patch -p1 < ../amx-runtime.patch
 ./contrib/download_prerequisites
 
 # create the build directory

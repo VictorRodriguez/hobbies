@@ -1,0 +1,892 @@
+From 76f47c8116189e3da334ce1858deb94b16a37092 Mon Sep 17 00:00:00 2001
+From: hongyuw1 <hongyuw1@gitlab.devtools.intel.com>
+Date: Fri, 11 Sep 2020 17:34:54 +0000
+Subject: [PATCH] Add AMX runtime testcases
+
+---
+ gcc/config.gcc                                |   6 +-
+ gcc/config/i386/amxbf16intrin.h               |   6 +-
+ gcc/config/i386/amxint8intrin.h               |  17 +-
+ gcc/config/i386/amxtileintrin.h               |  25 +-
+ gcc/doc/invoke.texi                           |   2 +-
+ gcc/testsuite/gcc.target/i386/amx-check.h     | 216 ++++++++++++++++++
+ .../gcc.target/i386/amxbf16-asmatt-2.c        |   4 -
+ .../gcc.target/i386/amxbf16-asmintel-2.c      |   4 -
+ .../gcc.target/i386/amxbf16-dpbf16ps-2.c      |  83 +++++++
+ .../gcc.target/i386/amxint8-asmatt-2.c        |   4 -
+ .../gcc.target/i386/amxint8-asmintel-2.c      |   4 -
+ .../gcc.target/i386/amxint8-dpbssd-2.c        |  62 +++++
+ .../gcc.target/i386/amxint8-dpbsud-2.c        |  61 +++++
+ .../gcc.target/i386/amxint8-dpbusd-2.c        |  61 +++++
+ .../gcc.target/i386/amxint8-dpbuud-2.c        |  61 +++++
+ gcc/testsuite/gcc.target/i386/amxtile-2.c     |  47 ++++
+ .../gcc.target/i386/amxtile-asmatt-2.c        |   4 -
+ .../gcc.target/i386/amxtile-asmintel-2.c      |   4 -
+ 18 files changed, 628 insertions(+), 43 deletions(-)
+ create mode 100644 gcc/testsuite/gcc.target/i386/amx-check.h
+ delete mode 100644 gcc/testsuite/gcc.target/i386/amxbf16-asmatt-2.c
+ delete mode 100644 gcc/testsuite/gcc.target/i386/amxbf16-asmintel-2.c
+ create mode 100644 gcc/testsuite/gcc.target/i386/amxbf16-dpbf16ps-2.c
+ delete mode 100644 gcc/testsuite/gcc.target/i386/amxint8-asmatt-2.c
+ delete mode 100644 gcc/testsuite/gcc.target/i386/amxint8-asmintel-2.c
+ create mode 100644 gcc/testsuite/gcc.target/i386/amxint8-dpbssd-2.c
+ create mode 100644 gcc/testsuite/gcc.target/i386/amxint8-dpbsud-2.c
+ create mode 100644 gcc/testsuite/gcc.target/i386/amxint8-dpbusd-2.c
+ create mode 100644 gcc/testsuite/gcc.target/i386/amxint8-dpbuud-2.c
+ create mode 100644 gcc/testsuite/gcc.target/i386/amxtile-2.c
+ delete mode 100644 gcc/testsuite/gcc.target/i386/amxtile-asmatt-2.c
+ delete mode 100644 gcc/testsuite/gcc.target/i386/amxtile-asmintel-2.c
+
+diff --git a/gcc/config.gcc b/gcc/config.gcc
+index d0e59e86a5c..5713e6d3893 100644
+--- a/gcc/config.gcc
++++ b/gcc/config.gcc
+@@ -412,7 +412,8 @@ i[34567]86-*-*)
+ 		       waitpkgintrin.h cldemoteintrin.h avx512bf16vlintrin.h
+ 		       avx512bf16intrin.h enqcmdintrin.h serializeintrin.h
+ 		       avx512vp2intersectintrin.h avx512vp2intersectvlintrin.h
+-		       tsxldtrkintrin.h amxtileintrin.h amxint8intrin.h amxbf16intrin.h"
++		       tsxldtrkintrin.h amxtileintrin.h amxint8intrin.h
++		       amxbf16intrin.h"
+ 	;;
+ x86_64-*-*)
+ 	cpu_type=i386
+@@ -447,7 +448,8 @@ x86_64-*-*)
+ 		       waitpkgintrin.h cldemoteintrin.h avx512bf16vlintrin.h
+ 		       avx512bf16intrin.h enqcmdintrin.h serializeintrin.h
+ 		       avx512vp2intersectintrin.h avx512vp2intersectvlintrin.h
+-		       tsxldtrkintrin.h amxtileintrin.h amxint8intrin.h amxbf16intrin.h"
++		       tsxldtrkintrin.h amxtileintrin.h amxint8intrin.h
++		       amxbf16intrin.h"
+ 	;;
+ ia64-*-*)
+ 	extra_headers=ia64intrin.h
+diff --git a/gcc/config/i386/amxbf16intrin.h b/gcc/config/i386/amxbf16intrin.h
+index df0e2262d50..b1620963944 100644
+--- a/gcc/config/i386/amxbf16intrin.h
++++ b/gcc/config/i386/amxbf16intrin.h
+@@ -12,9 +12,13 @@
+ #endif /* __AMX_BF16__ */
+
+ #if defined(__x86_64__) && defined(__AMX_BF16__)
+-#define _tile_dpbf16ps(dst,src1,src2)					\
++#define _tile_dpbf16ps_internal(dst,src1,src2)					\
+   __asm__ volatile\
+   ("{tdpbf16ps\t%%tmm"#src2", %%tmm"#src1", %%tmm"#dst"|tdpbf16ps\t%%tmm"#dst", %%tmm"#src1", %%tmm"#src2"}" ::)
++
++#define _tile_dpbf16ps(dst,src1,src2)					\
++  _tile_dpbf16ps_internal (dst, src1, src2)
++
+ #endif
+
+ #ifdef __DISABLE_AMX_BF16__
+diff --git a/gcc/config/i386/amxint8intrin.h b/gcc/config/i386/amxint8intrin.h
+index 4b7a59587dc..11adc1f1295 100644
+--- a/gcc/config/i386/amxint8intrin.h
++++ b/gcc/config/i386/amxint8intrin.h
+@@ -12,21 +12,22 @@
+ #endif /* __AMX_INT8__ */
+
+ #if defined(__x86_64__) && defined(__AMX_INT8__)
+-#define _tile_dpbssd(dst,src1,src2)					\
++#define _tile_int8_dp_internal(name,dst,src1,src2)					\
+   __asm__ volatile							\
+-  ("{tdpbssd\t%%tmm"#src2", %%tmm"#src1", %%tmm"#dst"|tdpbssd\t%%tmm"#dst", %%tmm"#src1", %%tmm"#src2"}" ::)
++  ("{"#name"\t%%tmm"#src2", %%tmm"#src1", %%tmm"#dst"|"#name"\t%%tmm"#dst", %%tmm"#src1", %%tmm"#src2"}" ::)
++
++#define _tile_dpbssd(dst,src1,src2)					\
++  _tile_int8_dp_internal (tdpbssd, dst, src1, src2)
+
+ #define _tile_dpbsud(dst,src1,src2)					\
+-  __asm__ volatile							\
+-  ("{tdpbsud\t%%tmm"#src2", %%tmm"#src1", %%tmm"#dst"|tdpbsud\t%%tmm"#dst", %%tmm"#src1", %%tmm"#src2"}" ::)
++  _tile_int8_dp_internal (tdpbsud, dst, src1, src2)
+
+ #define _tile_dpbusd(dst,src1,src2)					\
+-  __asm__ volatile\
+-  ("{tdpbusd\t%%tmm"#src2", %%tmm"#src1", %%tmm"#dst"|tdpbusd\t%%tmm"#dst", %%tmm"#src1", %%tmm"#src2"}" ::)
++  _tile_int8_dp_internal (tdpbusd, dst, src1, src2)
+
+ #define _tile_dpbuud(dst,src1,src2)					\
+-  __asm__ volatile							\
+-  ("{tdpbuud\t%%tmm"#src2", %%tmm"#src1", %%tmm"#dst"|tdpbuud\t%%tmm"#dst", %%tmm"#src1", %%tmm"#src2"}" ::)
++  _tile_int8_dp_internal (tdpbuud, dst, src1, src2)
++
+ #endif
+
+ #ifdef __DISABLE_AMX_INT8__
+diff --git a/gcc/config/i386/amxtileintrin.h b/gcc/config/i386/amxtileintrin.h
+index fe995232743..ee23b682fa1 100644
+--- a/gcc/config/i386/amxtileintrin.h
++++ b/gcc/config/i386/amxtileintrin.h
+@@ -12,19 +12,18 @@
+ #endif /* __AMX_TILE__ */
+
+ #if defined(__x86_64__) && defined(__AMX_TILE__)
+-
+ extern __inline void
+ __attribute__((__gnu_inline__, __always_inline__, __artificial__))
+ _tile_loadconfig (const void *__config)
+ {
+-  __asm__ volatile ("ldtilecfg\t%X0" :: "m" (__config));
++  __asm__ volatile ("ldtilecfg\t%X0" :: "m" (*((const void **)__config)));
+ }
+
+ extern __inline void
+ __attribute__((__gnu_inline__, __always_inline__, __artificial__))
+ _tile_storeconfig (void *__config)
+ {
+-  __asm__ volatile ("sttilecfg\t%X0" : "=m" (__config));
++  __asm__ volatile ("sttilecfg\t%X0" : "=m" (*((void **)__config)));
+ }
+
+ extern __inline void
+@@ -34,22 +33,34 @@ _tile_release (void)
+   __asm__ volatile ("tilerelease" ::);
+ }
+
+-#define _tile_loadd(dst,base,stride)					\
++#define _tile_loadd(dst,base,stride)		\
++  _tile_loadd_internal (dst, base, stride)
++
++#define _tile_loadd_internal(dst,base,stride)				\
+   __asm__ volatile							\
+   ("{tileloadd\t(%0,%1,1), %%tmm"#dst"|tileloadd\t%%tmm"#dst", [%0+%1*1]}" \
+    :: "r" ((const void*) base), "r" ((long) stride))
+
+-#define _tile_stream_loadd(dst,base,stride)				\
++#define _tile_stream_loadd(dst,base,stride)		\
++  _tile_stream_loadd_internal (dst, base, stride)
++
++#define _tile_stream_loadd_internal(dst,base,stride)			\
+   __asm__ volatile							\
+-  ("{tileloaddt1\t(%0,%1,1), %%tmm"#dst"|tileloaddt1\t%%tmm"#dst", [%0+%1*1]}"\
++  ("{tileloaddt1\t(%0,%1,1), %%tmm"#dst"|tileloaddt1\t%%tmm"#dst", [%0+%1*1]}" \
+    :: "r" ((const void*) base), "r" ((long) stride))
+
+-#define _tile_stored(src,base,stride)					\
++#define _tile_stored(dst,base,stride)		\
++  _tile_stored_internal (dst, base, stride)
++
++#define _tile_stored_internal(src,base,stride)				\
+   __asm__ volatile							\
+   ("{tilestored\t%%tmm"#src", (%0,%1,1)|tilestored\t[%0+%1*1], %%tmm"#src"}" \
+    :: "r" ((void*) base), "r" ((long) stride))
+
+ #define _tile_zero(dst)				\
++  _tile_zero_internal (dst)
++
++#define _tile_zero_internal(dst)		\
+   __asm__ volatile				\
+   ("tilezero\t%%tmm"#dst ::)
+
+diff --git a/gcc/doc/invoke.texi b/gcc/doc/invoke.texi
+index a46e31f5862..3e67108a67b 100644
+--- a/gcc/doc/invoke.texi
++++ b/gcc/doc/invoke.texi
+@@ -1357,7 +1357,7 @@ See RS/6000 and PowerPC Options.
+ -mvpclmulqdq  -mavx512bitalg  -mmovdiri  -mmovdir64b  -mavx512vpopcntdq @gol
+ -mavx5124fmaps  -mavx512vnni  -mavx5124vnniw  -mprfchw  -mrdpid @gol
+ -mrdseed  -msgx -mavx512vp2intersect -mserialize -mtsxldtrk@gol
+--mamx-tile -mamx-int8 -mamx-bf16@gol
++-mamx-tile  -mamx-int8  -mamx-bf16@gol
+ -mcldemote  -mms-bitfields  -mno-align-stringops  -minline-all-stringops @gol
+ -minline-stringops-dynamically  -mstringop-strategy=@var{alg} @gol
+ -mmemcpy-strategy=@var{strategy}  -mmemset-strategy=@var{strategy} @gol
+diff --git a/gcc/testsuite/gcc.target/i386/amx-check.h b/gcc/testsuite/gcc.target/i386/amx-check.h
+new file mode 100644
+index 00000000000..be4f297ee06
+--- /dev/null
++++ b/gcc/testsuite/gcc.target/i386/amx-check.h
+@@ -0,0 +1,216 @@
++#ifndef AMX_CHECK_H_INCLUDED
++#define AMX_CHECK_H_INCLUDED
++
++#include <stdlib.h>
++#include <string.h>
++#include <stdint.h>
++#ifdef DEBUG
++#include <stdio.h>
++#endif
++#include "cpuid.h"
++
++/* TODO: The tmm emulation is temporary for current
++   AMX implementation with no tmm regclass, should
++   be changed in the future. */
++typedef struct __tile_config
++{
++  uint8_t palette_id;
++  uint8_t start_row;
++  uint8_t reserved_0[14];
++  uint16_t colsb[8]; /* Colum size of each tmm register in bytes */
++  uint16_t reserved_1[8];
++  uint8_t rows[8]; /* Row size of each tmm reg in bytes */
++  uint8_t reserved_2[8];
++} __tilecfg;
++
++typedef union __union_tile_config
++{
++  __tilecfg s;
++  uint8_t a[64];
++} __tilecfg_u;
++
++typedef struct __tile
++{
++  /* Max size of tile register */
++  uint8_t buf[1024];
++  int rows;
++  int colsb;
++} __tile;
++
++/* Maxium col/row size in bytes */
++#define MAX_ROWS 16
++#define MAX_COLS 64
++
++/* Stride (colum width in byte) used for tileload/store */
++#define _STRIDE 64
++
++/* Initialize tile config by setting all tmm size to 16x64 */
++void init_tile_config (__tilecfg_u *dst)
++{
++  int i;
++
++  dst->s.palette_id = 1;
++  dst->s.start_row = 0;
++
++  for (i = 0; i < 14; i++)
++    dst->s.reserved_0[i] = 0;
++
++  for (i = 0; i < 8; i++)
++  {
++    dst->s.colsb[i] = _STRIDE;
++    dst->s.rows[i] = 16;
++    dst->s.reserved_1[i] = 0;
++    dst->s.reserved_2[i] = 0;
++  }
++
++  _tile_loadconfig (dst->a);
++}
++
++/* Init __tile variable that going to be store to register
++   w/o extra buffer. If buffer exists, it should be the same
++   size matrix as corresponding tmm register.
++   Should execute init_tile_config first */
++void init_tile_src (const int tmm_num, __tile *src, uint8_t *buffer)
++{
++  int rows, colsb, i, j;
++  __tilecfg_u tmp;
++
++  _tile_storeconfig (tmp.a);
++
++  src->rows = rows = tmp.s.rows[tmm_num];
++  src->colsb = colsb = tmp.s.colsb[tmm_num];
++
++  for (i = 0; i < rows; i++)
++    for (j = 0; j < colsb; j++)
++    {
++      if(buffer)
++	src->buf[i * colsb + j] = buffer[i * colsb + j];
++      else
++	src->buf[i * colsb + j] = (i + 11 * j) % 256;
++    }
++
++}
++
++/* Init __tile src and corresponding tmm register */
++#define init_tile_reg_and_src(tmm_num, src)   \
++{					      \
++  init_tile_src (tmm_num, &src, NULL);	      \
++  _tile_loadd (tmm_num, src.buf, _STRIDE);   \
++}
++
++#define init_tile_reg_and_src_with_buffer(tmm_num, src, buffer) \
++{								\
++  init_tile_src (tmm_num, &src, buffer);				\
++  _tile_loadd (tmm_num, src.buf, _STRIDE);			\
++}
++
++/* Zero __tile src. It should be init first. */
++void zero_tile_src (__tile *src)
++{
++  int i, j;
++
++  for (i = 0; i < src->rows; i++)
++    for (j = 0; j < src->colsb; j++)
++      src->buf[i * src->colsb + j] = 0;
++}
++
++/* Compare tile config value with __tilecfg_u dst */
++int check_tile_config (__tilecfg_u *src, __tilecfg_u *dst)
++{
++  size_t size = sizeof(__tilecfg);
++  uint8_t *pa_src = (uint8_t *) src->a;
++  uint8_t *pa_dst = (uint8_t *) dst->a;
++
++  for (int i = 0; i < size; i++)
++    if (pa_src[i] != pa_dst[i])
++      return 0;
++
++  return 1;
++}
++
++/* Compare tile register value with __tile variable */
++int check_tile_register (__tile* ref, __tile* target)
++{
++  /* Tile register should be stored from tmm to
++     memory and compare with emulation results. */
++  int rows = target->rows;
++  int colsb = target->colsb;
++  int i, j;
++
++  for (i = 0; i < rows; i++)
++    for (j = 0; j < colsb; j++)
++	if (ref->buf[i * colsb + j] != target->buf[i * colsb + j])
++	    return 0;
++
++  return 1;
++}
++
++#ifndef DO_TEST
++#define DO_TEST do_test
++static void test_amx (void);
++__attribute__ ((noinline))
++static void
++do_test (void)
++{
++  test_amx ();
++}
++#endif
++
++/* To verify whethe host has AMX support*/
++int
++valid_test ()
++{
++  unsigned int eax, ebx, ecx, edx;
++
++/* Check XCR0 stat for AMX */
++#define XSTATE_TILECFG          0x20000
++#define XSTATE_TILEDATA         0x40000
++
++  __cpuid (1, eax, ebx, ecx, edx);
++
++  if (ecx & bit_OSXSAVE)
++    {
++      unsigned int xcrlow;
++
++      __asm__ ("xgetbv"
++	      : "=a" (xcrlow)
++	      : "c" (0));
++
++      if (xcrlow & (XSTATE_TILECFG | XSTATE_TILEDATA))
++	{
++	  __get_cpuid_count (7, 0, &eax, &ebx, &ecx, &edx);
++
++	  if (edx & bit_AMX_TILE
++#ifdef AMX_INT8
++	    && (edx & bit_AMX_INT8)
++#endif
++#ifdef AMX_BF16
++	    && (edx & bit_AMX_BF16)
++#endif
++	    )
++	    return 1;
++	}
++    }
++
++  return 0;
++}
++
++int
++main ()
++{
++  if (valid_test ())
++    {
++      DO_TEST ();
++#ifdef DEBUG
++      printf ("PASSED\n");
++#endif
++    }
++#ifdef DEBUG
++  else
++    printf ("SKIPPED\n");
++#endif
++
++  return 0;
++}
++
++#endif
+diff --git a/gcc/testsuite/gcc.target/i386/amxbf16-asmatt-2.c b/gcc/testsuite/gcc.target/i386/amxbf16-asmatt-2.c
+deleted file mode 100644
+index b7332248ba7..00000000000
+--- a/gcc/testsuite/gcc.target/i386/amxbf16-asmatt-2.c
++++ /dev/null
+@@ -1,4 +0,0 @@
+-/* { dg-do assemble { target { ! ia32 } } } */
+-/* { dg-options "-O2 -mamx-bf16" } */
+-/* { dg-require-effective-target amx_bf16 } */
+-#include"amxbf16-asmatt-1.c"
+diff --git a/gcc/testsuite/gcc.target/i386/amxbf16-asmintel-2.c b/gcc/testsuite/gcc.target/i386/amxbf16-asmintel-2.c
+deleted file mode 100644
+index 605a44df3f8..00000000000
+--- a/gcc/testsuite/gcc.target/i386/amxbf16-asmintel-2.c
++++ /dev/null
+@@ -1,4 +0,0 @@
+-/* { dg-do assemble { target { ! ia32 } } } */
+-/* { dg-options "-O2 -mamx-bf16 -masm=intel" } */
+-/* { dg-require-effective-target amx_bf16 } */
+-#include"amxbf16-asmintel-1.c"
+diff --git a/gcc/testsuite/gcc.target/i386/amxbf16-dpbf16ps-2.c b/gcc/testsuite/gcc.target/i386/amxbf16-dpbf16ps-2.c
+new file mode 100644
+index 00000000000..c819113897d
+--- /dev/null
++++ b/gcc/testsuite/gcc.target/i386/amxbf16-dpbf16ps-2.c
+@@ -0,0 +1,83 @@
++/* { dg-do run { target { ! ia32 } } } */
++/* { dg-options "-O2 -mamx-tile -mamx-bf16" } */
++#include <immintrin.h>
++
++#define AMX_BF16
++#define DO_TEST test_amx_bf16_dpbf16ps
++void test_amx_bf16_dpbf16ps ();
++#include "amx-check.h"
++
++/* Transformation functions between bf16/float */
++static uint16_t make_bf16 (float f)
++{
++  uint32_t u = (uint32_t)f;
++  u = (u >> 16) & 0xffff;
++  return (uint16_t)u;
++}
++
++static float make_f32 (uint16_t bf)
++{
++  uint32_t u = (uint32_t)(bf << 16);
++  return (float)u;
++}
++
++/* Init tile buffer with bf16 pairs */
++void init_bf16_max_tile_buffer (uint8_t *buf)
++{
++  int i, j;
++  uint16_t *ptr = (uint16_t *)buf;
++
++  for(i = 0; i < 16; i++)
++    for(j = 0; j < 32; j++)
++      {
++	float f = 16.1f * i + 3.4f * j;
++	ptr[i * 32 + j] = make_bf16(f);
++      }
++}
++
++void calc_matrix_dpbf16ps (__tile *dst, __tile *src1, __tile *src2)
++{
++  uint16_t *src1_buf = (uint16_t *)src1->buf;
++  uint16_t *src2_buf = (uint16_t *)src2->buf;
++  float *dst_buf = (float *)dst->buf;
++
++  int M = src1->rows;
++  int N = src1->colsb / 4;
++  int K = src2->colsb / 4;
++  int i, j, k, t;
++
++  for (i = 0; i < M; i++)
++    for (j = 0; j < N; j++)
++      for (k = 0; k < K; k++)
++	for (t = 0; t < 2; t+=2)
++	  {
++	    dst_buf[i * N + k] +=
++	      (make_f32(src1_buf[i * 4 * N + 4 * j + t]) *
++	      make_f32(src2_buf[j * 4 * K + 4 * k + t])) +
++	      (make_f32(src1_buf[i * 4 * N + 4 * j + t + 1]) *
++	      make_f32(src1_buf[i * 4 * N + 4 * j + t + 1]));
++	  }
++
++}
++
++void test_amx_bf16_dpbf16ps ()
++{
++  __tilecfg_u cfg;
++  __tile dst, dst_ref, src1, src2;
++  uint8_t tmp_dst_buf[1024];
++
++  init_bf16_max_tile_buffer (tmp_dst_buf);
++
++  init_tile_config (&cfg);
++  init_tile_reg_and_src_with_buffer (1, dst, tmp_dst_buf);
++  init_tile_reg_and_src_with_buffer (2, dst, tmp_dst_buf);
++  init_tile_reg_and_src_with_buffer (3, dst, tmp_dst_buf);
++
++  calc_matrix_dpbf16ps (&dst, &src1, &src2);
++
++  _tile_dpbf16ps (1, 2, 3);
++  _tile_stored (1, dst_ref.buf, _STRIDE);
++
++  if (!check_tile_register (&dst_ref, &dst))
++        abort();
++}
+diff --git a/gcc/testsuite/gcc.target/i386/amxint8-asmatt-2.c b/gcc/testsuite/gcc.target/i386/amxint8-asmatt-2.c
+deleted file mode 100644
+index 307c9d813bb..00000000000
+--- a/gcc/testsuite/gcc.target/i386/amxint8-asmatt-2.c
++++ /dev/null
+@@ -1,4 +0,0 @@
+-/* { dg-do assemble { target { ! ia32 } } } */
+-/* { dg-options "-O2 -mamx-int8" } */
+-/* { dg-require-effective-target amx_int8 } */
+-#include"amxint8-asmatt-1.c"
+diff --git a/gcc/testsuite/gcc.target/i386/amxint8-asmintel-2.c b/gcc/testsuite/gcc.target/i386/amxint8-asmintel-2.c
+deleted file mode 100644
+index 7e1c1d63594..00000000000
+--- a/gcc/testsuite/gcc.target/i386/amxint8-asmintel-2.c
++++ /dev/null
+@@ -1,4 +0,0 @@
+-/* { dg-do assemble { target { ! ia32 } } } */
+-/* { dg-options "-O2 -mamx-int8 -masm=intel" } */
+-/* { dg-require-effective-target amx_int8 } */
+-#include"amxint8-asmintel-1.c"
+diff --git a/gcc/testsuite/gcc.target/i386/amxint8-dpbssd-2.c b/gcc/testsuite/gcc.target/i386/amxint8-dpbssd-2.c
+new file mode 100644
+index 00000000000..62d31ce3e81
+--- /dev/null
++++ b/gcc/testsuite/gcc.target/i386/amxint8-dpbssd-2.c
+@@ -0,0 +1,62 @@
++/* { dg-do run { target { ! ia32 } } } */
++/* { dg-options "-O2 -mamx-tile -mamx-int8" } */
++#include <immintrin.h>
++
++#define AMX_INT8
++#define DO_TEST test_amx_int8_dpbssd
++void test_amx_int8_dpbssd ();
++#include "amx-check.h"
++
++/* Init tile buffer with int32 value*/
++void init_i32_max_tile_buffer (uint8_t *buf)
++{
++  int i, j;
++  int *ptr = (int *)buf;
++  for (i = 0; i < 16; i++)
++    for (j = 0; j < 16; j++)
++      ptr[i * 16 + j] = 2 * i - (16 - j);
++}
++
++void calc_matrix_dpbssd (__tile *dst, __tile *src1, __tile *src2)
++{
++  int8_t *src1_buf = (int8_t *)src1->buf;
++  int8_t *src2_buf = (int8_t *)src2->buf;
++  int *dst_buf = (int *)dst->buf;
++
++  int M = src1->rows;
++  int N = src1->colsb / 4;
++  int K = src2->colsb / 4;
++  int i, j, k, t;
++
++  for (i = 0; i < M; i++)
++    for (j = 0; j < N; j++)
++      for (k = 0; k < K; k++)
++	for (t = 0; t < 4; t++)
++	  {
++	    dst_buf[i * N + k] +=
++	      ((int) src1_buf[i * 4 * N + 4 * j + t]) *
++	      ((int) src2_buf[j * 4 * K + 4 * k + t]);
++	  }
++}
++
++void test_amx_int8_dpbssd ()
++{
++  __tilecfg_u cfg;
++  __tile dst, dst_ref, src1, src2;
++  uint8_t tmp_dst_buf[1024];
++
++  init_i32_max_tile_buffer (tmp_dst_buf);
++
++  init_tile_config (&cfg);
++  init_tile_reg_and_src_with_buffer (1, dst, tmp_dst_buf);
++  init_tile_reg_and_src (2, src1);
++  init_tile_reg_and_src (3, src2);
++
++  calc_matrix_dpbssd (&dst, &src1, &src2);
++
++  _tile_dpbssd (1, 2, 3);
++  _tile_stored (1, dst_ref.buf, _STRIDE);
++
++  if (!check_tile_register (&dst_ref, &dst))
++      abort();
++}
+diff --git a/gcc/testsuite/gcc.target/i386/amxint8-dpbsud-2.c b/gcc/testsuite/gcc.target/i386/amxint8-dpbsud-2.c
+new file mode 100644
+index 00000000000..5007ee917f5
+--- /dev/null
++++ b/gcc/testsuite/gcc.target/i386/amxint8-dpbsud-2.c
+@@ -0,0 +1,61 @@
++/* { dg-do run { target { ! ia32 } } } */
++/* { dg-options "-O2 -mamx-tile -mamx-int8" } */
++#include <immintrin.h>
++
++#define AMX_INT8
++#define DO_TEST test_amx_int8_dpbsud
++void test_amx_int8_dpbsud ();
++#include "amx-check.h"
++
++/* Init tile buffer with int32 value*/
++void init_i32_max_tile_buffer (uint8_t *buf)
++{
++  int i, j;
++  int *ptr = (int *)buf;
++  for (i = 0; i < 16; i++)
++    for (j = 0; j < 16; j++)
++      ptr[i * 16 + j] = 2 * i - (16 - j);
++}
++
++void calc_matrix_dpbsud (__tile *dst, __tile *src1, __tile *src2)
++{
++  int8_t *src1_buf = (int8_t *)src1->buf;
++  uint8_t *src2_buf = (uint8_t *)src2->buf;
++  int *dst_buf = (int *)dst->buf;
++
++  int M = src1->rows;
++  int N = src1->colsb / 4;
++  int K = src2->colsb / 4;
++  int i, j, k, t;
++
++  for (i = 0; i < M; i++)
++    for (j = 0; j < N; j++)
++      for (k = 0; k < K; k++)
++	for (t = 0; t < 4; t++)
++	  {
++	    dst_buf[i * N + k] +=
++	      ((int) src1_buf[i * 4 * N + 4 * j + t]) *
++	      ((unsigned) src2_buf[j * 4 * K + 4 * k + t]);
++	  }
++}
++
++void test_amx_int8_dpbsud ()
++{
++  __tilecfg_u cfg;
++  __tile dst, dst_ref, src1, src2;
++  uint8_t tmp_dst_buf[1024];
++
++  init_i32_max_tile_buffer (tmp_dst_buf);
++
++  init_tile_config (&cfg);
++  init_tile_reg_and_src_with_buffer (1, dst, tmp_dst_buf);
++  init_tile_reg_and_src (2, src1);
++  init_tile_reg_and_src (3, src2);
++
++  calc_matrix_dpbsud (&dst, &src1, &src2);
++  _tile_dpbsud (1, 2, 3);
++  _tile_stored (1, dst_ref.buf, _STRIDE);
++
++  if (!check_tile_register (&dst_ref, &dst))
++      abort();
++}
+diff --git a/gcc/testsuite/gcc.target/i386/amxint8-dpbusd-2.c b/gcc/testsuite/gcc.target/i386/amxint8-dpbusd-2.c
+new file mode 100644
+index 00000000000..17888e26116
+--- /dev/null
++++ b/gcc/testsuite/gcc.target/i386/amxint8-dpbusd-2.c
+@@ -0,0 +1,61 @@
++/* { dg-do run { target { ! ia32 } } } */
++/* { dg-options "-O2 -mamx-tile -mamx-int8" } */
++#include <immintrin.h>
++
++#define AMX_INT8
++#define DO_TEST test_amx_int8_dpbusd
++void test_amx_int8_dpbusd ();
++#include "amx-check.h"
++
++/* Init tile buffer with int32 value*/
++void init_i32_max_tile_buffer (uint8_t *buf)
++{
++  int i, j;
++  int *ptr = (int *)buf;
++  for (i = 0; i < 16; i++)
++    for (j = 0; j < 16; j++)
++      ptr[i * 16 + j] = 2 * i - (16 - j);
++}
++
++void calc_matrix_dpbusd (__tile *dst, __tile *src1, __tile *src2)
++{
++  uint8_t *src1_buf = (uint8_t *)src1->buf;
++  int8_t *src2_buf = (int8_t *)src2->buf;
++  int *dst_buf = (int *)dst->buf;
++
++  int M = src1->rows;
++  int N = src1->colsb / 4;
++  int K = src2->colsb / 4;
++  int i, j, k, t;
++
++  for (i = 0; i < M; i++)
++    for (j = 0; j < N; j++)
++      for (k = 0; k < K; k++)
++	for (t = 0; t < 4; t++)
++	  {
++	    dst_buf[i * N + k] +=
++	      ((unsigned) src1_buf[i * 4 * N + 4 * j + t]) *
++	      ((int) src2_buf[j * 4 * K + 4 * k + t]);
++	  }
++}
++
++void test_amx_int8_dpbusd ()
++{
++  __tilecfg_u cfg;
++  __tile dst, dst_ref, src1, src2;
++  uint8_t tmp_dst_buf[1024];
++
++  init_i32_max_tile_buffer (tmp_dst_buf);
++
++  init_tile_config (&cfg);
++  init_tile_reg_and_src_with_buffer (1, dst, tmp_dst_buf);
++  init_tile_reg_and_src (2, src1);
++  init_tile_reg_and_src (3, src2);
++
++  calc_matrix_dpbusd (&dst, &src1, &src2);
++  _tile_dpbusd (1, 2, 3);
++  _tile_stored (1, dst_ref.buf, _STRIDE);
++
++  if (!check_tile_register (&dst_ref, &dst))
++      abort();
++}
+diff --git a/gcc/testsuite/gcc.target/i386/amxint8-dpbuud-2.c b/gcc/testsuite/gcc.target/i386/amxint8-dpbuud-2.c
+new file mode 100644
+index 00000000000..c39666c3643
+--- /dev/null
++++ b/gcc/testsuite/gcc.target/i386/amxint8-dpbuud-2.c
+@@ -0,0 +1,61 @@
++/* { dg-do run { target { ! ia32 } } } */
++/* { dg-options "-O2 -mamx-tile -mamx-int8" } */
++#include <immintrin.h>
++
++#define AMX_INT8
++#define DO_TEST test_amx_int8_dpbuud
++void test_amx_int8_dpbuud ();
++#include "amx-check.h"
++
++/* Init tile buffer with int32 value*/
++void init_i32_max_tile_buffer (uint8_t *buf)
++{
++  int i, j;
++  int *ptr = (int *)buf;
++  for (i = 0; i < 16; i++)
++    for (j = 0; j < 16; j++)
++      ptr[i * 16 + j] = 2 * i - (16 - j);
++}
++
++void calc_matrix_dpbuud (__tile *dst, __tile *src1, __tile *src2)
++{
++  uint8_t *src1_buf = (uint8_t *)src1->buf;
++  uint8_t *src2_buf = (uint8_t *)src2->buf;
++  int *dst_buf = (int *)dst->buf;
++
++  int M = src1->rows;
++  int N = src1->colsb / 4;
++  int K = src2->colsb / 4;
++  int i, j, k, t;
++
++  for (i = 0; i < M; i++)
++    for (j = 0; j < N; j++)
++      for (k = 0; k < K; k++)
++	for (t = 0; t < 4; t++)
++	  {
++	    dst_buf[i * N + k] +=
++	      ((unsigned) src1_buf[i * 4 * N + 4 * j + t]) *
++	      ((unsigned) src2_buf[j * 4 * K + 4 * k + t]);
++	  }
++}
++
++void test_amx_int8_dpbuud ()
++{
++  __tilecfg_u cfg;
++  __tile dst, dst_ref, src1, src2;
++  uint8_t tmp_dst_buf[1024];
++
++  init_i32_max_tile_buffer (tmp_dst_buf);
++
++  init_tile_config (&cfg);
++  init_tile_reg_and_src_with_buffer (1, dst, tmp_dst_buf);
++  init_tile_reg_and_src (2, src1);
++  init_tile_reg_and_src (3, src2);
++
++  calc_matrix_dpbuud (&dst, &src1, &src2);
++  _tile_dpbuud (1, 2, 3);
++  _tile_stored (1, dst_ref.buf, _STRIDE);
++
++  if (!check_tile_register (&dst_ref, &dst))
++      abort();
++}
+diff --git a/gcc/testsuite/gcc.target/i386/amxtile-2.c b/gcc/testsuite/gcc.target/i386/amxtile-2.c
+new file mode 100644
+index 00000000000..cef84f9f479
+--- /dev/null
++++ b/gcc/testsuite/gcc.target/i386/amxtile-2.c
+@@ -0,0 +1,47 @@
++/* { dg-do run { target { ! ia32 } } } */
++/* { dg-options "-O2 -mamx-tile " } */
++#include <immintrin.h>
++
++#define DO_TEST test_amx_tile
++void test_amx_tile ();
++#include "amx-check.h"
++
++void test_amx_tile ()
++{
++  __tilecfg_u cfg_src, cfg_dst;
++  __tile reg_src1, reg_src2, reg_ref;
++
++  /* check tile config load & store. */
++  init_tile_config (&cfg_src);
++  _tile_storeconfig (cfg_dst.a);
++
++  if (!check_tile_config (&cfg_src, &cfg_dst))
++    abort ();
++
++  /* check tile register load & store. */
++  init_tile_reg_and_src (1, reg_src1);
++  _tile_stored (1, reg_ref.buf, _STRIDE);
++  if (!check_tile_register (&reg_ref, &reg_src1))
++    abort ();
++
++  /* check tile stream load instruction */
++  init_tile_src (2, &reg_src2, NULL);
++  _tile_stream_loadd (2, reg_src2.buf, _STRIDE);
++  _tile_stored (2, reg_ref.buf, _STRIDE);
++  if (!check_tile_register (&reg_ref, &reg_src2))
++    abort ();
++
++  /* check tile register zeroing */
++  zero_tile_src (&reg_src2);
++  _tile_zero (2);
++  _tile_stored (2, reg_ref.buf, _STRIDE);
++  if (!check_tile_register (&reg_ref, &reg_src2))
++    abort ();
++
++  /* check tile cfg zeroing */
++  memset (cfg_dst.a, 0, sizeof(__tilecfg));
++  _tile_release ();
++  _tile_storeconfig (cfg_src.a);
++  if (!check_tile_config (&cfg_src, &cfg_dst))
++    abort ();
++}
+diff --git a/gcc/testsuite/gcc.target/i386/amxtile-asmatt-2.c b/gcc/testsuite/gcc.target/i386/amxtile-asmatt-2.c
+deleted file mode 100644
+index c00cd0a8fa2..00000000000
+--- a/gcc/testsuite/gcc.target/i386/amxtile-asmatt-2.c
++++ /dev/null
+@@ -1,4 +0,0 @@
+-/* { dg-do assemble { target { ! ia32 } } } */
+-/* { dg-options "-O2 -mamx-tile" } */
+-/* { dg-require-effective-target amx_tile } */
+-#include"amxtile-asmatt-1.c"
+diff --git a/gcc/testsuite/gcc.target/i386/amxtile-asmintel-2.c b/gcc/testsuite/gcc.target/i386/amxtile-asmintel-2.c
+deleted file mode 100644
+index 99da63c119e..00000000000
+--- a/gcc/testsuite/gcc.target/i386/amxtile-asmintel-2.c
++++ /dev/null
+@@ -1,4 +0,0 @@
+-/* { dg-do assemble { target { ! ia32 } } } */
+-/* { dg-options "-O2 -mamx-tile -masm=intel" } */
+-/* { dg-require-effective-target amx_tile } */
+-#include"amxtile-asmintel-1.c"
+--
+2.25.1
+
+
