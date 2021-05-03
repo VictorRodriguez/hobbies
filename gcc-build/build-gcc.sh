@@ -6,12 +6,12 @@ INSTALLDIR=$(pwd)"/install-dir"
 mkdir -p $INSTALLDIR
 
 FOLDER="gcc"
-URL="https://gitlab.com/x86-gcc/gcc/-/archive/master/gcc-master.tar.gz"
+URL="https://gcc.gnu.org/pub/gcc/releases/gcc-11.1.0/gcc-11.1.0.tar.xz"
 
 if [ ! -d "$FOLDER" ] ; then
     wget $URL
-	tar -xvf gcc-master.tar.gz
-	mv gcc-master $FOLDER
+	tar -xvf gcc-11.1.0.tar.xz
+	mv gcc-11.1.0 $FOLDER
 fi
 
 

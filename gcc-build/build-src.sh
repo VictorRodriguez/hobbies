@@ -1,6 +1,14 @@
 #!/bin/bash
 
-REPO=https://github.com/VictorRodriguez/AVX-SG.git
-git clone $REPO src/
-cd src/ && make
+if [ -d "/src" ]
+then
+    echo "Directory /src exists."
+else
+    echo "Error: Directory /src does not exists."
+	REPO=https://github.com/VictorRodriguez/AVX-SG.git
+	git clone $REPO src/
+fi
+
+cd /src/ && make
 cp -rf /src/build/* /build-binaries/
+
