@@ -9,4 +9,5 @@ clean:
 	rm -rf operations \
 	ternary \
 	arguments \
-	cast
+	cast \
+	static
