@@ -1,2 +1,3 @@
 FROM centos:latest
-CMD while true; echo "Como vas? / Whats the status of Jira?"; done
+ADD pm_bot.sh /
+CMD /pm_bot.sh
