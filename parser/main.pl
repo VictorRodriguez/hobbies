@@ -10,11 +10,12 @@ if (!defined($filename)) {
   $filename = 'logs/test.txt';
 }
 
+
 open(FH, '<', $filename) or die $!;
 
 while(<FH>){
 	if ($_ =~ /f64Longitude \(deg\) = (\d+)/) {
-    	print $1;
+    	print "$1\n";
 	}
 }
 
