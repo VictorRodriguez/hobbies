@@ -4,8 +4,11 @@ $x = 10;
 
 use warnings;
 
+my $filename   = $ARGV[0];
 
-my $filename = 'logs/test.txt';
+if (!defined($filename)) {
+  $filename = 'logs/test.txt';
+}
 
 open(FH, '<', $filename) or die $!;
 
