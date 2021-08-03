@@ -5,6 +5,7 @@ all:
 	gcc cast.c -o cast
 	gcc static.c -o static_example
 	gcc sort.c -o sort
+	gcc arrays.c -o arrays
 
 clean:
 	rm -rf operations \
@@ -12,4 +13,5 @@ clean:
 	arguments \
 	cast \
 	static_example \
-	sort
+	sort \
+	arrays
