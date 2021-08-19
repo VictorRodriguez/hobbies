@@ -1,0 +1,15 @@
+{
+    "variables": [
+        {
+            "cycles": "cycles",
+            "instructions": "instructions"
+        }
+    ],
+
+	"calculations": [
+        {
+            "variable": "cpi",
+			"function": "calculations.cpi"
+        }
+    ]
+}
