@@ -2,8 +2,12 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+
 sample = pd.DataFrame([[1000],[2000],[3000],[4000],[5000],[6000],[7000],[8000],[9000],[20000]]
  , columns=['Salary'])
+
+sample.plot()
+
 
 def outlier_treatment(datacolumn):
     sorted(datacolumn)
@@ -24,3 +28,6 @@ print(outliers)
 sample.drop(sample[ (sample.Salary > upperbound) | (sample.Salary < lowerbound) ].index , inplace=True)
 print("data w/o outliers")
 print(sample)
+sample.plot()
+
+plt.show(block=True)
