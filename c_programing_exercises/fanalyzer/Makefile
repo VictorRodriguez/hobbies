@@ -4,6 +4,7 @@ all:
 	gcc test_3.c -fanalyzer
 	gcc test_4.c -fanalyzer
 	gcc test_5.c -fanalyzer
+	gcc test_6.c -fanalyzer
 image:
 	docker build -t fanalyzer_example .
 clean:
