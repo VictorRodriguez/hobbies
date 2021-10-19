@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
@@ -20,6 +21,8 @@ y = df.loc[:,['workload_name']].values
 x = StandardScaler().fit_transform(x)
 pca = PCA(n_components=2)
 principalComponents = pca.fit_transform(x)
+print("pca.explained_variance_ratio_:")
+print(pca.explained_variance_ratio_)
 principalDf = pd.DataFrame(data = principalComponents, columns = ['principal component 1', 'principal component 2'])
 finalDf = pd.concat([principalDf, df[['workload_name']]], axis = 1)
 #print(finalDf)
@@ -39,4 +42,4 @@ for i, label in enumerate(y):
 
 ax.grid()
 plt.show()
-pca.explained_variance_ratio_
+
