@@ -11,10 +11,10 @@ from sklearn.preprocessing import StandardScaler
 features = ['sepal length', 'sepal width', 'petal length', 'petal width']
 # Separating out the features
 x = df.loc[:, features].values
+print(x)
 # Separating out the target
 y = df.loc[:,['target']].values
-#print(x)
-#print(y)
+print(y)
 
 # Standardizing the features
 x = StandardScaler().fit_transform(x)
@@ -42,4 +42,4 @@ for target, color in zip(targets,colors):
 ax.legend(targets)
 ax.grid()
 plt.show()
-
+pca.explained_variance_ratio_
