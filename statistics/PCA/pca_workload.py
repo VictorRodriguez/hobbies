@@ -5,13 +5,13 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 
 # load dataset into Pandas DataFrame
-df = pd.read_csv('workloads.csv')
-#print(df)
+df = pd.read_csv('out.csv')
+print(df)
 
-features = ['arithmetic','store','branch','other']
+features = ['arithmetic','branch','store_counter','other_counter']
 # Separating out the features
 x = df.loc[:, features].values
-#print(x)
+print(x)
 
 # Separating out the target
 y = df.loc[:,['workload_name']].values
