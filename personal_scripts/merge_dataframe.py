@@ -11,4 +11,4 @@ print(df_2)
 df = df_1.set_index('mnemonic').add(df_2.set_index('mnemonic'), fill_value=0).reset_index()
 print (df.sort_values('Count'))
 file_name="out.csv"
-df.to_csv(file_name, sep=',', encoding='utf-8')
+df.sort_values('Count',ascending=False).to_csv(file_name, sep=',', encoding='utf-8')
