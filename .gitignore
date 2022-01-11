@@ -1,3 +1,6 @@
+*.html
+*.csv
+*.txt
 *.tar.gz
 *.tar.xz
 *.deb

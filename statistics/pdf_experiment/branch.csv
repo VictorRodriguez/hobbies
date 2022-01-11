@@ -1,0 +1,13 @@
+mnemonic
+cmp
+call
+je
+test
+jmp
+jne
+ret
+jle
+ja
+jae
+jbe
+js
