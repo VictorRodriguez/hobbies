@@ -13,7 +13,7 @@ spec_workload  = "docker run --privileged -e BENCHMARK=_BENCH_ -e PLATFORM1=skyl
 
 perf_counters= " cycle_activity.cycles_l1d_miss,cycle_activity.cycles_mem_any,inst_retired.any,branch-instructions,branch-misses,cache-misses,cache-references,cycles,instructions,L1-dcache-loads,L1-dcache-load-misses,L1-dcache-stores"
 
-def process_files(file_list):
+def process_files(files_list):
     output = pd.DataFrame()
     for filename in files_list:
 
@@ -80,25 +80,30 @@ float_tests_list = ["603.bwaves_s",\
 "627.cam4_s" ,\
 "628.pop2_s" ,\
 "638.imagick_s" ,\
-"644.nab_s " ,\
+"644.nab_s" ,\
 "649.fotonik3d_s" ,\
-"654.roms_s "
+"654.roms_s"
 ]
 
-#for test in int_tests_list:
-#    runner_(test)
+def run_workloads():
+    for test in int_tests_list:
+        runner_(test)
 
-#for test in float_tests_list:
-#    runner_(test)
+    for test in float_tests_list:
+        runner_(test)
+def process_results():
+    files_list = []
 
-files_list = []
+    for files in os.listdir("."):
+        if files.endswith(".log"):
+            files_list.append(files)
+        else:
+            continue
+    df = process_files(files_list)
+    df_sorted = (df.sort_values(by=['test_name']))
+    df_sorted.to_csv('results.csv',index=False)
+    plot(df_sorted, "image_file_name.png")
 
-for files in os.listdir("."):
-    if files.endswith(".log"):
-        files_list.append(files)
-    else:
-        continue
-df = process_files(files_list)
-df_sorted = (df.sort_values(by=['test_name']))
-df_sorted.to_csv('results.csv',index=False)
-plot(df_sorted, "image_file_name.png")
+#run_workloads()
+
+process_results()
