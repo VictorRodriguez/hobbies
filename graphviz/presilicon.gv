@@ -1,0 +1,15 @@
+digraph G {
+	"Cloud Workloads Characterization using
+Pre silicon information
+and Clustering" -> "L. Eeckhout, H. Vandierendonck and K. De Bosschere, 
+\"Designing computer architecture research workloads,\" in Computer, vol. 36, no. 2, pp. 65-71, Feb. 2003, doi":" 10.1109/MC.2003.1178050"
+	"Cloud Workloads Characterization using
+Pre silicon information
+and Clustering" -> "R.T. Cheveresan, S. Holban., \"Workload Characterization an Essential Step 
+in Computer Systems Performance Analysis - Methodology and Tools,\" Advances in 
+Electrical and Computer Engineering, vol.9, no.3, pp.100-106, 2009, doi":"10.4316/AECE.2009.03018"
+	"Cloud Workloads Characterization using
+Pre silicon information
+and Clustering" -> "K. Rupnow, A. Rodrigues, K. Underwood, and K. Compton, 
+ Scientific applications vs. spec-fp":" A comparison of program behavior"
+}
