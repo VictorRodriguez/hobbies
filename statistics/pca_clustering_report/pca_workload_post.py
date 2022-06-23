@@ -3,16 +3,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
+import sys
 
 
-
-def get_explained_variance():
+def get_explained_variance(df,features):
 
     # load dataset into Pandas DataFrame
     df = pd.read_csv('results.csv')
-    print(df)
 
-    features = ['branch_misses','cache_misses','l1_dcache_load_misses']
     # Standardizing the features
 
     # Separating out the features
@@ -40,13 +38,9 @@ def get_explained_variance():
 
     plt.show()
 
-def get_PCA():
+def get_PCA(df, features):
 
-    # load dataset into Pandas DataFrame
-    df = pd.read_csv('results.csv')
-    print(df)
 
-    features = ['branch_misses','cache_misses','l1_dcache_load_misses']
     # Separating out the features
     x = df.loc[:, features].values
     # Separating out the target
@@ -78,6 +72,12 @@ def get_PCA():
     ax.grid()
     plt.show()
 
-get_explained_variance()
-get_PCA()
+# load dataset into Pandas DataFrame
+df = pd.read_csv('results.csv')
+print(df)
+
+features = list(df.columns)[1:]
+
+get_explained_variance(df,features)
+get_PCA(df,features)
 
