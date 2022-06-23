@@ -5,7 +5,6 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 
 
-features = ['cpu_bound','memory_bound','l3_bound', 'dram_bound', 'core_bound']
 
 def get_explained_variance():
 
@@ -13,6 +12,7 @@ def get_explained_variance():
     df = pd.read_csv('results.csv')
     print(df)
 
+    features = ['branch_misses','cache_misses','l1_dcache_load_misses']
     # Standardizing the features
 
     # Separating out the features
@@ -46,6 +46,7 @@ def get_PCA():
     df = pd.read_csv('results.csv')
     print(df)
 
+    features = ['branch_misses','cache_misses','l1_dcache_load_misses']
     # Separating out the features
     x = df.loc[:, features].values
     # Separating out the target

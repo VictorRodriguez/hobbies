@@ -7,12 +7,15 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 
 # load dataset into Pandas DataFrame
-df = pd.read_csv('workloads.csv')
+#df = pd.read_csv('workloads.csv')
+df = pd.read_csv('results.csv')
 
-features = ['arithmetic','store','branch','other']
+#features = ['arithmetic','store','branch','other']
+#features = ['arithmetic','branch','store_counter','other_counter']
+features = ['cpu_bound','memory_bound','l3_bound','dram_bound', 'core_bound']
 x = df.loc[:, features].values
 
-y = df.loc[:,['workload_name']].values
+y = df.loc[:,['test_name']].values
 
 # Standardizing the features
 x = StandardScaler().fit_transform(x)
@@ -34,9 +37,9 @@ ax.set_ylabel('Explained variance ratio')
 ax.set_xlabel('Principal component index')
 ax.set_title('Explained variance')
 
+plt.savefig('variance.png')
 plt.show()
 
-"""
 # Cumulative sum of eigenvalues; This will be used to create step plot
 # for visualizing the variance explained by each principal component.
 cum_sum_eigenvalues = np.cumsum(exp_var_pca)
@@ -48,5 +51,5 @@ plt.ylabel('Explained variance ratio')
 plt.xlabel('Principal component index')
 plt.legend(loc='best')
 plt.tight_layout()
+plt.savefig('variance_2.png')
 plt.show()
-"""
