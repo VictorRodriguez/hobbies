@@ -8,9 +8,12 @@ if len(sys.argv) > 1:
 else:
     clusters = 6
 
+df = pd.read_csv("pca.csv")
+test_column = list(df.columns)[3]
+print(test_column)
+
 df = pd.read_csv("pca.csv", usecols = ['principal component 1','principal component 2'])
 
-test_column = list(df.columns)[0]
 workload_name_df = pd.read_csv("pca.csv", usecols =[test_column])
 workload_name = workload_name_df[test_column].values
 
@@ -28,7 +31,7 @@ grouped_df = df.groupby("labels")
 grouped_lists = grouped_df[test_column].apply(list)
 grouped_lists = grouped_lists.reset_index()
 print(grouped_lists.explode(test_column))
-grouped_lists.to_csv("clusters.csv")
+grouped_lists.explode(test_column).to_csv("clusters.csv")
 
 plt.scatter(df['principal component 1'], df['principal component 2'], c= kmeans.labels_.astype(float), s=50, alpha=0.5)
 plt.scatter(centroids[:, 0], centroids[:, 1], c='red', s=50)
