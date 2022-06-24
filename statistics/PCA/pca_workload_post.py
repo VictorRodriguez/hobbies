@@ -3,64 +3,58 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
+import sys
 
 
+def get_explained_variance(X_std):
 
-def get_explained_variance():
-
-    # load dataset into Pandas DataFrame
-    df = pd.read_csv('results.csv')
-    print(df)
-
-    features = ['branch_misses','cache_misses','l1_dcache_load_misses']
-    # Standardizing the features
-
-    # Separating out the features
-    x = df.loc[:, features].values
-    # Separating out the target
-    y = df.loc[:,['test_name']].values
-
-    x = StandardScaler().fit_transform(x)
     pca = PCA()
-    principalComponents = pca.fit_transform(x)
+    principalComponents = pca.fit_transform(X_std)
 
     # Determine explained variance using explained_variance_ration_ attribute
     exp_var_pca = pca.explained_variance_ratio_
 
-    print("pca.explained_variance_ratio_:")
-    print(exp_var_pca)
+    cum_sum_eigenvalues = np.cumsum(exp_var_pca)
 
-    df = pd.DataFrame({'lab':features, 'val':exp_var_pca})
-
-    ax = df.plot.bar(x='lab', y='val', rot=0)
-
-    ax.set_ylabel('Explained variance ratio')
-    ax.set_xlabel('Principal component index')
-    ax.set_title('Explained variance')
-
+    plt.bar(range(0,len(exp_var_pca)), exp_var_pca, alpha=0.5, align='center', label='Individual explained variance')
+    plt.step(range(0,len(cum_sum_eigenvalues)), cum_sum_eigenvalues, where='mid',label='Cumulative explained variance')
+    plt.ylabel('Explained variance ratio')
+    plt.xlabel('Principal component index')
+    plt.legend(loc='best')
+    plt.tight_layout()
+    plt.savefig('variance.png')
     plt.show()
 
-def get_PCA():
+def get_eigen(X_std):
 
-    # load dataset into Pandas DataFrame
-    df = pd.read_csv('results.csv')
-    print(df)
+    mean_vec = np.mean(X_std, axis=0)
+    cov_mat = (X_std - mean_vec).T.dot((X_std - mean_vec)) / (X_std.shape[0]-1)
+    eig_vals, eig_vecs = np.linalg.eig(cov_mat)
 
-    features = ['branch_misses','cache_misses','l1_dcache_load_misses']
+    print(f'Covariance matrix \n {cov_mat}')
+    print(f'Eigenvectors \n {eig_vecs}')
+    print(f'Eigenvalues \n {eig_vals}')
+
+def get_PCA(df, features, test_column):
+
     # Separating out the features
     x = df.loc[:, features].values
     # Separating out the target
-    y = df.loc[:,['test_name']].values
+    y = df.loc[:,[test_column]].values
 
     # Standardizing the features
-    x = StandardScaler().fit_transform(x)
+    X_std = StandardScaler().fit_transform(x)
+
+    get_eigen(X_std)
+    get_explained_variance(X_std)
+
     pca = PCA(n_components=2)
-    principalComponents = pca.fit_transform(x)
+    principalComponents = pca.fit_transform(X_std)
 
     principalDf = pd.DataFrame(data = principalComponents, columns = ['principal component 1', 'principal component 2'])
     finalDf = pd.concat([principalDf, df[['test_name']]], axis = 1)
-    print(finalDf)
     finalDf.to_csv("pca.csv")
+    print(finalDf)
 
     fig = plt.figure(figsize = (8,8))
     ax = fig.add_subplot(1,1,1)
@@ -76,8 +70,16 @@ def get_PCA():
         plt.annotate(label, (finalDf['principal component 1'][i], finalDf['principal component 2'][i]))
 
     ax.grid()
+    plt.savefig('pca.png')
     plt.show()
 
-get_explained_variance()
-get_PCA()
+def main():
+    df = pd.read_csv('results.csv')
+    features = list(df.columns)[1:]
+    test_column = list(df.columns)[0]
+    get_PCA(df, features,test_column)
+
+if __name__ == "__main__":
+    main()
+
 
