@@ -37,7 +37,7 @@ def get_eigen(X_std):
     print(f'Eigenvalues \n {eig_vals}')
 
 def get_PCA(df, features, test_column):
-
+    print(df)
     # Separating out the features
     x = df.loc[:, features].values
     # Separating out the target
@@ -78,6 +78,7 @@ def main():
     df = pd.read_csv('results.csv')
     features = list(df.columns)[1:]
     test_column = list(df.columns)[0]
+
     get_PCA(df, features,test_column)
     calculate_elbow(pd.read_csv("pca.csv"))
 

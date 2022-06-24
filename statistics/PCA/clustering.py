@@ -38,5 +38,3 @@ plt.ylabel("Principal component 2")
 plt.grid()
 plt.show()
 
-
-
