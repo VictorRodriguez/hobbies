@@ -122,12 +122,6 @@ def main():
                 d =  {'probability': str(column_name)}
                 df_new = df_sumary.rename(columns = d, inplace = False)
                 print(df_new)
-                """
-                arithmetic = (df_new[column_name].iloc[0]) / normal_
-                branch= (df_new[column_name].iloc[1]) /  normal_
-                store_counter = (df_new[column_name].iloc[2]) / normal_
-                other_counter = (df_new[column_name].iloc[3]) / normal_
-                """
 
                 arithmetic = (df_new[column_name].iloc[0])
                 branch= (df_new[column_name].iloc[1])

@@ -7,3 +7,6 @@ post:
 	python3 pca_workload_post.py
 	python3 distortion.py
 	python3 kmean_post.py 2
+
+clean:
+	rm -rf *.png

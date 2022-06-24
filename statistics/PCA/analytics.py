@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from distortion import *
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 import sys
@@ -78,6 +79,7 @@ def main():
     features = list(df.columns)[1:]
     test_column = list(df.columns)[0]
     get_PCA(df, features,test_column)
+    calculate_elbow(pd.read_csv("pca.csv"))
 
 if __name__ == "__main__":
     main()
