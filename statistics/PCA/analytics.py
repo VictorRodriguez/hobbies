@@ -36,17 +36,28 @@ def get_eigen(X_std):
     print(f'Eigenvectors \n {eig_vecs}')
     print(f'Eigenvalues \n {eig_vals}')
 
+
 def get_PCA(df, features, test_column):
     print(df)
     # Separating out the features
     x = df.loc[:, features].values
     # Separating out the target
     y = df.loc[:,[test_column]].values
+    print(x)
+
+    cov_mat = np.cov(x.T)
+    print(cov_mat)
+    eig_vals, eig_vecs = np.linalg.eig(cov_mat)
+    print('Eigenvectors \n%s' %eig_vecs)
+    print('\nEigenvalues \n%s' %eig_vals)
+
 
     # Standardizing the features
     X_std = StandardScaler().fit_transform(x)
+    #X_std = x
 
     get_eigen(X_std)
+
     get_explained_variance(X_std)
 
     pca = PCA(n_components=2)
@@ -75,7 +86,7 @@ def get_PCA(df, features, test_column):
     plt.show()
 
 def main():
-    df = pd.read_csv('results.csv')
+    df = pd.read_csv('results_icx_norm.csv')
     features = list(df.columns)[1:]
     test_column = list(df.columns)[0]
 
