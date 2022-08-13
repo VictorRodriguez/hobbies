@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 
+
 if len(sys.argv) > 1:
     clusters = int(sys.argv[1])
 else:
@@ -17,7 +18,7 @@ df = pd.read_csv("pca.csv", usecols = ['principal component 1','principal compon
 workload_name_df = pd.read_csv("pca.csv", usecols =[test_column])
 workload_name = workload_name_df[test_column].values
 
-kmeans = KMeans(n_clusters=clusters).fit(df)
+kmeans = KMeans(init="k-means++", n_clusters=clusters).fit(df)
 centroids = kmeans.cluster_centers_
 labels = kmeans.labels_
 print(labels)
