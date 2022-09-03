@@ -10,28 +10,25 @@ import csv
 import matplotlib.pyplot as plt
 from matplotlib.ticker import PercentFormatter
 from IPython.display import display
+import urllib
+
+def read_json(CUMULUS_ID):
+    url = f'http://10.88.81.185:5000/services-framework/histogram-data-pull?run_uri={CUMULUS_ID}'
+    req = urllib.request.Request(url)
+    response = urllib.request.urlopen(req)
+    data = response.read()
+    values = json.loads(data)
+    df = pd.json_normalize(values['data'])
+    return df
 
 def read_histogram(CSV_FILE):
     df = pd.read_csv(CSV_FILE)
     df = df.sort_values(by='Count',ascending=False)
     return df
 
-def standardize_histogram(df_copy):
-
-    df_arithmetic_vector = pd.read_csv('instructions_kind/arithmetic-vector.csv')
-
-    for index, row in df_arithmetic_vector.iterrows():
-        count = 0
-        vector_ins = row['mnemonic']
-        for value in df_copy['mnemonic']:
-            count=count+1
-            if vector_ins == value:
-                ins_count = int(df_copy.loc[[count]]['Count'])
-                df_copy.at[count,'Count']=(ins_count*16)
-
-    return df_copy
-
 def calcualte_values(df_copy):
+
+    df_copy["Count"] = pd.to_numeric(df_copy["Count"])
 
     df_arithmetic = pd.read_csv('instructions_kind/arithmetic.csv')
     df_branch = pd.read_csv('instructions_kind/branch.csv')
@@ -44,20 +41,12 @@ def calcualte_values(df_copy):
     df_s = df_copy[df_copy.mnemonic.isin(df_store.mnemonic)]
     df_o = pd.concat([df_copy,df_a, df_b, df_s]).drop_duplicates(keep=False)
 
-    """
-    data_count = [['arithmetic', df_a['Count'].sum()],\
-            ['branch',df_b['Count'].sum()],\
-            ['store_counter', df_s['Count'].sum()],\
-            ['other_counter', df_o['Count'].sum()]]
-    """
 
     data_prob = [['arithmetic', df_a['pro'].sum()],\
                 ['branch', df_b['pro'].sum()],\
                 ['store_counter', df_s['pro'].sum()],\
                 ['other_counter', df_o['pro'].sum()]]
 
-
-    #df_sumary = pd.DataFrame(data_count, columns = ['InstrKind', 'Times'])
     df_prob = pd.DataFrame(data_prob, columns = ['InstrKind', 'probability'])
     return(df_prob)
 
@@ -81,7 +70,7 @@ def get_pareto(df):
 
 def plot(df_sumary):
     my_labels=['arithmetic','branch','store','other']
-    df_sumary.plot(labels=my_labels,y='Times',kind='pie',autopct='%1.1f%%',\
+    df_sumary.plot(labels=my_labels,y='probability',kind='pie',autopct='%1.1f%%',\
         startangle=15, shadow = True,)
     plt.ylabel('')
     plt.show()
@@ -91,13 +80,19 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--histogram")
+    parser.add_argument("--cumulus_uri")
     parser.add_argument("--iterate", action='store_true')
     args = parser.parse_args()
 
+    if args.cumulus_uri:
+        df = read_json(args.cumulus_uri)
+        df_sumary = calcualte_values(df)
+        get_pareto(df)
+        plot(df_sumary)
+
     if args.histogram:
         df = read_histogram(args.histogram)
-        df_standard = standardize_histogram(df)
-        df_sumary = calcualte_values(df_standard)
+        df_sumary = calcualte_values(df)
         print(df_sumary)
     if args.iterate:
         directory = r'./histograms'
