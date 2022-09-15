@@ -1,4 +1,5 @@
 import sys
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
@@ -28,12 +29,22 @@ workload_name = workload_name_df[test_column].values
 kmeans = KMeans(init="k-means++", n_clusters=clusters).fit(df)
 centroids = kmeans.cluster_centers_
 labels = kmeans.labels_
+X_dist = (kmeans.transform(df))
+
+distance = []
+
+for inner_list in X_dist:
+    distance.append((min(inner_list)))
+
 print(labels)
+print(distance)
 print(centroids)
 df['labels'] = labels
 df[test_column] = workload_name
-
+df['distance'] = distance
 print(df)
+df.to_csv("test.csv")
+
 y = df.loc[:,['test_name']].values
 
 grouped_df = df.groupby("labels")

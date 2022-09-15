@@ -19,8 +19,8 @@ def get_explained_variance(X_std):
 
     cum_sum_eigenvalues = np.cumsum(exp_var_pca)
 
-    plt.bar(range(0,len(exp_var_pca)), exp_var_pca, alpha=0.5, align='center', label='Individual explained variance')
-    plt.step(range(0,len(cum_sum_eigenvalues)), cum_sum_eigenvalues, where='mid',label='Cumulative explained variance')
+    plt.bar(range(1,len(exp_var_pca) +1 ), exp_var_pca, alpha=0.5, align='center', label='Individual explained variance')
+    plt.step(range(1,len(cum_sum_eigenvalues) + 1), cum_sum_eigenvalues, where='mid',label='Cumulative explained variance')
     plt.ylabel('Explained variance ratio')
     plt.xlabel('Principal component index')
     plt.legend(loc='best')
@@ -128,13 +128,35 @@ def get_PCA(df, features, test_column):
 
 
 def main():
-    df = pd.read_csv('results_icx_norm.csv')
-    features = list(df.columns)[1:]
-    test_column = list(df.columns)[0]
 
-    get_PCA(df, features,test_column)
-    get_TSNE(df, features,test_column)
-    calculate_elbow(pd.read_csv("pca.csv"))
+    filename = None
+
+    if len(sys.argv) > 1:
+        filename = sys.argv[1]
+    else:
+        filename = 'results_spec2017.csv'
+
+    if filename:
+        df = pd.read_csv(filename)
+
+        # Normalize
+        df_ = df
+        df_ = df.loc[:, df.columns != 'test_name']
+        df_=(df_-df_.min())/(df_.max()-df_.min())
+        extracted_col = df["test_name"]
+        df_.insert(0, 'test_name', extracted_col)
+        df_.set_index('test_name')
+        df_.to_csv('normalized_df.csv')
+        df = df_
+
+        features = list(df.columns)[1:]
+        test_column = list(df.columns)[0]
+
+        get_PCA(df, features,test_column)
+        get_TSNE(df, features,test_column)
+        calculate_elbow(pd.read_csv("pca.csv"))
+    else:
+        print("Filename error")
 
 if __name__ == "__main__":
     main()
