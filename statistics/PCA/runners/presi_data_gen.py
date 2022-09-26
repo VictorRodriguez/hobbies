@@ -10,6 +10,12 @@ from matplotlib.ticker import PercentFormatter
 from IPython.display import display
 import urllib
 
+def read_histogram(CSV_FILE):
+    df = pd.read_csv(CSV_FILE)
+    df.columns= df.columns.str.lower()
+    df = df.sort_values(by='count',ascending=False)
+    print(df)
+    return df
 
 def read_json(CUMULUS_ID):
     url = f'http://10.88.81.185:5000/services-framework/histogram-data-pull?run_uri={CUMULUS_ID}'
@@ -23,13 +29,13 @@ def read_json(CUMULUS_ID):
 
 def calcualte_values(df_copy):
 
-    df_copy["Count"] = pd.to_numeric(df_copy["Count"])
+    df_copy["count"] = pd.to_numeric(df_copy["count"])
 
     df_arithmetic = pd.read_csv('instructions_kind/arithmetic.csv')
     df_branch = pd.read_csv('instructions_kind/branch.csv')
     df_store = pd.read_csv('instructions_kind/store.csv')
 
-    df_copy["pro"] = df_copy["Count"]/df_copy["Count"].sum()
+    df_copy["pro"] = df_copy["count"]/df_copy["count"].sum()
 
     df_a = df_copy[df_copy.mnemonic.isin(df_arithmetic.mnemonic)]
     df_b = df_copy[df_copy.mnemonic.isin(df_branch.mnemonic)]
@@ -47,15 +53,15 @@ def calcualte_values(df_copy):
 
 def get_pareto(df):
 
-    df["cumpercentage"] = df["Count"].cumsum()/df["Count"].sum()*100
-    df2 = pd.DataFrame(columns=["mnemonic", "Count", "cumpercentage"])
+    df["cumpercentage"] = df["count"].cumsum()/df["count"].sum()*100
+    df2 = pd.DataFrame(columns=["mnemonic", "count", "cumpercentage"])
     for ind in df.index:
         if (df['cumpercentage'][ind]) <= 80:
             df2 = df2.append(df.iloc[ind])
     display(df2)
 
     fig, ax = plt.subplots()
-    ax.bar(df2["mnemonic"], df2["Count"], color="C0")
+    ax.bar(df2["mnemonic"], df2["count"], color="C0")
     ax2 = ax.twinx()
     ax2.plot(df2["mnemonic"], df2["cumpercentage"],
              color="C1", marker="D", ms=7)
@@ -78,13 +84,19 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--cumulus_uri")
+    parser.add_argument("--histogram")
     args = parser.parse_args()
+
+    if args.histogram:
+        df = read_histogram(args.histogram)
+        df_sumary = calcualte_values(df)
 
     if args.cumulus_uri:
         df = read_json(args.cumulus_uri)
         df_sumary = calcualte_values(df)
-        get_pareto(df)
-        plot(df_sumary)
+
+    get_pareto(df)
+    plot(df_sumary)
 
 
 if __name__ == '__main__':
