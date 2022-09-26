@@ -1,7 +1,6 @@
 
 #!/bin/python3
 
-import os
 import json
 import argparse
 import pandas as pd
@@ -10,12 +9,14 @@ from matplotlib.ticker import PercentFormatter
 from IPython.display import display
 import urllib
 
+
 def read_histogram(CSV_FILE):
     df = pd.read_csv(CSV_FILE)
-    df.columns= df.columns.str.lower()
-    df = df.sort_values(by='count',ascending=False)
+    df.columns = df.columns.str.lower()
+    df = df.sort_values(by='count', ascending=False)
     print(df)
     return df
+
 
 def read_json(CUMULUS_ID):
     url = f'http://10.88.81.185:5000/services-framework/histogram-data-pull?run_uri={CUMULUS_ID}'
