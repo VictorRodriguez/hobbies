@@ -39,7 +39,7 @@ for inner_list in X_dist:
 print(labels)
 print(distance)
 print(centroids)
-df['labels'] = labels
+df['PRED'] = labels
 df[test_column] = workload_name
 df['distance'] = distance
 print(df)
@@ -47,7 +47,7 @@ df.to_csv("test.csv")
 
 y = df.loc[:,['test_name']].values
 
-grouped_df = df.groupby("labels")
+grouped_df = df.groupby("PRED")
 grouped_lists = grouped_df[test_column].apply(list)
 grouped_lists = grouped_lists.reset_index()
 print(grouped_lists.explode(test_column))
