@@ -19,12 +19,14 @@ def read_histogram(CSV_FILE):
 
 
 def read_json(CUMULUS_ID):
-    url = f'http://10.88.81.185:5000/services-framework/histogram-data-pull?run_uri={CUMULUS_ID}'
+    url = f'https://cumulus-dashboard.intel.com/services-framework/api/metadata/histogram/{CUMULUS_ID}'
+    print(url)
     req = urllib.request.Request(url)
     response = urllib.request.urlopen(req)
     data = response.read()
     values = json.loads(data)
     df = pd.json_normalize(values['data'])
+    df.columns = df.columns.str.lower()
     return df
 
 
