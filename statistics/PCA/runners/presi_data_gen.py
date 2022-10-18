@@ -1,4 +1,3 @@
-
 #!/bin/python3
 
 import json
@@ -82,6 +81,14 @@ def plot(df_sumary):
     plt.show()
     display(df_sumary)
 
+def plot_stacked_bar(df_sumary):
+    my_labels = ['arithmetic', 'branch', 'store', 'other']
+    df = pd.DataFrame(columns=my_labels)
+    df.loc['test_case'] = df_sumary['probability'].values.tolist()
+    df.plot(kind='bar', stacked=True)
+    plt.show()
+    display(df_sumary)
+
 
 def main():
 
@@ -100,6 +107,7 @@ def main():
 
     get_pareto(df)
     plot(df_sumary)
+    plot_stacked_bar(df_sumary)
 
 
 if __name__ == '__main__':
