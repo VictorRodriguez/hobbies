@@ -81,13 +81,9 @@ def plot(df_sumary):
     plt.show()
     display(df_sumary)
 
-def plot_stacked_bar(df_sumary):
-    my_labels = ['arithmetic', 'branch', 'store', 'other']
-    df = pd.DataFrame(columns=my_labels)
-    df.loc['test_case'] = df_sumary['probability'].values.tolist()
+def plot_stacked_bar(df):
     df.plot(kind='bar', stacked=True)
     plt.show()
-    display(df_sumary)
 
 
 def main():
@@ -95,19 +91,33 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--cumulus_uri")
     parser.add_argument("--histogram")
+    parser.add_argument('--files',nargs='*')
     args = parser.parse_args()
 
-    if args.histogram:
+    if args.files:
+        my_labels = ['arithmetic', 'branch', 'store', 'other']
+        df_global = pd.DataFrame(columns=my_labels)
+        for file_name in args.files:
+            print(file_name)
+            test_name = file_name
+            df = read_histogram(file_name)
+            df_sumary = calcualte_values(df)
+            df_global.loc[test_name] = df_sumary['probability'].values.tolist()
+        plot_stacked_bar(df_global)
+        exit(0)
+
+    elif args.histogram:
         df = read_histogram(args.histogram)
         df_sumary = calcualte_values(df)
 
-    if args.cumulus_uri:
+    elif args.cumulus_uri:
         df = read_json(args.cumulus_uri)
         df_sumary = calcualte_values(df)
+    else:
+        exit(-1)
 
     get_pareto(df)
     plot(df_sumary)
-    plot_stacked_bar(df_sumary)
 
 
 if __name__ == '__main__':
