@@ -8,18 +8,17 @@ from matplotlib.ticker import PercentFormatter
 from IPython.display import display
 import urllib
 
+results_file = 'presilicon_spec_cpu2017.csv'
 
 def read_histogram(CSV_FILE):
     df = pd.read_csv(CSV_FILE)
     df.columns = df.columns.str.lower()
     df = df.sort_values(by='count', ascending=False)
-    print(df)
     return df
 
 
 def read_json(CUMULUS_ID):
     url = f'https://cumulus-dashboard.intel.com/services-framework/api/metadata/histogram/{CUMULUS_ID}'
-    print(url)
     req = urllib.request.Request(url)
     response = urllib.request.urlopen(req)
     data = response.read()
@@ -27,6 +26,23 @@ def read_json(CUMULUS_ID):
     df = pd.json_normalize(values['data'])
     df.columns = df.columns.str.lower()
     return df
+
+def get_cathegory(df_histogram):
+    df_intrinsics = pd.read_json('/Users/vrodri3/Downloads/intrinsics.json')
+    df_histogram["category"] = ""
+
+    for instruction in df_histogram['mnemonic']:
+        if (df_intrinsics['instruction'].eq(instruction.upper())).any():
+            category = df_intrinsics.loc[df_intrinsics['instruction'] == instruction.upper(), 'category'].iloc[0]
+            category = str(category).strip()
+            df_histogram.loc[df_histogram['mnemonic'] == instruction,'category'] = category
+        else:
+            df_histogram.loc[df_histogram['mnemonic'] == instruction,'category'] = 'None'
+
+
+    df = df_histogram.groupby(['category']).sum(numeric_only=True)
+    print(df)
+
 
 
 def calcualte_values(df_copy):
@@ -82,7 +98,7 @@ def plot(df_sumary):
     display(df_sumary)
 
 def plot_stacked_bar(df):
-    df.plot(kind='bar', stacked=True)
+    df.plot.barh(stacked=True)
     plt.show()
 
 
@@ -98,16 +114,19 @@ def main():
         my_labels = ['arithmetic', 'branch', 'store', 'other']
         df_global = pd.DataFrame(columns=my_labels)
         for file_name in args.files:
-            print(file_name)
             test_name = file_name
             df = read_histogram(file_name)
             df_sumary = calcualte_values(df)
             df_global.loc[test_name] = df_sumary['probability'].values.tolist()
         plot_stacked_bar(df_global)
+        print(df_global)
+        df_global.to_csv(results_file)
         exit(0)
 
     elif args.histogram:
         df = read_histogram(args.histogram)
+        get_cathegory(df)
+        exit(0)
         df_sumary = calcualte_values(df)
 
     elif args.cumulus_uri:
