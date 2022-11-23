@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import PercentFormatter
 from IPython.display import display
 import urllib
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 results_file = 'presilicon_spec_cpu2017.csv'
 
@@ -41,8 +43,13 @@ def get_cathegory(df_histogram):
 
 
     df = df_histogram.groupby(['category']).sum(numeric_only=True)
+    df = df.sort_values(by=['count'], ascending=False)
+
+    df['percent'] = (df['count'] / df['count'].sum()) * 100
+
     print(df)
 
+    return df
 
 
 def calcualte_values(df_copy):
@@ -89,6 +96,10 @@ def get_pareto(df):
     plt.show()
 
 
+def plot_sumary(df_sumary):
+    df_sumary.plot.pie(y = 'percent')
+    plt.show()
+
 def plot(df_sumary):
     my_labels = ['arithmetic', 'branch', 'store', 'other']
     df_sumary.plot(labels=my_labels, y='probability', kind='pie', autopct='%1.1f%%',
@@ -125,9 +136,12 @@ def main():
 
     elif args.histogram:
         df = read_histogram(args.histogram)
-        get_cathegory(df)
-        exit(0)
-        df_sumary = calcualte_values(df)
+
+        # new methodology using Intel intrinsics numbers
+        df_sumary = get_cathegory(df)
+
+        # uncoment this when using old methodology
+        #df_sumary = calcualte_values(df)
 
     elif args.cumulus_uri:
         df = read_json(args.cumulus_uri)
@@ -136,7 +150,7 @@ def main():
         exit(-1)
 
     get_pareto(df)
-    plot(df_sumary)
+    plot_sumary(df_sumary)
 
 
 if __name__ == '__main__':
