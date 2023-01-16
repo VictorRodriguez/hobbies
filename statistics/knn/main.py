@@ -18,5 +18,9 @@ knn = KNeighborsClassifier(n_neighbors=7)
 
 knn.fit(X_train, y_train)
 
+print(X_train.shape)
+print(X_train)
+print(y_train)
 # Calculate the accuracy of the model
 print(knn.score(X_test, y_test))
+print(knn.predict([[7.6,3.6,5.0,2.2]])) # must return 2
