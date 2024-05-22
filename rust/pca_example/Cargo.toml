@@ -4,6 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-ndarray = "0.15.3"
 linfa = "0.7.0"
 linfa-reduction = "0.7.0"
+ndarray = "0.15"
+ndarray-linalg = { version = "0.15", features = ["openblas-system"] }
+linfa-datasets = { version = "0.7", features = ["iris"] }
+
