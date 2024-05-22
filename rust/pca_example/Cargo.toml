@@ -4,6 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-ndarray = "0.15"
-ndarray-linalg = "0.15"
-
+ndarray = "0.15.3"
+linfa = "0.7.0"
+linfa-reduction = "0.7.0"
