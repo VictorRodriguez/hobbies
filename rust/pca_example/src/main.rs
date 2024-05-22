@@ -1,14 +1,8 @@
-//use linfa::Dataset;
-//use ndarray::array;
 use linfa::traits::{Fit, Predict};
 use linfa_reduction::Pca;
 use linfa_clustering::{KMeans};
 
 fn main() {
-    // Input data
-    //let x = array![[1.0, 2.0],
-    //               [3.0, 4.0]];
-    //let dataset = Dataset::from(x);
 
     let dataset = linfa_datasets::iris();
 
@@ -18,22 +12,25 @@ fn main() {
 
     let transformed = pca.predict(dataset.clone());
 
-    println!("Transformed data:\n{:?}", transformed);
+    let new_points = transformed.records();
+
+    println!("{:?}", new_points);
 
     let cluster_range = 1..10;
     let mut inertias = Vec::new();
 
+	println!("\n Inertias per cluster:");
     for n_clusters in cluster_range.clone() {
         let _model = KMeans::params(n_clusters)
         .fit(&dataset)
         .expect("KMeans fitted");
         let _inertia = _model.inertia();
         inertias.push((n_clusters, _inertia));
-        println!("{:?}",_inertia);
+        println!("Inertia with {} clusters = {:?}",n_clusters,_inertia);
     }
 
     let optimal_k = find_elbow(&inertias);
-    println!("Optimal number of clusters (elbow point): {}", optimal_k);
+    println!("\nOptimal number of clusters (elbow point): {}", optimal_k);
 
 
 	let _model = KMeans::params(optimal_k)
@@ -42,7 +39,10 @@ fn main() {
 
 	// Get the labels assigned to each data point
     let labels = _model.predict(&dataset);
-	println!("{}",labels)
+
+	for (i, label) in labels.iter().enumerate() {
+        println!("Element {}: Label {}", i, label);
+    }
 
 
 }
