@@ -35,6 +35,16 @@ fn main() {
     let optimal_k = find_elbow(&inertias);
     println!("Optimal number of clusters (elbow point): {}", optimal_k);
 
+
+	let _model = KMeans::params(optimal_k)
+		.fit(&dataset)
+		.expect("KMeans fitted");
+
+	// Get the labels assigned to each data point
+    let labels = _model.predict(&dataset);
+	println!("{}",labels)
+
+
 }
 
 fn find_elbow(inertias: &[(usize, f64)]) -> usize {
