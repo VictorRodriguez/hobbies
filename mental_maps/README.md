@@ -134,5 +134,5 @@ nx.draw(G, pos, with_labels=True, labels={i: breed for i, breed in enumerate(bre
 plt.title("Mental Map of Dog and Cat Breeds")
 plt.show()
 ```
-
+![Mental Map](mental_map.png)
 
