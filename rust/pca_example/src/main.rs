@@ -2,9 +2,30 @@ use linfa::traits::{Fit, Predict};
 use linfa_reduction::Pca;
 use linfa_clustering::{KMeans};
 
+use std::error::Error;
+use std::fs::File;
+use std::io::Read;
+use csv::ReaderBuilder;
+use ndarray::Array2;
+
+use linfa::dataset::DatasetBase;
+
+
 fn main() {
 
-    let dataset = linfa_datasets::iris();
+    // Read the CSV file
+    let (array, header) = match read_csv("iris.csv") {
+        Ok(result) => result,
+        Err(err) => {
+            eprintln!("Error reading CSV file: {}", err);
+            return;
+        }
+    };
+
+    println!("Header: {:?}", header);
+    println!("Data Array:\n{:?}", array);
+
+    let dataset = DatasetBase::from(array);
 
     let pca = Pca::params(2)
         .fit(&dataset)
@@ -62,3 +83,32 @@ fn find_elbow(inertias: &[(usize, f64)]) -> usize {
     best_k
 }
 
+// Function to read a CSV file into an ndarray along with its header
+fn read_csv(file_path: &str) -> Result<(Array2<f64>, Vec<String>), Box<dyn Error>> {
+    let mut reader = ReaderBuilder::new()
+        .has_headers(true)
+        .from_path(file_path)?;
+
+    // Read the header
+    let header = reader.headers()?.iter().map(|s| s.to_string()).collect();
+
+    let mut records = Vec::new();
+
+    for result in reader.records() {
+        let record = result?;
+        let parsed_record: Vec<f64> = record.iter()
+            .take(4) // Exclude the species column
+            .map(|field| field.parse().expect("Failed to parse field"))
+            .collect();
+        records.push(parsed_record);
+    }
+
+    // Determine the shape of the resulting array
+    let num_rows = records.len();
+    let num_cols = records[0].len();
+    let flat_data: Vec<f64> = records.into_iter().flatten().collect();
+
+    let array = Array2::from_shape_vec((num_rows, num_cols), flat_data)?;
+
+    Ok((array, header))
+}

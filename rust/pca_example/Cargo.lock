@@ -714,6 +714,7 @@ checksum = "efa535d5117d3661134dbf1719b6f0ffe06f2375843b13935db186cd094105eb"
 name = "pca_example"
 version = "0.1.0"
 dependencies = [
+ "csv",
  "linfa",
  "linfa-clustering",
  "linfa-datasets",
