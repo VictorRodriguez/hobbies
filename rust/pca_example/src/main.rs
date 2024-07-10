@@ -27,15 +27,28 @@ fn main() {
 
     let dataset = DatasetBase::from(array);
 
+    // apply PCA projection along a line which maximizes the spread of the data
+    let embedding = Pca::params(3).fit(&dataset).unwrap();
+
+    // reduce dimensionality of the dataset
+    let new_points = embedding.predict(dataset.clone());
+
+    /*
     let pca = Pca::params(2)
         .fit(&dataset)
         .expect("PCA failing");
 
     let transformed = pca.predict(dataset.clone());
-
     let new_points = transformed.records();
+    */
+    println!("Printing PCA data");
+    println!("{:?}", new_points.targets());
 
-    println!("{:?}", new_points);
+    //println!("Amount of explained variance per element");
+    //println!("{:?}", new_points.explained_variance());
+
+    //println!("components");
+    //println!("{:?}", new_points.components());
 
     let cluster_range = 1..10;
     let mut inertias = Vec::new();
