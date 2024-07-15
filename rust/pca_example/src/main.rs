@@ -28,19 +28,11 @@ fn main() {
     let dataset = DatasetBase::from(array);
 
     // apply PCA projection along a line which maximizes the spread of the data
-    let embedding = Pca::params(3).fit(&dataset).unwrap();
+    let embedding = Pca::params(2).fit(&dataset).unwrap();
 
     // reduce dimensionality of the dataset
     let new_points = embedding.predict(dataset.clone());
 
-    /*
-    let pca = Pca::params(2)
-        .fit(&dataset)
-        .expect("PCA failing");
-
-    let transformed = pca.predict(dataset.clone());
-    let new_points = transformed.records();
-    */
     println!("Printing PCA data");
     println!("{:?}", new_points.targets());
 
@@ -56,7 +48,8 @@ fn main() {
 	println!("\n Inertias per cluster:");
     for n_clusters in cluster_range.clone() {
         let _model = KMeans::params(n_clusters)
-        .fit(&dataset)
+        //.fit(&dataset)
+        .fit(&new_points)
         .expect("KMeans fitted");
         let _inertia = _model.inertia();
         inertias.push((n_clusters, _inertia));
@@ -68,11 +61,11 @@ fn main() {
 
 
 	let _model = KMeans::params(optimal_k)
-		.fit(&dataset)
+		.fit(&new_points)
 		.expect("KMeans fitted");
 
 	// Get the labels assigned to each data point
-    let labels = _model.predict(&dataset);
+    let labels = _model.predict(&new_points);
 
 	for (i, label) in labels.iter().enumerate() {
         println!("Element {}: Label {}", i, label);
