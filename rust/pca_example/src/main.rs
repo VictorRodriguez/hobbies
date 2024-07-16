@@ -8,6 +8,7 @@ use std::io::Read;
 use csv::ReaderBuilder;
 use ndarray::Array2;
 
+use ndarray::{Axis, array, s};
 use linfa::dataset::DatasetBase;
 
 
@@ -48,7 +49,6 @@ fn main() {
 	println!("\n Inertias per cluster:");
     for n_clusters in cluster_range.clone() {
         let _model = KMeans::params(n_clusters)
-        //.fit(&dataset)
         .fit(&new_points)
         .expect("KMeans fitted");
         let _inertia = _model.inertia();
@@ -66,6 +66,19 @@ fn main() {
 
 	// Get the labels assigned to each data point
     let labels = _model.predict(&new_points);
+    println!("Labels:\n{}", labels);
+
+	// Get the centroids
+    let centroids = &_model.centroids();
+    println!("Centroids:\n{}", centroids);
+
+    // Print centroids
+    for centroid in centroids.outer_iter() {
+        let x = centroid[0];
+        let y = centroid[1];
+        println!("Centroid: ({}, {})", x, y);
+    }
+
 
 	for (i, label) in labels.iter().enumerate() {
         println!("Element {}: Label {}", i, label);
