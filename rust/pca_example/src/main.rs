@@ -26,7 +26,11 @@ fn main() {
     println!("Header: {:?}", header);
     println!("Data Array:\n{:?}", array);
 
-    let dataset = DatasetBase::from(array);
+    // Create a new array with the specified column removed
+    let new_array = drop_column(array, 0);
+
+    // Create a new dataset
+    let dataset = DatasetBase::from(new_array);
 
     // apply PCA projection along a line which maximizes the spread of the data
     let embedding = Pca::params(2).fit(&dataset).unwrap();
@@ -34,14 +38,14 @@ fn main() {
     // reduce dimensionality of the dataset
     let new_points = embedding.predict(dataset.clone());
 
+    let DatasetBase {
+        records, targets, ..
+    } = new_points.clone();
+
+    let targets_db = DatasetBase::from(targets.clone());
+
     println!("Printing PCA data");
-    println!("{:?}", new_points.targets());
-
-    //println!("Amount of explained variance per element");
-    //println!("{:?}", new_points.explained_variance());
-
-    //println!("components");
-    //println!("{:?}", new_points.components());
+    println!("Targets: {:?}", targets_db);
 
     let cluster_range = 1..10;
     let mut inertias = Vec::new();
@@ -49,7 +53,7 @@ fn main() {
 	println!("\n Inertias per cluster:");
     for n_clusters in cluster_range.clone() {
         let _model = KMeans::params(n_clusters)
-        .fit(&new_points)
+        .fit(&targets_db)
         .expect("KMeans fitted");
         let _inertia = _model.inertia();
         inertias.push((n_clusters, _inertia));
@@ -59,13 +63,12 @@ fn main() {
     let optimal_k = find_elbow(&inertias);
     println!("\nOptimal number of clusters (elbow point): {}", optimal_k);
 
-
 	let _model = KMeans::params(optimal_k)
-		.fit(&new_points)
+		.fit(&targets_db)
 		.expect("KMeans fitted");
 
 	// Get the labels assigned to each data point
-    let labels = _model.predict(&new_points);
+    let labels = _model.predict(&targets_db);
     println!("Labels:\n{}", labels);
 
 	// Get the centroids
@@ -116,7 +119,7 @@ fn read_csv(file_path: &str) -> Result<(Array2<f64>, Vec<String>), Box<dyn Error
     for result in reader.records() {
         let record = result?;
         let parsed_record: Vec<f64> = record.iter()
-            .take(4) // Exclude the species column
+            .take(5) // Exclude the species column
             .map(|field| field.parse().expect("Failed to parse field"))
             .collect();
         records.push(parsed_record);
@@ -130,4 +133,23 @@ fn read_csv(file_path: &str) -> Result<(Array2<f64>, Vec<String>), Box<dyn Error
     let array = Array2::from_shape_vec((num_rows, num_cols), flat_data)?;
 
     Ok((array, header))
+}
+
+fn drop_column(array: Array2<f64>, column_to_drop: usize) -> Array2<f64> {
+    let shape = array.shape();
+    let (nrows, ncols) = (shape[0], shape[1]);
+
+    // Create a new array with one less column
+    let mut new_array = Array2::<f64>::zeros((nrows, ncols - 1));
+
+    for i in 0..nrows {
+        for j in 0..column_to_drop {
+            new_array[[i, j]] = array[[i, j]];
+        }
+        for j in column_to_drop + 1..ncols {
+            new_array[[i, j - 1]] = array[[i, j]];
+        }
+    }
+
+    new_array
 }

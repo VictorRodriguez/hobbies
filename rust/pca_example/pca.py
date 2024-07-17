@@ -15,7 +15,7 @@ pd.set_option('display.max_columns', None)
 df = pd.read_csv('iris.csv')
 
 # Extract features
-features = df.drop(columns=['Species'])  # Assuming the species column is the label
+features = df.drop(columns=['Id','Species'])
 
 # Perform PCA
 pca = PCA(n_components=2)
