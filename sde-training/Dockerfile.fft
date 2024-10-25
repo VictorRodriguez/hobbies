@@ -1,0 +1,23 @@
+# Start from a minimal image with basic Linux utilities
+FROM ubuntu:latest
+
+# Install any dependencies required by fft_stress (e.g., if FFTW library is used)
+RUN apt-get update && \
+    apt-get install -y libfftw3-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+# Set the working directory
+WORKDIR /usr/src/app
+
+# Copy the fft_stress binary to the container
+COPY fft_stress /usr/src/app/fft_stress
+
+# Make sure the binary is executable
+RUN chmod +x fft_stress
+
+# Define the entrypoint to run fft_stress with a default argument of 10 iterations
+ENTRYPOINT ["./fft_stress"]
+
+# Set a default argument (can be overridden in the docker run command)
+CMD ["1000"]
+
