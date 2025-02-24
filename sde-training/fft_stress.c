@@ -61,11 +61,13 @@ int main(int argc, char *argv[]) {
     clock_t start = clock();
 
 
+	printf("START\n");
 	SimRoiStart();
     // Perform the FFT multiple times
     for (int i = 0; i < iterations; i++) {
         fft(X, n);
     }
+	printf("END\n");
   	SimRoiEnd();
     clock_t end = clock();
     double time_spent = (double)(end - start) / CLOCKS_PER_SEC;
