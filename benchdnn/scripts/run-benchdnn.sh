@@ -1,10 +1,15 @@
 #!/bin/bash
-
 set -x
 
-cd /oneDNN/build/tests/benchdnn
+# Optionally enable DMR/AMX/AVX10 support if requested
+if [ -n "$ONEDNN_MAX_CPU_ISA" ]; then
+    export ONEDNN_MAX_CPU_ISA=$ONEDNN_MAX_CPU_ISA
+fi
+
 export DNNL_CPU_RUNTIME=OMP
 export OMP_PLACES=cores
 export OMP_PROC_BIND=close
 
-DNNL_VERBOSE=1 ./benchdnn --engine=cpu --mode=p $DRIVER --cfg=$CONFIG --batch=$BATCH
+# Run the benchmark with flexible options
+DNNL_VERBOSE=1 ./benchdnn --engine=cpu --mode=p $DRIVER --dt=$DT --batch=$BATCH $EXTRA_ARGS
+
