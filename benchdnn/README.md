@@ -136,6 +136,67 @@ BenchDNN can report:
 
 ---
 
+
+## CPU Dispatcher Control (`ONEDNN_MAX_CPU_ISA`)
+
+OneDNN provides a **CPU dispatcher** mechanism that selects the most optimized kernel for your processor’s instruction set at runtime. By default, oneDNN automatically picks the highest available ISA supported by your CPU.
+
+You can **override this behavior** using the environment variable:
+
+```bash
+export ONEDNN_MAX_CPU_ISA=<ISA>
+```
+
+Where `<ISA>` can be:
+
+* `SSE4_1` – Intel SSE4.1 instructions
+* `AVX2` – Intel AVX2 instructions
+* `AVX512_CORE` – Intel AVX-512 instructions
+* `AMX` – Advanced Matrix Extensions
+* `AVX10` / `DMR` – Experimental / upcoming CPU instruction sets
+
+---
+
+### Why this is useful
+
+1. **Controlled testing of new ISAs:**
+   When validating **new CPU features** (e.g., DMR, AMX, or AVX10), you can force BenchDNN to use a specific ISA without depending on CPU auto-detection. This is crucial for **pre-silicon or lab testing**, where hardware might be partially implemented.
+
+2. **Performance regression testing:**
+   Comparing benchmarks across different instruction sets helps identify regressions or optimizations.
+
+3. **Reproducibility:**
+   Ensures that all benchmark runs use the exact same ISA, making results comparable across different machines or CI/CD environments.
+
+4. **Debugging new kernels:**
+   Developers can isolate performance issues in **experimental or partially supported ISAs** without affecting stable kernels.
+
+---
+
+### Example Usage
+
+Run BenchDNN with **AMX instructions**:
+
+```bash
+docker run --rm -it \
+  -e ONEDNN_MAX_CPU_ISA=AMX \
+  benchdnn:latest
+```
+
+Run with an **experimental DMR ISA**:
+
+```bash
+docker run --rm -it \
+  -e ONEDNN_MAX_CPU_ISA=AVX10 \
+  benchdnn:latest
+```
+
+BenchDNN will **only dispatch kernels compatible with the specified ISA**, allowing precise evaluation of performance and correctness.
+
+---
+
+
+
 ## Summary
 
 BenchDNN is a **powerful tool for CPU deep learning performance characterization**. Using the provided Docker setup, you can:
