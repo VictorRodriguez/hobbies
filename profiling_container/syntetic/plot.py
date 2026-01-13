@@ -97,22 +97,66 @@ plt.tight_layout()
 plt.savefig("cache_ipc_heatmap.png")
 plt.close()
 
-# Filter compute-bound data
-df_freq = df[df['mode'] == 'freq']
 
-# Line plot: IPC vs iterations for each governor
-plt.figure(figsize=(8,5))
-sns.lineplot(
-    data=df_freq,
-    x='iterations',
-    y='ipc',
-    hue='governor',
-    marker='o'
+# Convert numeric columns, coerce errors (turns '<not counted>' into NaN)
+df_cache['LLC_misses'] = pd.to_numeric(df_cache['LLC_misses'], errors='coerce')
+df_cache['L1_misses'] = pd.to_numeric(df_cache['L1_misses'], errors='coerce')
+
+# Filter only cache mode if needed
+df_cache_cache = df_cache[df_cache['mode'] == 'cache']
+
+# Pivot for heatmaps
+heatmap_llc = df_cache_cache.pivot_table(
+    index='stride',
+    columns='working_set',
+    values='LLC_misses',
+    aggfunc='mean'
 )
-plt.xscale('log')  # Because iterations vary by orders of magnitude
-plt.xlabel("Iterations")
-plt.ylabel("IPC")
-plt.title("Compute-bound IPC vs Iterations")
-plt.grid(True)
-plt.savefig("compute_bound_ipc_vs_iterations.png")
+
+heatmap_l1 = df_cache_cache.pivot_table(
+    index='stride',
+    columns='working_set',
+    values='L1_misses',
+    aggfunc='mean'
+)
+
+# Plot and save LLC heatmap
+plt.figure(figsize=(10, 6))
+sns.heatmap(heatmap_llc, annot=True, fmt=".0f", cmap="viridis")
+plt.title("LLC Misses Heatmap")
+plt.xlabel("Working Set")
+plt.ylabel("Stride")
+plt.tight_layout()
+plt.savefig("heatmap_LLC_misses.png")
+plt.close()  # Close figure to free memory
+
+# Plot and save L1 heatmap
+plt.figure(figsize=(10, 6))
+sns.heatmap(heatmap_l1, annot=True, fmt=".0f", cmap="magma")
+plt.title("L1 Misses Heatmap")
+plt.xlabel("Working Set")
+plt.ylabel("Stride")
+plt.tight_layout()
+plt.savefig("heatmap_L1_misses.png")
+plt.close()
+
+# Replace '<not counted>' with NaN and convert to numeric
+df['LLC_misses'] = pd.to_numeric(df['LLC_misses'], errors='coerce')
+
+# Group by working set and sum LLC misses
+misses_by_ws = df.groupby('working_set')['LLC_misses'].sum()
+
+# Plot
+plt.figure(figsize=(8,5))
+plt.plot(misses_by_ws.index, misses_by_ws.values, marker='o')
+plt.xscale('log')
+plt.yscale('log')
+plt.xlabel('Working Set Size (Bytes)')
+plt.ylabel('Total LLC Misses')
+plt.title('Total LLC Misses vs Working Set Size')
+plt.grid(True, which="both", ls="--")
+
+# Save to file
+plt.savefig("cache_misses_vs_ws.png", dpi=300, bbox_inches='tight')
+plt.close()  # Close the figure so it doesn’t display in interactive environments
 

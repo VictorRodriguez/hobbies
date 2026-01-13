@@ -1,0 +1,135 @@
+# BenchDNN Docker Environment
+
+BenchDNN is a benchmarking tool included in oneDNN (Intel® oneAPI Deep Neural Network Library) that allows you to evaluate the performance of deep learning primitives, such as convolutions, inner products, and more, on CPUs. It is particularly useful for profiling, testing optimizations, and comparing different data types, batch sizes, and CPU instruction sets.
+
+## Key Features
+
+Flexible primitive selection: Convolutions, inner products, pooling, normalization, RNNs, etc.
+
+Supports multiple data types: f32 (float32), s8/u8 (quantized), bf16 (bfloat16).
+
+Instruction set tuning: Test performance across AVX2, AVX512, AMX, or the maximum supported CPU ISA.
+
+Batch and shape customization: Run benchmarks with predefined shapes (e.g., ResNet-50 inputs) or custom shapes.
+
+Threading support: Uses OpenMP for CPU parallelism; supports core binding for predictable performance.
+
+Docker-Based Benchmarking Environment
+
+This repository provides a Dockerfile and helper scripts to run BenchDNN in a reproducible containerized environment.
+
+Dockerfile
+FROM rockylinux:8
+
+# Default benchmark options (can be overridden at runtime)
+ENV DRIVER="--conv"
+ENV DT="u8:s8:f32"
+ENV BATCH="inputs/conv/shapes_resnet_50"
+ENV EXTRA_ARGS=""
+ENV ONEDNN_MAX_CPU_ISA=""
+
+# Prepare repos and install build requirements
+RUN dnf install -y dnf-plugins-core && \
+    dnf config-manager --set-enabled powertools && \
+    dnf install -y doxygen cmake git && \
+    dnf groupinstall -y "Development Tools"
+
+# Clone and build oneDNN
+RUN git clone https://github.com/oneapi-src/oneDNN.git
+RUN mkdir oneDNN/build
+RUN cd oneDNN/build && cmake ../ ; exit 0
+RUN cd oneDNN/build && make -j
+
+# Add benchmark script
+COPY ./scripts/run-benchdnn.sh /
+
+WORKDIR /oneDNN/build/tests/benchdnn
+
+CMD ["/run-benchdnn.sh"]
+
+Benchmark Script
+
+scripts/run-benchdnn.sh:
+
+#!/bin/bash
+set -x
+
+# Optionally enable DMR/AMX/AVX10 support if requested
+if [ -n "$ONEDNN_MAX_CPU_ISA" ]; then
+    export ONEDNN_MAX_CPU_ISA=$ONEDNN_MAX_CPU_ISA
+fi
+
+export DNNL_CPU_RUNTIME=OMP
+export OMP_PLACES=cores
+export OMP_PROC_BIND=close
+
+# Run the benchmark with flexible options
+./benchdnn $DRIVER --dt=$DT --batch=$BATCH $EXTRA_ARGS
+
+
+Environment variables:
+
+DRIVER: Primitive to benchmark (--conv, --ip, --pool, etc.)
+
+DT: Data types (f32, s8, u8, bf16)
+
+BATCH: Batch/shape definitions (inputs/conv/shapes_resnet_50, etc.)
+
+EXTRA_ARGS: Additional BenchDNN command-line options
+
+ONEDNN_MAX_CPU_ISA: Force specific CPU ISA (AVX2, AVX512, AMX, etc.)
+
+Building and Running the Docker Container
+
+Build the container:
+
+docker build -t benchdnn:latest .
+
+
+Run the container with default settings:
+
+docker run --rm -it benchdnn:latest
+
+
+Override benchmark options at runtime:
+
+docker run --rm -it \
+  -e DRIVER="--ip" \
+  -e DT="f32" \
+  -e BATCH="inputs/ip/shapes_test" \
+  benchdnn:latest
+
+Types of Benchmarks
+
+BenchDNN supports a variety of benchmarks targeting different neural network operations:
+
+Benchmark Type	Description
+Convolution (--conv)	Forward/backward convolutions for CNNs
+Inner Product (--ip)	Dense layers, fully-connected operations
+Pooling (--pool)	Max/average pooling layers
+Normalization (--norm)	BatchNorm, LayerNorm, etc.
+RNN / LSTM (--rnn)	Recurrent layers
+Binary/Quantized Ops	INT8, UINT8, BF16 performance evaluation
+Custom shapes	User-defined batch sizes and input/output shapes
+
+Benchmarks can also measure:
+
+Execution time
+
+Gflops / Gops performance
+
+Memory footprint
+
+Thread scaling / CPU utilization
+
+Summary
+
+BenchDNN is an essential tool for performance characterization and tuning of deep learning workloads on CPUs. Using the Docker environment, you can:
+
+Quickly build and run benchmarks without affecting your host system.
+
+Experiment with different CPU ISAs and threading configurations.
+
+Evaluate multiple data types and batch shapes.
+
+Integrate benchmarks into CI/CD pipelines or regression tests.
