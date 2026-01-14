@@ -10,7 +10,7 @@ PLATFORM=skx1c
 MODES=("freq" "cache")
 
 # Parameter sweeps (same as perf script)
-ITERATIONS=(100000000 500000000 2000000000)
+ITERATIONS=(10000000 50000000 200000000)
 WORKSETS=(1024 16384 262144)
 STRIDES=(1 8 64 256)
 
@@ -53,39 +53,39 @@ select_frequency() {
 for MODE in "${MODES[@]}"; do
   for ITER in "${ITERATIONS[@]}"; do
 
-    if [[ "${MODE}" == "freq" ]]; then
-      WS=1
-      STR=1
-      FREQ=$(select_frequency "${MODE}" "${WS}")
+    #if [[ "${MODE}" == "freq" ]]; then
+    #  WS=1
+    #  STR=1
+    #  FREQ=$(select_frequency "${MODE}" "${WS}")
 
-      OUTDIR="${RESULTS_DIR}/${MODE}/iter_${ITER}/freq_${FREQ}GHz"
-      mkdir -p "${OUTDIR}"
+    #  OUTDIR="${RESULTS_DIR}/${MODE}/iter_${ITER}/freq_${FREQ}GHz"
+    #  mkdir -p "${OUTDIR}"
 
-      CMD=(
-        run-iwps
-        -c "${PLATFORM}"
-        -c "perf_model/core/frequency=${FREQ}"
-        --roi
-        -d "${OUTDIR}"
-        --
-        "${BIN}" freq "${ITER}" "${WS}" "${STR}"
-      )
+    #  CMD=(
+    #    run-iwps
+    #    -c "${PLATFORM}"
+    #    -c "perf_model/core/frequency=${FREQ}"
+    #    --roi
+    #    -d "${OUTDIR}"
+    #    --
+    #    "${BIN}" freq "${ITER}" "${WS}" "${STR}"
+    #  )
 
-      echo "=================================================="
-      echo "Run: mode=freq iter=${ITER} freq=${FREQ}GHz"
-      echo "CMD: ${CMD[*]}"
-      echo "=================================================="
+    #  echo "=================================================="
+    #  echo "Run: mode=freq iter=${ITER} freq=${FREQ}GHz"
+    #  echo "CMD: ${CMD[*]}"
+    #  echo "=================================================="
 
-      "${CMD[@]}"
+    #  "${CMD[@]}"
 
-      if [[ ! -f "${OUTDIR}/sim.out" ]]; then
-        echo "ERROR: sim.out not found in ${OUTDIR}"
-        exit 1
-      fi
+    #  if [[ ! -f "${OUTDIR}/sim.out" ]]; then
+    #    echo "ERROR: sim.out not found in ${OUTDIR}"
+    #    exit 1
+    #  fi
 
-      echo "freq,${FREQ},${ITER},NA,NA,${OUTDIR}" >> "${MANIFEST}"
+    #  echo "freq,${FREQ},${ITER},NA,NA,${OUTDIR}" >> "${MANIFEST}"
 
-    elif [[ "${MODE}" == "cache" ]]; then
+    if [[ "${MODE}" == "cache" ]]; then
       for WS in "${WORKSETS[@]}"; do
         for STR in "${STRIDES[@]}"; do
 
@@ -97,7 +97,6 @@ for MODE in "${MODES[@]}"; do
             run-iwps
             -c "${PLATFORM}"
             -c "perf_model/core/frequency=${FREQ}"
-            --roi
             -d "${OUTDIR}"
             --
             "${BIN}" cache "${ITER}" "${WS}" "${STR}"

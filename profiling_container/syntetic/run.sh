@@ -12,7 +12,8 @@ EVENTS=cycles,instructions,cpu-clock,branches,branch-misses
 GOVERNORS=("performance" "powersave")
 
 # Workload parameter sweeps
-ITERATIONS=(100000000 500000000 2000000000)
+#ITERATIONS=(100000000 500000000 2000000000) run with this one latter
+ITERATIONS=(10000000 50000000 200000000)
 WORKING_SETS=(1024 16384 262144)  # For cache mode
 STRIDES=(1 8 64 256)
 
@@ -34,6 +35,8 @@ for GOV in "${GOVERNORS[@]}"; do
     # ----------------------------
     for ITER in "${ITERATIONS[@]}"; do
         echo "Run freq mode: gov=${GOV}, iter=${ITER}"
+
+		echo "${BIN} freq ${ITER} 1 1"
 
         PERF_OUT=$(taskset -c ${CPU} \
             perf stat -x, -e ${EVENTS} \
@@ -57,6 +60,7 @@ for GOV in "${GOVERNORS[@]}"; do
             for ITER in "${ITERATIONS[@]}"; do
                 echo "Run cache mode: gov=${GOV}, iter=${ITER}, ws=${WS}, stride=${STRIDE}"
 
+				echo "${BIN} cache ${ITER} ${WS} ${STRIDE}"
                 PERF_OUT=$(taskset -c ${CPU} \
                     perf stat -x, -e ${EVENTS} \
                     ${BIN} cache ${ITER} ${WS} ${STRIDE} 2>&1)

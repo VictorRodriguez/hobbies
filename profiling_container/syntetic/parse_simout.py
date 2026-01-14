@@ -25,6 +25,9 @@ parser.add_argument("--csv", required=True, help="CSV output file")
 args = parser.parse_args()
 
 sim_file = Path(args.simout)
+
+print(sim_file)
+
 if not sim_file.exists():
     print(f"ERROR: {args.simout} does not exist")
     exit(1)
@@ -40,8 +43,16 @@ eff_freq_ghz = (cycles / time_ns * 1e9) if time_ns else 0.0
 
 
 # --- Cache metrics ---
-l1_misses = extract(r"Cache L1-D\s+\|.*num cache misses\s+\|\s+([0-9,]+)", sim_text)
-llc_misses = extract(r"LLC\s+\|.*num cache misses\s+\|\s+([0-9,]+)", sim_text)
+def extract_cache_misses(cache_name, text):
+    pattern = rf"{cache_name}.*?num cache misses\s+\|\s+([0-9,]+)"
+    m = re.search(pattern, text, re.DOTALL)
+    if not m:
+        return 0
+    return int(m.group(1).replace(",", ""))
+
+l1_misses = extract_cache_misses("Cache L1-D", sim_text)
+llc_misses = extract_cache_misses("Cache L2", sim_text)
+
 
 row = {
     "mode": args.mode,
@@ -57,6 +68,7 @@ row = {
     "llc_misses": llc_misses
 }
 
+print(row)
 # Append to CSV
 csv_file = Path(args.csv)
 if not csv_file.exists():

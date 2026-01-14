@@ -16,7 +16,8 @@ EVENTS="cycles,instructions,cpu-clock,branches,branch-misses,L1-dcache-load-miss
 GOVERNORS=("performance" "powersave")
 
 # Workload parameter sweeps
-ITERATIONS=(100000000 500000000 2000000000)
+#ITERATIONS=(100000000 500000000 2000000000)
+ITERATIONS=(10000000 50000000 200000000)
 WORKSETS=(1024 16384 262144)
 STRIDES=(1 8 64 256)
 CHAINS=(1 4 8)
