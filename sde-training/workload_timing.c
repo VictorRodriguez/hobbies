@@ -10,15 +10,15 @@ void cpu_intensive_task(int duration_seconds) {
 	time_t start_time = time(NULL);
 
     // Print the raw numeric value of start_time
-    printf("Start time (raw): %ld\n", (long)start_time);
+    //printf("Start time (raw): %ld\n", (long)start_time);
 
 	while (time(NULL) - start_time < duration_seconds) {
 		for (int i = 0; i < 1000000; i++) {
 			result += i * 0.1;
 		}
-    	printf("Time (raw): %ld\n", (long)time(NULL));
+    	//printf("Time (raw): %ld\n", (long)time(NULL));
 	}
-	printf("\nresult = %d",result);
+	printf("result = %d\n",result);
 }
 
 int main(int argc, char *argv[]) {
@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
     SimRoiStart();
     cpu_intensive_task(seconds);
     SimRoiEnd();
-    printf("CPU-intensive task completed.\n");
+    printf("\nCPU-intensive task completed.\n");
 
     return 0;
 }

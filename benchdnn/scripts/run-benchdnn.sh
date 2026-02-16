@@ -11,5 +11,6 @@ export OMP_PLACES=cores
 export OMP_PROC_BIND=close
 
 # Run the benchmark with flexible options
+echo "ROI_START"
 ./benchdnn $DRIVER --dt=$DT --batch=$BATCH $EXTRA_ARGS
-
+echo "ROI_END"

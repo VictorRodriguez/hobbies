@@ -1,5 +1,6 @@
 import csv
 import re
+import argparse
 
 def parse_sde_mix_out(file_path):
     mnemonics = {}
@@ -28,11 +29,15 @@ def write_to_csv(mnemonics, output_file):
             writer.writerow({'Mnemonic': mnemonic, 'Count': count})
 
 def main():
-    input_file = 'sde-mix-out.txt'
-    output_file = 'mnemonics_counts.csv'
-    mnemonics = parse_sde_mix_out(input_file)
-    write_to_csv(mnemonics, output_file)
-    print(f"CSV file '{output_file}' has been created successfully.")
+    parser = argparse.ArgumentParser(description='Process an SDE mix output file.')
+    parser.add_argument('input_file', help='Path to the SDE mix output file')
+    parser.add_argument('-o', '--output', default='mnemonics_counts.csv', help='Output CSV file name (default: mnemonics_counts.csv)')
+
+    args = parser.parse_args()
+
+    mnemonics = parse_sde_mix_out(args.input_file)
+    write_to_csv(mnemonics, args.output)
+    print(f"CSV file '{args.output}' has been created successfully.")
 
 if __name__ == "__main__":
     main()

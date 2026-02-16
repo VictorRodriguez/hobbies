@@ -6,8 +6,8 @@
 int main() {
     int k[ROWS][COLS];
 
-    for (int x = 0; x < ROWS; x++) {
-        for (int y = 0; y < COLS; y++) {
+    for (int y = 0; y < COLS; y++) {
+        for (int x = 0; x < ROWS; x++) {
             k[x][y] = x * y;
         }
     }

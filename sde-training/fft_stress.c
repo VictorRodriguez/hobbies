@@ -6,7 +6,6 @@
 
 #define PI 3.14159265358979323846
 
-#include "sim_api.h"
 
 // Function to perform the FFT
 void fft(complex double *X, int n) {
@@ -62,13 +61,11 @@ int main(int argc, char *argv[]) {
 
 
 	printf("START\n");
-	SimRoiStart();
     // Perform the FFT multiple times
     for (int i = 0; i < iterations; i++) {
         fft(X, n);
     }
 	printf("END\n");
-  	SimRoiEnd();
     clock_t end = clock();
     double time_spent = (double)(end - start) / CLOCKS_PER_SEC;
 
