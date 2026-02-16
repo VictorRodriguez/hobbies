@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-RESULTS_DIR="results_iwps"
+RESULTS_DIR="results_iwps_long"
 CSV_FILE="iwps_workload_results.csv"
 
 echo "mode,iterations,working_set,stride,frequency,cycles,instructions,ipc,eff_freq_ghz,l1_misses,llc_misses" > "${CSV_FILE}"
