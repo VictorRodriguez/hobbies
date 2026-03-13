@@ -5,8 +5,8 @@ SRC := gemm_stress.c
 
 SNIPER_ROOT ?= /home/centos/intelwps-internal-conf-25.12-2025-12-08-lin
 
-CFLAGS_BASE := -O3 -pipe -fno-plt -fno-math-errno -fno-trapping-math -ffast-math \
-               -fomit-frame-pointer -Wall -Wextra
+CFLAGS_BASE := -O3 -static -pipe -fno-plt -fno-math-errno -fno-trapping-math -ffast-math \
+               -fomit-frame-pointer -Wall -Wextra -Wno-unused-function
 
 SNIPER_INC   := -I$(SNIPER_ROOT)/include
 SNIPER_LIB   := -L$(SNIPER_ROOT)/lib -lsim_api
