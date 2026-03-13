@@ -139,14 +139,14 @@ static void init_mats(double *Acol, double *Brow, double *Crow, uint64_t M, uint
 int main(int argc, char **argv) {
     if (argc < 2 || argc > 5) {
         fprintf(stderr, "Usage: %s <iters> [M] [N] [K]\n", argv[0]);
-        fprintf(stderr, "Defaults: M=N=K=256 (CPU-bound-ish on 1 core)\n");
+        fprintf(stderr, "Defaults: M=N=K=32 (CPU-bound-ish on 1 core)\n");
         return 1;
     }
 
     uint64_t iters = strtoull(argv[1], NULL, 10);
-    uint64_t M = (argc >= 3) ? strtoull(argv[2], NULL, 10) : 256;
-    uint64_t N = (argc >= 4) ? strtoull(argv[3], NULL, 10) : 256;
-    uint64_t K = (argc >= 5) ? strtoull(argv[4], NULL, 10) : 256;
+    uint64_t M = (argc >= 3) ? strtoull(argv[2], NULL, 10) : 32;
+    uint64_t N = (argc >= 4) ? strtoull(argv[3], NULL, 10) : 32;
+    uint64_t K = (argc >= 5) ? strtoull(argv[4], NULL, 10) : 32;
 
     if (iters == 0 || M == 0 || N == 0 || K == 0) {
         fprintf(stderr, "iters/M/N/K must be > 0\n");
