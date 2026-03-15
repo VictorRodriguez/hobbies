@@ -46,6 +46,7 @@ void freq_kernel_p(uint64_t iters, uint64_t N, uint64_t stride)
             for (uint64_t i = offset; i < N; i += stride) {
                 a[i] = b[i] * c[i] + a[i];
             }
+        }
     }
     SimRoiEnd();
     printf("ROI_END\n");
