@@ -17,8 +17,8 @@ SNIPER_LIB = $(SNIPER_ROOT)/lib
 CFLAGS  = -g -O2 -Wall -fno-tree-vectorize -DENABLE_SNIPER \
           -I$(SNIPER_INC)
 
-CFLAGS_O  = -g -O3 -march=native -funroll-loops -ftree-vectorize -ffast-math -ftree-vectorizer-verbose=2  -DENABLE_SNIPER \
-          -I$(SNIPER_INC)
+CFLAGS_O  = -g -O3 -march=native -funroll-loops -ftree-vectorize -ffast-math -ftree-vectorizer-verbose=2 -static \
+           -DENABLE_SNIPER -I$(SNIPER_INC)
 
 LDFLAGS = -L$(SNIPER_LIB) -lsim_api
 
