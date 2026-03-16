@@ -19,7 +19,6 @@
 
 #include <stdint.h>
 #include <stdlib.h>
-#define SIZE_N 1000
 
 volatile double sink_p;
 
@@ -27,7 +26,7 @@ volatile double sink_p;
  * Compute-bound frequency-scaling kernel - Parallel
  * ------------------------------------------------- */
 
-void freq_kernel_p(uint64_t iters, uint64_t N)
+void freq_kernel_p(uint64_t iters, uint64_t N, uint64_t stride)
 {
     double *a = malloc(N * sizeof(double));
     double *b = malloc(N * sizeof(double));
@@ -39,15 +38,18 @@ void freq_kernel_p(uint64_t iters, uint64_t N)
         b[i] = 2.2;
         c[i] = 3.3;
     }
-	printf("ROI_START\n");
+    printf("ROI_START\n");
     SimRoiStart();
     for (uint64_t iter = 0; iter < iters; iter++) {
-        for (uint64_t i = 0; i < N; i++) {
-            a[i] = b[i] * c[i] + a[i];
+        // traverse the arrays multiple times using different offset, to reduce spatial locality
+        for (uint64_t offset = 0; offset < stride; offset++) {
+            for (uint64_t i = offset; i < N; i += stride) {
+                a[i] = b[i] * c[i] + a[i];
+            }
         }
     }
     SimRoiEnd();
-	printf("ROI_END\n");
+    printf("ROI_END\n");
 
     // Prevent optimization
     double sum = 0.0;
@@ -70,7 +72,7 @@ void freq_kernel(uint64_t iters)
 {
     double a = 1.1, b = 2.2, c = 3.3;
 
-	printf("ROI_START\n");
+    printf("ROI_START\n");
     SimRoiStart();
     for (uint64_t i = 0; i < iters; i++) {
         a = a * b + c;
@@ -78,7 +80,7 @@ void freq_kernel(uint64_t iters)
         c = c * a + b;
     }
     SimRoiEnd();
-	printf("ROI_END\n");
+    printf("ROI_END\n");
 
     sink = a + b + c;
 }
@@ -130,7 +132,7 @@ int main(int argc, char **argv)
         freq_kernel(iters);
     }
     else if (!strcmp(mode, "freq_p")) {
-        freq_kernel_p(iters,SIZE_N);
+        freq_kernel_p(iters, ws, stride);
     }
     else if (!strcmp(mode, "cache")) {
         uint64_t *array = aligned_alloc(64, ws * sizeof(uint64_t));
