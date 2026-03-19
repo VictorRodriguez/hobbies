@@ -14,7 +14,7 @@ SNIPER_RPATH := -Wl,-rpath,$(SNIPER_ROOT)/lib
 
 .PHONY: all avx2_sniper avx512_sniper avx2 avx512 clean
 
-all: avx2_sniper avx512_sniper
+all: avx2 avx512
 
 avx2_sniper:
 	$(CC) $(CFLAGS_BASE) -DUSE_SNIPER -mavx2 -mfma \
