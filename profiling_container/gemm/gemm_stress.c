@@ -22,29 +22,27 @@ static void *aligned_malloc(size_t alignment, size_t size) {
     return p;
 }
 
+static inline uint64_t round_up_u64(uint64_t x, uint64_t a) {
+    return (x + a - 1) / a * a;
+}
+
 // -------------------- AVX2 microkernel: MR=4, NR=4 (double) --------------------
 __attribute__((noinline))
 static void gemm_kernel_4x4_avx2(
     const double *Acol, const double *Brow, double *Crow,
     uint64_t M, uint64_t N, uint64_t K,
+    uint64_t ldb, uint64_t ldc,
     uint64_t i, uint64_t j
 ) {
-    // Load C block (4 rows x 4 cols). Each column is a __m256d (4 doubles).
-    __m256d c0 = _mm256_loadu_pd(&Crow[(i + 0) * N + (j + 0)]); // rows i..i+3, col j+0 (not contiguous!)
-    // Above would be wrong for row-major; rows are strided by N.
-    // Instead, we store C row-major and load 4 elements from ONE ROW contiguous.
-    // So for AVX2 we vectorize across columns (NR=4) for a single row at a time.
-    //
-    // We'll compute 4 rows, each row vectorized across 4 columns.
-
-    __m256d c_r0 = _mm256_loadu_pd(&Crow[(i + 0) * N + j]);
-    __m256d c_r1 = _mm256_loadu_pd(&Crow[(i + 1) * N + j]);
-    __m256d c_r2 = _mm256_loadu_pd(&Crow[(i + 2) * N + j]);
-    __m256d c_r3 = _mm256_loadu_pd(&Crow[(i + 3) * N + j]);
+    // Load C block (4 rows x 4 cols), aligned
+    __m256d c_r0 = _mm256_load_pd(&Crow[(i + 0) * ldc + j]);
+    __m256d c_r1 = _mm256_load_pd(&Crow[(i + 1) * ldc + j]);
+    __m256d c_r2 = _mm256_load_pd(&Crow[(i + 2) * ldc + j]);
+    __m256d c_r3 = _mm256_load_pd(&Crow[(i + 3) * ldc + j]);
 
     for (uint64_t k = 0; k < K; k++) {
-        // Load B row k, columns j..j+3 (contiguous)
-        __m256d b = _mm256_loadu_pd(&Brow[k * N + j]);
+        // Load B row k, columns j..j+3 (aligned)
+        __m256d b = _mm256_load_pd(&Brow[k * ldb + j]);
 
         // Load A scalars for 4 rows at column k from Acol (column-major)
         double a0 = Acol[k * M + (i + 0)];
@@ -58,12 +56,12 @@ static void gemm_kernel_4x4_avx2(
         c_r3 = _mm256_fmadd_pd(_mm256_set1_pd(a3), b, c_r3);
     }
 
-    _mm256_storeu_pd(&Crow[(i + 0) * N + j], c_r0);
-    _mm256_storeu_pd(&Crow[(i + 1) * N + j], c_r1);
-    _mm256_storeu_pd(&Crow[(i + 2) * N + j], c_r2);
-    _mm256_storeu_pd(&Crow[(i + 3) * N + j], c_r3);
+    _mm256_store_pd(&Crow[(i + 0) * ldc + j], c_r0);
+    _mm256_store_pd(&Crow[(i + 1) * ldc + j], c_r1);
+    _mm256_store_pd(&Crow[(i + 2) * ldc + j], c_r2);
+    _mm256_store_pd(&Crow[(i + 3) * ldc + j], c_r3);
 
-    (void)c0; // silence unused warning from earlier note
+    (void)N;
 }
 
 // -------------------- AVX-512 microkernel: MR=8, NR=8 (double) --------------------
@@ -72,21 +70,22 @@ __attribute__((noinline))
 static void gemm_kernel_8x8_avx512(
     const double *Acol, const double *Brow, double *Crow,
     uint64_t M, uint64_t N, uint64_t K,
+    uint64_t ldb, uint64_t ldc,
     uint64_t i, uint64_t j
 ) {
     // C rows i..i+7, columns j..j+7 (row-major, contiguous across columns)
-    __m512d c0 = _mm512_loadu_pd(&Crow[(i + 0) * N + j]);
-    __m512d c1 = _mm512_loadu_pd(&Crow[(i + 1) * N + j]);
-    __m512d c2 = _mm512_loadu_pd(&Crow[(i + 2) * N + j]);
-    __m512d c3 = _mm512_loadu_pd(&Crow[(i + 3) * N + j]);
-    __m512d c4 = _mm512_loadu_pd(&Crow[(i + 4) * N + j]);
-    __m512d c5 = _mm512_loadu_pd(&Crow[(i + 5) * N + j]);
-    __m512d c6 = _mm512_loadu_pd(&Crow[(i + 6) * N + j]);
-    __m512d c7 = _mm512_loadu_pd(&Crow[(i + 7) * N + j]);
+    __m512d c0 = _mm512_load_pd(&Crow[(i + 0) * ldc + j]);
+    __m512d c1 = _mm512_load_pd(&Crow[(i + 1) * ldc + j]);
+    __m512d c2 = _mm512_load_pd(&Crow[(i + 2) * ldc + j]);
+    __m512d c3 = _mm512_load_pd(&Crow[(i + 3) * ldc + j]);
+    __m512d c4 = _mm512_load_pd(&Crow[(i + 4) * ldc + j]);
+    __m512d c5 = _mm512_load_pd(&Crow[(i + 5) * ldc + j]);
+    __m512d c6 = _mm512_load_pd(&Crow[(i + 6) * ldc + j]);
+    __m512d c7 = _mm512_load_pd(&Crow[(i + 7) * ldc + j]);
 
     for (uint64_t k = 0; k < K; k++) {
-        // Load 8 columns of B for this k (contiguous)
-        __m512d b = _mm512_loadu_pd(&Brow[k * N + j]);
+        // Load 8 columns of B for this k (aligned)
+        __m512d b = _mm512_load_pd(&Brow[k * ldb + j]);
 
         // Broadcast A(i..i+7, k) scalars
         double a0 = Acol[k * M + (i + 0)];
@@ -108,32 +107,39 @@ static void gemm_kernel_8x8_avx512(
         c7 = _mm512_fmadd_pd(_mm512_set1_pd(a7), b, c7);
     }
 
-    _mm512_storeu_pd(&Crow[(i + 0) * N + j], c0);
-    _mm512_storeu_pd(&Crow[(i + 1) * N + j], c1);
-    _mm512_storeu_pd(&Crow[(i + 2) * N + j], c2);
-    _mm512_storeu_pd(&Crow[(i + 3) * N + j], c3);
-    _mm512_storeu_pd(&Crow[(i + 4) * N + j], c4);
-    _mm512_storeu_pd(&Crow[(i + 5) * N + j], c5);
-    _mm512_storeu_pd(&Crow[(i + 6) * N + j], c6);
-    _mm512_storeu_pd(&Crow[(i + 7) * N + j], c7);
+    _mm512_store_pd(&Crow[(i + 0) * ldc + j], c0);
+    _mm512_store_pd(&Crow[(i + 1) * ldc + j], c1);
+    _mm512_store_pd(&Crow[(i + 2) * ldc + j], c2);
+    _mm512_store_pd(&Crow[(i + 3) * ldc + j], c3);
+    _mm512_store_pd(&Crow[(i + 4) * ldc + j], c4);
+    _mm512_store_pd(&Crow[(i + 5) * ldc + j], c5);
+    _mm512_store_pd(&Crow[(i + 6) * ldc + j], c6);
+    _mm512_store_pd(&Crow[(i + 7) * ldc + j], c7);
+
+    (void)N;
 }
 #endif
 
-static void init_mats(double *Acol, double *Brow, double *Crow, uint64_t M, uint64_t N, uint64_t K) {
+static void init_mats(double *Acol, double *Brow, double *Crow,
+                      uint64_t M, uint64_t N, uint64_t K,
+                      uint64_t ldb, uint64_t ldc) {
     // Acol: MxK column-major => Acol[k*M + i]
     for (uint64_t k = 0; k < K; k++)
         for (uint64_t i = 0; i < M; i++)
             Acol[k * M + i] = 1.0 + (double)((i + k) & 7) * 0.001;
 
-    // Brow: KxN row-major => Brow[k*N + j]
-    for (uint64_t k = 0; k < K; k++)
+    // Brow: Kxldb row-major, initialize padding to 0
+    for (uint64_t k = 0; k < K; k++) {
+        for (uint64_t j = 0; j < ldb; j++)
+            Brow[k * ldb + j] = 0.0;
         for (uint64_t j = 0; j < N; j++)
-            Brow[k * N + j] = 1.0 + (double)((j + k) & 7) * 0.002;
+            Brow[k * ldb + j] = 1.0 + (double)((j + k) & 7) * 0.002;
+    }
 
-    // Crow: MxN row-major
+    // Crow: Mxldc row-major, initialize padding to 0
     for (uint64_t i = 0; i < M; i++)
-        for (uint64_t j = 0; j < N; j++)
-            Crow[i * N + j] = 0.0;
+        for (uint64_t j = 0; j < ldc; j++)
+            Crow[i * ldc + j] = 0.0;
 }
 
 int main(int argc, char **argv) {
@@ -160,15 +166,9 @@ int main(int argc, char **argv) {
     }
 
     // Allocate aligned
-    double *Acol = (double*)aligned_malloc(64, sizeof(double) * M * K);
-    double *Brow = (double*)aligned_malloc(64, sizeof(double) * K * N);
-    double *Crow = (double*)aligned_malloc(64, sizeof(double) * M * N);
-    if (!Acol || !Brow || !Crow) {
-        fprintf(stderr, "Allocation failed\n");
-        return 1;
-    }
-
-    init_mats(Acol, Brow, Crow, M, N, K);
+    double *Acol;
+    double *Brow;
+    double *Crow;
 
     printf("ROI_START\n");
 #ifdef USE_SNIPER
@@ -187,13 +187,26 @@ int main(int argc, char **argv) {
         return 1;
     }
 
+    uint64_t ldb = round_up_u64(N, NR);
+    uint64_t ldc = round_up_u64(N, NR);
+
+    Acol = (double*)aligned_malloc(64, sizeof(double) * M * K);
+    Brow = (double*)aligned_malloc(64, sizeof(double) * K * ldb);
+    Crow = (double*)aligned_malloc(64, sizeof(double) * M * ldc);
+    if (!Acol || !Brow || !Crow) {
+        fprintf(stderr, "Allocation failed\n");
+        return 1;
+    }
+
+    init_mats(Acol, Brow, Crow, M, N, K, ldb, ldc);
+
     for (uint64_t iter = 0; iter < iters; iter++) {
         for (uint64_t i = 0; i + MR <= M; i += MR) {
             for (uint64_t j = 0; j + NR <= N; j += NR) {
 #ifdef __AVX512F__
-                gemm_kernel_8x8_avx512(Acol, Brow, Crow, M, N, K, i, j);
+                gemm_kernel_8x8_avx512(Acol, Brow, Crow, M, N, K, ldb, ldc, i, j);
 #else
-                gemm_kernel_4x4_avx2(Acol, Brow, Crow, M, N, K, i, j);
+                gemm_kernel_4x4_avx2(Acol, Brow, Crow, M, N, K, ldb, ldc, i, j);
 #endif
             }
         }
@@ -206,7 +219,10 @@ int main(int argc, char **argv) {
 
     // Prevent DCE
     double sum = 0.0;
-    for (uint64_t i = 0; i < M * N; i++) sum += Crow[i];
+    for (uint64_t i = 0; i < M; i++)
+        for (uint64_t j = 0; j < N; j++)
+            sum += Crow[i * ldc + j];
+
     sink_p = sum;
     fprintf(stderr, "checksum=%f\n", sum);
 
@@ -215,4 +231,3 @@ int main(int argc, char **argv) {
     free(Crow);
     return 0;
 }
-
