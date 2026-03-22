@@ -16,28 +16,53 @@
 /* Prevent compiler from optimizing away loops */
 #define COMPILER_BARRIER() asm volatile("" ::: "memory")
 
-
-#include <stdint.h>
-#include <stdlib.h>
-
 volatile double sink_p;
+volatile double sink;
+
+static void *aligned_malloc(size_t alignment, size_t size)
+{
+    void *p = NULL;
+    if (posix_memalign(&p, alignment, size) != 0) return NULL;
+    return p;
+}
+
+static inline uint64_t round_up_u64(uint64_t x, uint64_t a)
+{
+    return (x + a - 1) / a * a;
+}
 
 /* -------------------------------------------------
  * Compute-bound frequency-scaling kernel - Parallel
  * ------------------------------------------------- */
-
 void freq_kernel_p(uint64_t iters, uint64_t N, uint64_t stride)
 {
-    double *a = malloc(N * sizeof(double));
-    double *b = malloc(N * sizeof(double));
-    double *c = malloc(N * sizeof(double));
+    uint64_t N_pad = round_up_u64(N, 8);
+
+    double *a = aligned_malloc(64, N_pad * sizeof(double));
+    double *b = aligned_malloc(64, N_pad * sizeof(double));
+    double *c = aligned_malloc(64, N_pad * sizeof(double));
+
+    if (!a || !b || !c) {
+        perror("aligned_malloc");
+        free(a);
+        free(b);
+        free(c);
+        exit(1);
+    }
 
     // Initialize arrays
+    for (uint64_t i = 0; i < N_pad; i++) {
+        a[i] = 0.0;
+        b[i] = 0.0;
+        c[i] = 0.0;
+    }
+
     for (uint64_t i = 0; i < N; i++) {
         a[i] = 1.1;
         b[i] = 2.2;
         c[i] = 3.3;
     }
+
     printf("ROI_START\n");
     SimRoiStart();
     for (uint64_t iter = 0; iter < iters; iter++) {
@@ -66,8 +91,6 @@ void freq_kernel_p(uint64_t iters, uint64_t N, uint64_t stride)
 /* -------------------------------------------------
  * Compute-bound frequency-scaling kernel - Serial
  * ------------------------------------------------- */
-volatile double sink;
-
 void freq_kernel(uint64_t iters)
 {
     double a = 1.1, b = 2.2, c = 3.3;
@@ -100,6 +123,7 @@ void cache_kernel(uint64_t *array, uint64_t iters)
     SimRoiEnd();
 
     COMPILER_BARRIER();
+    sink_p = (double)idx;
 }
 
 /* -------------------------------------------------
@@ -135,9 +159,10 @@ int main(int argc, char **argv)
         freq_kernel_p(iters, ws, stride);
     }
     else if (!strcmp(mode, "cache")) {
-        uint64_t *array = aligned_alloc(64, ws * sizeof(uint64_t));
+        uint64_t ws_pad = round_up_u64(ws, 8);
+        uint64_t *array = aligned_malloc(64, ws_pad * sizeof(uint64_t));
         if (!array) {
-            perror("aligned_alloc");
+            perror("aligned_malloc");
             exit(1);
         }
 
@@ -153,4 +178,3 @@ int main(int argc, char **argv)
 
     return 0;
 }
-
