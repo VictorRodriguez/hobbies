@@ -2,6 +2,7 @@ all:
 	gcc -g -std=c99 -O2 -ftree-vectorize add.c -o add
 	gcc -g -std=c99 malloc.c -o malloc
 	gcc -g -std=c99 branches.c -o branches --coverage
+	gcc -g -O3 -march=native -o roi_demo roi_demo.c
 
 static:
 	gcc -static -g -std=c99 add.c -o add
