@@ -190,7 +190,7 @@ int main(int argc, char **argv)
             exit(1);
         }
 
-        init_array(array, ws);
+        init_array(array, ws_pad);
         cache_kernel(array, iters);
 
         free(array);
