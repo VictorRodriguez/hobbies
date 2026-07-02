@@ -1,5 +1,4 @@
-
-#define SIZE 100000
+#define SIZE 10000
 
 int a[SIZE];
 int b[SIZE];

@@ -5,7 +5,7 @@
 #include <string.h>
 int main( int argc, char *argv[] ) {
 	char *str,*p;
-	unsigned int secs = 30;
+	unsigned int secs = 15;
 	unsigned int timer;
 	int block = 100;
 	if( argc == 2 ) {
