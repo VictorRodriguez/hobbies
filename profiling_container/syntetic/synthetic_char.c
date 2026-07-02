@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <assert.h>
 
 /* -------------------------------------------------
  * Sniper ROI hooks
@@ -15,6 +16,7 @@
 
 /* Prevent compiler from optimizing away loops */
 #define COMPILER_BARRIER() asm volatile("" ::: "memory")
+#define ELEMS_PER_LINE 8   // 64B cache line / 8B per uint64_t or double
 
 volatile double sink_p;
 volatile double sink;
@@ -129,11 +131,33 @@ void cache_kernel(uint64_t *array, uint64_t iters)
 /* -------------------------------------------------
  * Initialize pointer-chasing array
  * ------------------------------------------------- */
-void init_array(uint64_t *array, uint64_t size, uint64_t stride)
+void init_array(uint64_t *array, uint64_t size)
 {
-    for (uint64_t i = 0; i < size; i++) {
-        array[i] = (i + stride) % size;
+    assert((size & (size - 1)) == 0);                  // size is power of 2
+    assert((size % ELEMS_PER_LINE) == 0);              // whole number of cache lines
+
+    uint64_t lines = size / ELEMS_PER_LINE;
+    assert((lines & (lines - 1)) == 0);                // lines is also power of 2
+
+    uint64_t mask = lines - 1;
+
+    /* odd constant => permutation modulo 2^k */
+    const uint64_t A = 11400714819323198485ull;
+
+    uint64_t prev_idx   = 0; 
+    uint64_t cur_line;
+    uint64_t cur_idx;
+    
+    for (uint64_t i = 1; i < lines; i++) {
+        cur_line = (i * A) & mask;
+        cur_idx  = cur_line * ELEMS_PER_LINE;
+
+        array[prev_idx] = cur_idx;
+        prev_idx = cur_idx;
     }
+
+    // close the cycle
+    array[prev_idx] = 0;
 }
 
 /* -------------------------------------------------
@@ -166,7 +190,7 @@ int main(int argc, char **argv)
             exit(1);
         }
 
-        init_array(array, ws, stride);
+        init_array(array, ws_pad);
         cache_kernel(array, iters);
 
         free(array);
