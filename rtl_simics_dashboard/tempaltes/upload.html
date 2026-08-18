@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Add Component</title>
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Add RTL / Simics Component</h1>
+
+    <div class="card">
+
+        <form
+            method="POST"
+            enctype="multipart/form-data"
+        >
+
+            <label>
+                Component Name
+            </label>
+
+            <input
+                type="text"
+                name="component_name"
+                placeholder="PCIe Controller"
+                required
+            >
+
+            <label>
+                RTL Analysis JSON
+            </label>
+
+            <input
+                type="file"
+                name="rtl_file"
+                accept=".json"
+                required
+            >
+
+            <label>
+                Simics Analysis JSON
+            </label>
+
+            <input
+                type="file"
+                name="simics_file"
+                accept=".json"
+                required
+            >
+
+            <label>
+                RTL vs Simics Comparison JSON
+            </label>
+
+            <input
+                type="file"
+                name="comparison_file"
+                accept=".json"
+                required
+            >
+
+            <button type="submit">
+                Create Component
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

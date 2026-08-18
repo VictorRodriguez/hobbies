@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>
+        {{ metadata.name }}
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <a href="/">
+        ← All Components
+    </a>
+
+    <h1>
+        {{ metadata.name }}
+    </h1>
+
+    <div class="metrics">
+
+        <div class="metric">
+
+            <span>RTL Complexity</span>
+
+            <strong>
+                {{
+                    comparison.get(
+                        "rtl_complexity",
+                        rtl.get(
+                            "complexity_score",
+                            "N/A"
+                        )
+                    )
+                }}
+            </strong>
+
+        </div>
+
+        <div class="metric">
+
+            <span>Simics Level</span>
+
+            <strong>
+                {{
+                    comparison.get(
+                        "simics_level",
+                        simics.get(
+                            "model_level",
+                            "N/A"
+                        )
+                    )
+                }}
+            </strong>
+
+        </div>
+
+        <div class="metric">
+
+            <span>Fidelity Coverage</span>
+
+            <strong>
+                {{
+                    comparison.get(
+                        "fidelity_coverage",
+                        "N/A"
+                    )
+                }}
+            </strong>
+
+        </div>
+
+        <div class="metric">
+
+            <span>Gap Score</span>
+
+            <strong>
+                {{
+                    comparison.get(
+                        "gap_score",
+                        "N/A"
+                    )
+                }}
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Adequacy</h2>
+
+        <h3>
+            {{
+                comparison.get(
+                    "adequacy",
+                    "Unknown"
+                )
+            }}
+        </h3>
+
+        <p>
+            Validation objective:
+            <strong>
+                {{
+                    comparison.get(
+                        "validation_objective",
+                        "Not specified"
+                    )
+                }}
+            </strong>
+        </p>
+
+    </div>
+
+
+    {% if comparison.get("capabilities") %}
+
+    <div class="card">
+
+        <h2>Capability Coverage</h2>
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>Capability</th>
+                    <th>Required</th>
+                    <th>Match</th>
+                    <th>Confidence</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+            {% for capability in comparison.capabilities %}
+
+                <tr>
+
+                    <td>
+                        {{
+                            capability.get(
+                                "name",
+                                "Unknown"
+                            )
+                        }}
+                    </td>
+
+                    <td>
+                        {{
+                            capability.get(
+                                "required",
+                                ""
+                            )
+                        }}
+                    </td>
+
+                    <td>
+                        {{
+                            capability.get(
+                                "match",
+                                ""
+                            )
+                        }}
+                    </td>
+
+                    <td>
+                        {{
+                            capability.get(
+                                "confidence",
+                                ""
+                            )
+                        }}
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    {% endif %}
+
+
+    <div class="grid">
+
+        <div class="card">
+
+            <h2>RTL Analysis</h2>
+
+            <pre>
+{{ rtl | tojson(indent=2) }}
+            </pre>
+
+        </div>
+
+
+        <div class="card">
+
+            <h2>Simics Analysis</h2>
+
+            <pre>
+{{ simics | tojson(indent=2) }}
+            </pre>
+
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Final Comparison</h2>
+
+        <pre>
+{{ comparison | tojson(indent=2) }}
+        </pre>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>
