@@ -1,6 +1,8 @@
 # PID-Level Microarchitectural Workload Characterization
 ## Time-domain, frequency-domain, and hybrid analysis with Intel PCM / PMU telemetry
 
+> **GitHub rendering note:** Display equations use GitHub's fenced `math` blocks for reliable rendering across desktop and web views.
+
 This tutorial develops a practical methodology for characterizing short execution windows from individual PIDs using microarchitectural measurements such as CPI, IPC, cache MPKI, branch MPKI, and related counters.
 
 The long-term objective is to build an **online PID-level detector** that identifies processes whose microarchitectural behavior makes them good candidates for further ransomware investigation.
@@ -13,28 +15,28 @@ The long-term objective is to build an **online PID-level detector** that identi
 
 For each active PID, Intel PCM or another PMU collection mechanism provides repeated measurements such as:
 
-$$
+```math
 \mathbf{x}_p(t)=
-\left[
+[
 CPI(t),
 IPC(t),
 LLCMPKI(t),
 BranchMPKI(t),
 \ldots
-\right].
-$$
+].
+```
 
 Instead of waiting until the process finishes, execution is divided into short observation windows:
 
-$$
+```math
 W_{p,k}=
-\left\{
+\{
 \mathbf{x}_p(t_k),
 \mathbf{x}_p(t_k+1),
 \ldots,
 \mathbf{x}_p(t_k+N-1)
-\right\}.
-$$
+\}.
+```
 
 Each window is treated as a **small workload instance** and converted into a fixed-length feature vector.
 
@@ -95,9 +97,9 @@ PID 4821
 
 If the sample frequency is $f_s$ samples/second, then each window contains approximately
 
-$$
+```math
 N = f_s T_w
-$$
+```
 
 samples.
 
@@ -141,19 +143,19 @@ The simplest useful feature is the mean.
 
 For a metric $x$ with $N$ samples:
 
-$$
+```math
 \mu_x =
 \frac{1}{N}
 \sum_{i=1}^{N}x_i.
-$$
+```
 
 For CPI:
 
-$$
+```math
 \mu_{CPI}=
 \frac{1}{N}
 \sum_{i=1}^{N} CPI_i.
-$$
+```
 
 The mean describes the typical level of the metric within one window.
 
@@ -161,37 +163,35 @@ However, the mean alone loses information about variability.
 
 Therefore we also calculate the standard deviation:
 
-$$
+```math
 \sigma_x=
 \sqrt{
 \frac{1}{N}
 \sum_{i=1}^{N}
 (x_i-\mu_x)^2
 }.
-$$
+```
 
 The first practical time-domain representation is therefore:
 
-$$
-\boxed{
+```math
 F_{time}=
 [\mu,\sigma]
-}
-$$
+```
 
 for every PMU metric.
 
 For example, if we collect four metrics:
 
-$$
+```math
 CPI,\ IPC,\ LLCMPKI,\ BranchMPKI,
-$$
+```
 
 then a window becomes:
 
-$$
+```math
 \mathbf{f}_{time}=
-\left[
+[
 \mu_{CPI},
 \sigma_{CPI},
 \mu_{IPC},
@@ -200,8 +200,8 @@ $$
 \sigma_{LLCMPKI},
 \mu_{BranchMPKI},
 \sigma_{BranchMPKI}
-\right].
-$$
+].
+```
 
 ---
 
@@ -219,11 +219,11 @@ The main idea is:
 
 So instead of having one row per complete benchmark, we now have one row per:
 
-$$
-\boxed{
+```math
+
 PID + time\ window
-}
-$$
+
+```
 
 ---
 
@@ -233,35 +233,35 @@ Consider two signals.
 
 Signal A:
 
-$$
+```math
 A=[1,1,1,1,1]
-$$
+```
 
 Signal B:
 
-$$
+```math
 B=[0,2,0,2,1].
-$$
+```
 
 Both have:
 
-$$
+```math
 \mu_A=\mu_B=1.
-$$
+```
 
 But their temporal behavior is obviously different.
 
 The standard deviation helps:
 
-$$
+```math
 \sigma_A=0
-$$
+```
 
 while
 
-$$
+```math
 \sigma_B>0.
-$$
+```
 
 However, even mean and standard deviation can fail to capture **how variation is organized in time**.
 
@@ -279,35 +279,35 @@ This motivates frequency-domain analysis.
 
 For a discrete signal
 
-$$
+```math
 x[0],x[1],\ldots,x[N-1],
-$$
+```
 
 the Discrete Fourier Transform is:
 
-$$
+```math
 X[k]
 =
 \sum_{n=0}^{N-1}
 x[n]
 e^{-j2\pi kn/N}.
-$$
+```
 
 The FFT is an efficient algorithm for computing the DFT.
 
 The magnitude
 
-$$
+```math
 |X[k]|
-$$
+```
 
 tells us how strongly each frequency component is represented.
 
 A simple power representation is:
 
-$$
+```math
 P[k]=|X[k]|^2.
-$$
+```
 
 ---
 
@@ -317,15 +317,15 @@ The zero-frequency FFT component is the **DC component**, which is strongly rela
 
 To focus on temporal variation, first center the signal:
 
-$$
+```math
 x_c[n]=x[n]-\mu_x.
-$$
+```
 
 Then calculate:
 
-$$
+```math
 X_c[k]=FFT(x_c[n]).
-$$
+```
 
 This prevents the average level from dominating the spectral representation.
 
@@ -353,44 +353,44 @@ Rather than feeding every FFT bin directly into the first ML experiment, summari
 
 The dominant non-zero frequency is:
 
-$$
+```math
 f_{peak}
 =
-\underset{f>0}{\operatorname{argmax}}\,P(f).
-$$
+\underset{f>0}{\mathrm{arg\,max}}\,P(f).
+```
 
 ## 10.2 Peak power
 
-$$
+```math
 P_{peak}
 =
 \max_{f>0}P(f).
-$$
+```
 
 ## 10.3 Total spectral energy
 
-$$
+```math
 E=
 \sum_{f>0}P(f).
-$$
+```
 
 ## 10.4 Spectral entropy
 
 First normalize the spectrum:
 
-$$
+```math
 p_k=
 \frac{P[k]}
 {\sum_j P[j]}.
-$$
+```
 
 Then:
 
-$$
+```math
 H_s=
 -\sum_k
 p_k\log_2(p_k).
-$$
+```
 
 Interpretation:
 
@@ -399,7 +399,7 @@ Interpretation:
 
 The resulting frequency-domain feature vector can be written as:
 
-$$
+```math
 \mathbf{f}_{freq}
 =
 [
@@ -409,7 +409,7 @@ E,
 H_s,
 \ldots
 ].
-$$
+```
 
 These quantities are calculated independently for selected PMU metrics.
 
@@ -433,39 +433,39 @@ Spectral analysis depends critically on the sampling frequency.
 
 If PCM measurements are collected at
 
-$$
+```math
 f_s
-$$
+```
 
 samples per second, the Nyquist frequency is:
 
-$$
+```math
 f_{Nyquist}
 =
 \frac{f_s}{2}.
-$$
+```
 
 The approximate FFT frequency resolution is:
 
-$$
+```math
 \Delta f
 =
 \frac{f_s}{N}.
-$$
+```
 
 Since
 
-$$
+```math
 N=f_sT_w,
-$$
+```
 
 we obtain:
 
-$$
+```math
 \Delta f
 =
 \frac{1}{T_w}.
-$$
+```
 
 This gives two useful design rules:
 
@@ -482,15 +482,15 @@ The experiment should compare three representations.
 
 ## A. Time domain
 
-$$
+```math
 F_{time}
 =
 [\mu,\sigma].
-$$
+```
 
 ## B. Frequency domain
 
-$$
+```math
 F_{freq}
 =
 [
@@ -499,20 +499,18 @@ P_{peak},
 E,
 H_s
 ].
-$$
+```
 
 ## C. Hybrid representation
 
-$$
-\boxed{
+```math
 F_{hybrid}
 =
 [
 F_{time},
 F_{freq}
 ]
-}
-$$
+```
 
 The central research question becomes:
 
@@ -536,11 +534,11 @@ PID   Window   Class             mu_CPI   std_CPI   CPI_peak_f   CPI_entropy
 
 The resulting feature matrix is:
 
-$$
+```math
 F
 \in
 \mathbb{R}^{M\times D},
-$$
+```
 
 where:
 
@@ -555,7 +553,7 @@ PMU and spectral features have very different numerical scales.
 
 For feature $j$, standardization is:
 
-$$
+```math
 z_{ij}
 =
 \frac{
@@ -563,7 +561,7 @@ f_{ij}-\mu_j
 }{
 \sigma_j
 }.
-$$
+```
 
 This produces approximately zero-mean, unit-variance features.
 
@@ -575,26 +573,26 @@ Without this step, a feature with a numerically large range can dominate the cov
 
 Let the standardized matrix be:
 
-$$
+```math
 Z.
-$$
+```
 
 Its covariance matrix is approximately:
 
-$$
+```math
 C
 =
 \frac{1}{M-1}
 Z^T Z.
-$$
+```
 
 PCA solves the eigenvalue problem:
 
-$$
+```math
 C\mathbf{v}_i
 =
 \lambda_i\mathbf{v}_i.
-$$
+```
 
 The eigenvectors $\mathbf{v}_i$ define the principal-component directions.
 
@@ -602,11 +600,11 @@ The eigenvalues $\lambda_i$ describe the variance explained by those directions.
 
 A sample $\mathbf{z}$ is projected onto principal component $i$ as:
 
-$$
+```math
 PC_i
 =
 \mathbf{z}\cdot\mathbf{v}_i.
-$$
+```
 
 ---
 
@@ -618,13 +616,13 @@ Before looking only at PC1 and PC2, inspect how much information the principal c
 
 The cumulative explained variance is:
 
-$$
+```math
 EVR_{cum}(K)
 =
 \sum_{i=1}^{K}
 \frac{\lambda_i}
 {\sum_j\lambda_j}.
-$$
+```
 
 This tells us how many components are necessary to preserve most of the variance in the feature space.
 
@@ -634,11 +632,11 @@ This tells us how many components are necessary to preserve most of the variance
 
 The first experiment uses only:
 
-$$
+```math
 \mu
 \quad\text{and}\quad
 \sigma.
-$$
+```
 
 ![PCA time-domain features](pcm_demo_output/08_pca_time_domain.png)
 
@@ -654,12 +652,12 @@ This answers:
 
 Next use only spectral characteristics:
 
-$$
+```math
 f_{peak},
 P_{peak},
 E,
 H_s.
-$$
+```
 
 ![PCA frequency-domain features](pcm_demo_output/09_pca_frequency_domain.png)
 
@@ -673,14 +671,14 @@ This answers a different question:
 
 Finally combine both domains:
 
-$$
+```math
 F_{hybrid}
 =
 [
 F_{time},
 F_{freq}
 ].
-$$
+```
 
 ![PCA hybrid features](pcm_demo_output/10_pca_hybrid.png)
 
@@ -713,23 +711,23 @@ The benign dataset should contain workloads that may be microarchitecturally sim
 
 The real problem is:
 
-$$
-\boxed{
+```math
+
 Ransomware
 \quad
 vs.
 \quad
 legitimate\ workloads\ with\ similar\ behavior
-}
-$$
+
+```
 
 This is much more meaningful than simply learning:
 
-$$
+```math
 high\ CPU\ activity
 \Rightarrow
 ransomware.
-$$
+```
 
 ---
 
@@ -739,14 +737,14 @@ PCA and clustering are useful first steps for understanding the data.
 
 The eventual detector would move toward a supervised estimate such as:
 
-$$
+```math
 P
-\left(
+(
 RansomwareCandidate
 \mid
 W_{p,t}
-\right).
-$$
+).
+```
 
 For example:
 
@@ -762,9 +760,9 @@ Window 5  -> suspicious
 
 Instead of acting on one isolated prediction, the system can require persistence:
 
-$$
+```math
 P(R\mid W_{p,t})>\tau
-$$
+```
 
 for $K$ consecutive windows.
 
@@ -778,13 +776,13 @@ For a security-oriented system, classification accuracy is not enough.
 
 A key metric is detection latency:
 
-$$
+```math
 T_{detect}
 =
 T_{alert}
 -
 T_{attack\ onset}.
-$$
+```
 
 Window length directly affects this quantity.
 
@@ -792,9 +790,9 @@ For example, if the detector requires a complete 10-second window before making 
 
 Therefore the experimental study should compare multiple values of:
 
-$$
+```math
 T_w.
-$$
+```
 
 ---
 
@@ -860,19 +858,19 @@ The fact that PCM produces time-series data does **not** mean that the first mod
 
 A strong interpretable baseline is:
 
-$$
-\boxed{
+```math
+
 PID\ telemetry
-\rightarrow
+arrow
 windows
-\rightarrow
+arrow
 time/frequency\ characterization
-\rightarrow
+arrow
 PCA
-\rightarrow
+arrow
 clustering/classification
-}
-$$
+
+```
 
 The time-domain representation captures **how much** a metric changes.
 
@@ -880,8 +878,7 @@ The frequency-domain representation captures **how that change is organized in t
 
 The hybrid representation combines both:
 
-$$
-\boxed{
+```math
 F_{hybrid}
 =
 [
@@ -893,12 +890,10 @@ E,
 H_s,
 \ldots
 ]
-}
-$$
+```
 
 The next scientific question is therefore not merely whether FFT can be applied to PMU data.
 
 It is:
 
 > **Does spectral characterization provide additional information that improves PID-level discrimination of ransomware candidates from realistic benign workloads?**
-
